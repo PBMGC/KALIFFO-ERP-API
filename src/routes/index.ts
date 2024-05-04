@@ -9,11 +9,11 @@ const cleanFileName = (fileName: string) => {
   return file;
 };
 
-readdirSync(PATH_ROUTER).filter((filename) => {
-  const cleanName = cleanFileName(filename);
+readdirSync(PATH_ROUTER).filter((fileName) => {
+  const cleanName = cleanFileName(fileName);
   if (cleanName !== "index") {
     import(`./${cleanName}`).then((m) => {
-      router.use(`${cleanName}`, m.router);
+      router.use(`/${cleanName}`, m.router);
     });
   }
 });
