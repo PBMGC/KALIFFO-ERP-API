@@ -4,8 +4,8 @@ import { router } from "../routes";
 import { Categoria } from "./categoria";
 import { Cliente } from "./cliente";
 import { Producto } from "./producto";
-import { Boleta } from "./boleto";
-import { DetalleBoleta } from "./boletaDetalle";
+import { Venta } from "./venta";
+import { DetalleVenta } from "./detalleVenta";
 
 class Serve {
   app: express.Application;
@@ -41,8 +41,8 @@ class Serve {
       await Categoria.sync();
       await Cliente.sync();
       await Producto.sync();
-      await Boleta.sync();
-      await DetalleBoleta.sync();
+      await Venta.sync();
+      await DetalleVenta.sync();
     } catch (error) {
       console.log(error);
     }

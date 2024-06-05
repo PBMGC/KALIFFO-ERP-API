@@ -1,18 +1,17 @@
 import { DataTypes, Model } from "sequelize";
-import { DetalleBoleta as DetalleBoletaInterface } from "../interface/detalleBoleta";
+import { DetalleVenta as DetalleVentaInterface } from "../interface/detalleVenta";
 import sequelize from "../db/connection";
-import { Cliente } from "./cliente";
-import { Boleta } from "./boleto";
 import { Producto } from "./producto";
+import { Venta } from "./venta";
 
-export interface DetalleBoletaModel
-  extends Model<DetalleBoletaInterface>,
-    DetalleBoletaInterface {}
+export interface DetalleVentaModel
+  extends Model<DetalleVentaInterface>,
+    DetalleVentaInterface {}
 
-export const DetalleBoleta = sequelize.define<DetalleBoletaModel>(
+export const DetalleVenta = sequelize.define<DetalleVentaModel>(
   "boleta",
   {
-    detalleBoleta_id: {
+    detalleVenta_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -25,8 +24,8 @@ export const DetalleBoleta = sequelize.define<DetalleBoletaModel>(
       type: DataTypes.FLOAT(5, 2),
       allowNull: false,
     },
-    boleta_id: {
-      type: DataTypes.INTEGER,
+    codigo: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     producto_id: {
@@ -39,10 +38,10 @@ export const DetalleBoleta = sequelize.define<DetalleBoletaModel>(
   }
 );
 
-DetalleBoleta.belongsTo(Boleta, {
-  foreignKey: "boleta_id",
+DetalleVenta.belongsTo(Venta, {
+  foreignKey: "codigo",
 });
 
-DetalleBoleta.belongsTo(Producto, {
+DetalleVenta.belongsTo(Producto, {
   foreignKey: "producto_id",
 });

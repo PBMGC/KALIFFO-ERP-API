@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import { Categoria as CategoriaInterface } from "../interface/categoria";
 import { Categoria } from "../models/categoria";
 
@@ -48,7 +49,7 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
       };
     }
 
-    Categoria.create(categoria);
+    await Categoria.create(categoria);
 
     return {
       msg: `Categoria de ${categoria.tipo} creada => ${categoria.categoria}`,
@@ -65,7 +66,7 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
 
 export const _deleteCategoria = async (categoria_id: string) => {
   try {
-    if (await Categoria.findOne({ where: { categoria_id: categoria_id } })) {
+    if (!(await Categoria.findOne({ where: { categoria_id: categoria_id } }))) {
       return {
         msg: `no exite la categoria con id ${categoria_id}`,
         status: 400,
@@ -81,6 +82,35 @@ export const _deleteCategoria = async (categoria_id: string) => {
   } catch (error) {
     return {
       msg: "error _deleteCategoria",
+      error,
+      status: 400,
+    };
+  }
+};
+
+export const _updateCategoria = async (categoria: CategoriaInterface) => {
+  try {
+    if (
+      !(await Categoria.findOne({
+        where: { categoria_id: categoria.categoria_id },
+      }))
+    ) {
+      return {
+        msg: `La categoria con id => ${categoria.categoria_id} no existe`,
+        status: 400,
+      };
+    }
+    await Categoria.update(categoria, {
+      where: { categoria_id: categoria.categoria_id },
+    });
+
+    return {
+      msg: `Categoria tipo ${categoria.tipo} con id ${categoria.categoria_id} a sido actualizada`,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      msg: "error _updateCategoria",
       error,
       status: 400,
     };

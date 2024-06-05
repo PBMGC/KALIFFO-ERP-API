@@ -31,6 +31,10 @@ export const Producto = sequelize.define<ProductoModel>(
       type: DataTypes.FLOAT(5, 2),
       allowNull: false,
     },
+    descuento: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     categoria_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
