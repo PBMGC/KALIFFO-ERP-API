@@ -29,7 +29,7 @@ export const getVenta = async (req: Request, res: Response) => {
 
 export const createVenta = async (req: Request, res: Response) => {
   const {
-    codigo,
+    codigo_venta,
     metodoVenta,
     metodoPago,
     tipoVenta,
@@ -38,11 +38,11 @@ export const createVenta = async (req: Request, res: Response) => {
     igv,
     precioTotal,
     fecha,
-    cliente_id,
+    codigo_cliente,
   } = req.body;
 
   const venta: Venta = {
-    codigo,
+    codigo_venta,
     metodoVenta,
     metodoPago,
     tipoVenta,
@@ -51,7 +51,7 @@ export const createVenta = async (req: Request, res: Response) => {
     igv,
     precioTotal,
     fecha,
-    cliente_id,
+    codigo_cliente,
   };
 
   try {
@@ -75,7 +75,7 @@ export const deleteVenta = async (req: Request, res: Response) => {
 
 export const updateVenta = async (req: Request, res: Response) => {
   const {
-    codigo,
+    codigo_venta,
     metodoVenta,
     metodoPago,
     tipoVenta,
@@ -84,11 +84,11 @@ export const updateVenta = async (req: Request, res: Response) => {
     igv,
     precioTotal,
     fecha,
-    cliente_id,
+    codigo_cliente,
   } = req.body;
 
   const venta: Venta = {
-    codigo,
+    codigo_venta,
     metodoVenta,
     metodoPago,
     tipoVenta,
@@ -97,7 +97,7 @@ export const updateVenta = async (req: Request, res: Response) => {
     igv,
     precioTotal,
     fecha,
-    cliente_id,
+    codigo_cliente,
   };
 
   try {

@@ -18,9 +18,9 @@ export const getClientes = async (req: Request, res: Response) => {
 };
 
 export const getCliente = async (req: Request, res: Response) => {
-  const { cliente_id } = req.params;
+  const { codigo } = req.params;
   try {
-    const response = await _getCliente(cliente_id);
+    const response = await _getCliente(codigo);
     res.status(response.status).json(response.item);
   } catch (error) {
     res.status(400).json(error);
@@ -28,12 +28,21 @@ export const getCliente = async (req: Request, res: Response) => {
 };
 
 export const createCliente = async (req: Request, res: Response) => {
-  const { nombre, apellido, edad, telefono, email, estado, categoria_id } =
-    req.body;
+  const {
+    nombre,
+    apellido_paterno,
+    apellido_materno,
+    edad,
+    telefono,
+    email,
+    estado,
+    categoria_id,
+  } = req.body;
 
   const newCliente: Cliente = {
     nombre,
-    apellido,
+    apellido_paterno,
+    apellido_materno,
     edad,
     telefono,
     email,
@@ -50,10 +59,10 @@ export const createCliente = async (req: Request, res: Response) => {
 };
 
 export const deleteCliente = async (req: Request, res: Response) => {
-  const { cliente_id } = req.params;
+  const { codigo } = req.params;
 
   try {
-    const response = await _deleteCliente(cliente_id);
+    const response = await _deleteCliente(codigo);
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);
@@ -62,9 +71,10 @@ export const deleteCliente = async (req: Request, res: Response) => {
 
 export const updateCliente = async (req: Request, res: Response) => {
   const {
-    cliente_id,
+    codigo_cliente,
     nombre,
-    apellido,
+    apellido_paterno,
+    apellido_materno,
     edad,
     telefono,
     email,
@@ -73,9 +83,10 @@ export const updateCliente = async (req: Request, res: Response) => {
   } = req.body;
 
   const cliente: Cliente = {
-    cliente_id,
+    codigo_cliente,
     nombre,
-    apellido,
+    apellido_paterno,
+    apellido_materno,
     edad,
     telefono,
     email,

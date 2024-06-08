@@ -18,8 +18,8 @@ export const _getVentas = async () => {
   }
 };
 
-export const _getVenta = async (codigo: string) => {
-  const item = await Venta.findOne({ where: { codigo: codigo } });
+export const _getVenta = async (codigo_venta: string) => {
+  const item = await Venta.findOne({ where: { codigo_venta: codigo_venta } });
 
   try {
     return {
@@ -37,7 +37,7 @@ export const _getVenta = async (codigo: string) => {
 
 export const _createVenta = async (venta: VentaInteface) => {
   try {
-    if (await Venta.findOne({ where: { codigo: venta.codigo } })) {
+    if (await Venta.findOne({ where: { codigo_venta: venta.codigo_venta } })) {
       return {
         msg: "Esta venta ya existe",
         status: 400,
@@ -47,7 +47,7 @@ export const _createVenta = async (venta: VentaInteface) => {
     await Venta.create(venta);
 
     return {
-      msg: `Venta ${venta.codigo} creado`,
+      msg: `Venta ${venta.codigo_venta} creado`,
       status: 200,
     };
   } catch (error) {
@@ -59,18 +59,18 @@ export const _createVenta = async (venta: VentaInteface) => {
   }
 };
 
-export const _deleteVente = async (codigo: string) => {
+export const _deleteVente = async (codigo_venta: string) => {
   try {
-    if (!(await Venta.findOne({ where: { codigo: codigo } }))) {
+    if (!(await Venta.findOne({ where: { codigo_venta: codigo_venta } }))) {
       return {
-        msg: `La venta con codigo ${codigo} no existe`,
+        msg: `La venta con codigo_venta ${codigo_venta} no existe`,
         status: 400,
       };
     }
-    await Venta.destroy({ where: { codigo: codigo } });
+    await Venta.destroy({ where: { codigo_venta: codigo_venta } });
 
     return {
-      msg: `La venta con codigo ${codigo} a sido eliminada`,
+      msg: `La venta con codigo_venta ${codigo_venta} a sido eliminada`,
       status: 200,
     };
   } catch (error) {
@@ -86,21 +86,21 @@ export const _updateVenta = async (venta: VentaInteface) => {
   try {
     if (
       !(await Venta.findOne({
-        where: { codigo: venta.codigo },
+        where: { codigo_venta: venta.codigo_venta },
       }))
     ) {
       return {
-        msg: `La venta con codigo ${venta.codigo} no existe`,
+        msg: `La venta con codigo_venta ${venta.codigo_venta} no existe`,
         status: 400,
       };
     }
 
     await Venta.update(venta, {
-      where: { codigo: venta.codigo },
+      where: { codigo_venta: venta.codigo_venta },
     });
 
     return {
-      msg: `La venta con codigo ${venta.codigo} a sido actualizada`,
+      msg: `La venta con codigo_venta ${venta.codigo_venta} a sido actualizada`,
       status: 200,
     };
   } catch (error) {

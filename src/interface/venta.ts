@@ -1,5 +1,5 @@
 export interface Venta {
-  codigo: string;
+  codigo_venta: string;
   metodoVenta: string;
   metodoPago: string;
   tipoVenta: string;
@@ -9,5 +9,5 @@ export interface Venta {
   precioTotal: number;
   fecha: Date;
 
-  cliente_id: number;
+  codigo_cliente: number;
 }

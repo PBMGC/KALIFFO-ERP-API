@@ -10,16 +10,19 @@ export interface ClienteModel
 export const Cliente = sequelize.define<ClienteModel>(
   "cliente",
   {
-    cliente_id: {
-      type: DataTypes.INTEGER,
+    codigo_cliente: {
+      type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
     },
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    apellido: {
+    apellido_paterno: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    apellido_materno: {
       type: DataTypes.STRING,
       allowNull: false,
     },

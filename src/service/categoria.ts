@@ -1,4 +1,3 @@
-import { where } from "sequelize";
 import { Categoria as CategoriaInterface } from "../interface/categoria";
 import { Categoria } from "../models/categoria";
 

@@ -24,7 +24,7 @@ export const DetalleVenta = sequelize.define<DetalleVentaModel>(
       type: DataTypes.FLOAT(5, 2),
       allowNull: false,
     },
-    codigo: {
+    codigo_venta: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -39,7 +39,7 @@ export const DetalleVenta = sequelize.define<DetalleVentaModel>(
 );
 
 DetalleVenta.belongsTo(Venta, {
-  foreignKey: "codigo",
+  foreignKey: "codigo_venta",
 });
 
 DetalleVenta.belongsTo(Producto, {

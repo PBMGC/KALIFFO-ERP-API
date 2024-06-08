@@ -3,6 +3,6 @@ export interface DetalleVenta {
   cantidad: number;
   precioTotal: number;
 
-  codigo: string;
+  codigo_venta: string;
   producto_id: number;
 }

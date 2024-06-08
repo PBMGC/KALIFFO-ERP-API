@@ -53,6 +53,8 @@ export const _createProducto = async (producto: ProductoInterface) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "error _createProducto",
       error,
@@ -102,7 +104,7 @@ export const _updateProducto = async (producto: ProductoInterface) => {
     });
 
     return {
-      msg: `El producto con id ${producto.producto_id} a sido actualizado`,
+      msg: `El producto ${producto.producto_id} ha sido actualizado con exito`,
       status: 200,
     };
   } catch (error) {

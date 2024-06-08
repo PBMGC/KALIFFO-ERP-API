@@ -8,7 +8,7 @@ export interface VentaModel extends Model<VentaInterface>, VentaInterface {}
 export const Venta = sequelize.define<VentaModel>(
   "venta",
   {
-    codigo: {
+    codigo_venta: {
       type: DataTypes.STRING,
       unique: true,
       primaryKey: true,
@@ -45,8 +45,8 @@ export const Venta = sequelize.define<VentaModel>(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    cliente_id: {
-      type: DataTypes.INTEGER,
+    codigo_cliente: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -56,5 +56,5 @@ export const Venta = sequelize.define<VentaModel>(
 );
 
 Venta.belongsTo(Cliente, {
-  foreignKey: "cliente_id",
+  foreignKey: "codigo_cliente",
 });

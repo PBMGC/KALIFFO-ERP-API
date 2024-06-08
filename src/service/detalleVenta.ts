@@ -1,8 +1,10 @@
 import { DetalleVenta as DetalleVentaInteface } from "../interface/detalleVenta";
 import { DetalleVenta } from "../models/detalleVenta";
 
-export const _getDetalleVenta = async (codigo: string) => {
-  const items = await DetalleVenta.findAll({ where: { codigo: codigo } });
+export const _getDetalleVenta = async (codigo_venta: string) => {
+  const items = await DetalleVenta.findAll({
+    where: { codigo_venta: codigo_venta },
+  });
 
   try {
     return {
