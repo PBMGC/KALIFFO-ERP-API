@@ -82,7 +82,7 @@ export const updateCliente = async (req: Request, res: Response) => {
     categoria_id,
   } = req.body;
 
-  const cliente: Cliente = {
+  const cliente: Partial<Cliente> = {
     codigo_cliente,
     nombre,
     apellido_paterno,

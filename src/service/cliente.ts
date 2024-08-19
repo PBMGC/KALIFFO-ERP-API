@@ -76,7 +76,7 @@ export const _createCliente = async (cliente: ClienteInterface) => {
           : codigos.length + 1);
     }
 
-    cliente.codigo_cliente = codigo.toLocaleLowerCase();
+    cliente.codigo_cliente = codigo.toLocaleUpperCase();
     await Cliente.create(cliente);
 
     return {
@@ -119,7 +119,7 @@ export const _deleteCliente = async (codigo_cliente: string) => {
   }
 };
 
-export const _updateCliente = async (cliente: ClienteInterface) => {
+export const _updateCliente = async (cliente: Partial<ClienteInterface>) => {
   try {
     if (
       !(await Cliente.findOne({
@@ -141,6 +141,8 @@ export const _updateCliente = async (cliente: ClienteInterface) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "error _updateCliente",
       error,
