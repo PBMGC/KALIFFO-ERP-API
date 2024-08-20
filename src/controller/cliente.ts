@@ -32,22 +32,18 @@ export const createCliente = async (req: Request, res: Response) => {
     nombre,
     apellido_paterno,
     apellido_materno,
-    edad,
     telefono,
     email,
-    estado,
-    categoria_id,
+    fecha_nacimiento,
   } = req.body;
 
   const newCliente: Cliente = {
     nombre,
     apellido_paterno,
     apellido_materno,
-    edad,
+    fecha_nacimiento,
     telefono,
     email,
-    estado,
-    categoria_id,
   };
 
   try {
@@ -75,11 +71,9 @@ export const updateCliente = async (req: Request, res: Response) => {
     nombre,
     apellido_paterno,
     apellido_materno,
-    edad,
     telefono,
     email,
-    estado,
-    categoria_id,
+    fecha_nacimiento,
   } = req.body;
 
   const cliente: Partial<Cliente> = {
@@ -87,11 +81,9 @@ export const updateCliente = async (req: Request, res: Response) => {
     nombre,
     apellido_paterno,
     apellido_materno,
-    edad,
     telefono,
     email,
-    estado,
-    categoria_id,
+    fecha_nacimiento,
   };
 
   try {

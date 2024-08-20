@@ -8,12 +8,14 @@ export const _getClientes = async () => {
   try {
     return {
       items,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _getClientes",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -27,12 +29,14 @@ export const _getCliente = async (codigo_cliente: string) => {
   try {
     return {
       item,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _getClientes",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -51,6 +55,7 @@ export const _createCliente = async (cliente: ClienteInterface) => {
     ) {
       return {
         msg: "Este cliente ya existe",
+        succes: false,
         status: 400,
       };
     }
@@ -81,6 +86,7 @@ export const _createCliente = async (cliente: ClienteInterface) => {
 
     return {
       msg: `Cliente con codigo ${cliente.codigo_cliente} a sido creado`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
@@ -89,6 +95,7 @@ export const _createCliente = async (cliente: ClienteInterface) => {
     return {
       msg: "error _createCliente",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -101,6 +108,7 @@ export const _deleteCliente = async (codigo_cliente: string) => {
     ) {
       return {
         msg: `El cliente con id ${codigo_cliente} no existe`,
+        succes: false,
         status: 400,
       };
     }
@@ -108,12 +116,14 @@ export const _deleteCliente = async (codigo_cliente: string) => {
 
     return {
       msg: `El cliente con id ${codigo_cliente} a sido eliminado`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _deleteCliente",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -127,7 +137,8 @@ export const _updateCliente = async (cliente: Partial<ClienteInterface>) => {
       }))
     ) {
       return {
-        msg: `El cliente con id => ${cliente.categoria_id} no existe`,
+        msg: `El cliente con id => ${cliente.codigo_cliente} no existe`,
+        succes: false,
         status: 400,
       };
     }
@@ -138,6 +149,7 @@ export const _updateCliente = async (cliente: Partial<ClienteInterface>) => {
 
     return {
       msg: `El cliente con id ${cliente.codigo_cliente} a sido actualizado`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
@@ -146,6 +158,7 @@ export const _updateCliente = async (cliente: Partial<ClienteInterface>) => {
     return {
       msg: "error _updateCliente",
       error,
+      succes: false,
       status: 400,
     };
   }
