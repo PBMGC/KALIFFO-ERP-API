@@ -26,8 +26,8 @@ export const Cliente = sequelize.define<ClienteModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    edad: {
-      type: DataTypes.STRING,
+    fecha_nacimiento: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
     telefono: {
@@ -38,20 +38,8 @@ export const Cliente = sequelize.define<ClienteModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    estado: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    categoria_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
   {
     freezeTableName: true,
   }
 );
-
-Cliente.belongsTo(Categoria, {
-  foreignKey: "categoria_id",
-});

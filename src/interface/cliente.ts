@@ -3,10 +3,7 @@ export interface Cliente {
   nombre: string;
   apellido_paterno: string;
   apellido_materno: string;
-  edad: string;
+  fecha_nacimiento: Date;
   telefono: string;
   email: string;
-  estado: string;
-
-  categoria_id: number;
 }

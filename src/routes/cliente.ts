@@ -9,10 +9,10 @@ import {
 
 const router = Router();
 
+router.post("/create", createCliente);
 router.get("/", getClientes);
 router.get("/:codigo", getCliente);
-router.post("/create", createCliente);
-router.delete("/delete/:codigo", deleteCliente);
 router.put("/update", updateCliente);
+router.delete("/delete/:codigo", deleteCliente);
 
 export { router };
