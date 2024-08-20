@@ -6,12 +6,14 @@ export const _getCategorias = async (tipo: string) => {
     const items = await Categoria.findAll({ where: { tipo: tipo } });
     return {
       items,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _getCategorias",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -24,12 +26,14 @@ export const _getCategoria = async (categoria_id: string) => {
     });
     return {
       item,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _getCategoria",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -44,6 +48,7 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
     ) {
       return {
         msg: "Esta Categoria ya existe",
+        succes: false,
         status: 400,
       };
     }
@@ -52,12 +57,15 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
 
     return {
       msg: `Categoria de ${categoria.tipo} creada => ${categoria.categoria}`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _createCategoria",
+
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -68,6 +76,7 @@ export const _deleteCategoria = async (categoria_id: string) => {
     if (!(await Categoria.findOne({ where: { categoria_id: categoria_id } }))) {
       return {
         msg: `no exite la categoria con id ${categoria_id}`,
+        succes: false,
         status: 400,
       };
     }
@@ -76,12 +85,14 @@ export const _deleteCategoria = async (categoria_id: string) => {
 
     return {
       msg: `La categoría con ID ${categoria_id} ha sido eliminada correctamente`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _deleteCategoria",
       error,
+      succes: false,
       status: 400,
     };
   }
@@ -96,6 +107,7 @@ export const _updateCategoria = async (categoria: CategoriaInterface) => {
     ) {
       return {
         msg: `La categoria con id => ${categoria.categoria_id} no existe`,
+        succes: false,
         status: 400,
       };
     }
@@ -105,12 +117,14 @@ export const _updateCategoria = async (categoria: CategoriaInterface) => {
 
     return {
       msg: `Categoria tipo ${categoria.tipo} con id ${categoria.categoria_id} a sido actualizada`,
+      succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _updateCategoria",
       error,
+      succes: false,
       status: 400,
     };
   }
