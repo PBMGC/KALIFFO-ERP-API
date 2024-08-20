@@ -5,6 +5,5 @@ export interface Producto {
   stock: number;
   precio: number;
   descuento: number;
-
   categoria_id: number;
 }

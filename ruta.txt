@@ -1,14 +1,15 @@
---Categorias
+# Categorias
 
--> /categoria/create (POST)
-Entrada => { "tipo:string", "categoria:string"  }
-Salida { "msg","succes","status" }
-
+- 
 -> /categoria/producto y /categoria/cliente (GET)
 Salida [ { "categoria_id", "tipo", "categoria" } ]
 
 -> /categoria/search/{ categoria_id } (GET)
 Salida { "categoria_id", "tipo", "categoria" }
+
+-> /categoria/create (POST)
+Entrada => { "tipo:string", "categoria:string"  }
+Salida { "msg","succes","status" }
 
 -> /categoria/delete/{ categoria_id } (DELETE)
 Salida { "msg", "succes", "status" }
