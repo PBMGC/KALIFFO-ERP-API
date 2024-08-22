@@ -105,10 +105,19 @@ export const updateUsuario = async (req: Request, res: Response) => {
 };
 
 export const loginUsuario = async (req: Request, res: Response) => {
-  const { usuario_id, contraseña } = req.body;
+  console.log("asdas");
+
+  const { dni, contraseña } = req.body;
 
   try {
-    const response = await _login(usuario_id, contraseña);
+    const response = await _login(dni, contraseña);
+    res.cookie("token", response.token, {
+      maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
+    delete response.token;
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(400);
@@ -116,21 +125,21 @@ export const loginUsuario = async (req: Request, res: Response) => {
 };
 
 export const horaEntrada = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
+  const usuario_id = req.decodeToken.usuario_id;
 
   try {
-    const response = await _horaEntrada(Number(usuario_id));
+    const response = await _horaEntrada(usuario_id);
     res.status(response.status).json(response);
+    // res.status(200).json("das");
   } catch (error) {
     res.status(400).json(error);
   }
 };
 
 export const horaSalida = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
-
+  const usuario_id = req.decodeToken.usuario_id;
   try {
-    const response = await _horaSalida(Number(usuario_id));
+    const response = await _horaSalida(usuario_id);
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);

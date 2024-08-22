@@ -10,6 +10,7 @@ import { Puesto } from "./puesto";
 import { Tienda } from "./tienda";
 import { Usuario } from "./usuario";
 import { Horario } from "./horario";
+import cookieParser from "cookie-parser";
 
 class Serve {
   app: express.Application;
@@ -34,6 +35,7 @@ class Serve {
   midddlewares() {
     this.app.use(express.json());
     this.app.use(cors());
+    this.app.use(cookieParser());
   }
 
   route() {

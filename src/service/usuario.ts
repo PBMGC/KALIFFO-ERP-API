@@ -1,6 +1,10 @@
 import { Usuario as UsuarioInterface } from "../interface/usuario";
 import { Horario } from "../models/horario";
 import { Usuario } from "../models/usuario";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
   try {
@@ -11,6 +15,9 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
         status: 400,
       };
     }
+
+    const hashPassword = await bcrypt.hash(usuario.contraseña, 8);
+    usuario.contraseña = hashPassword;
 
     const newUsuario = await Usuario.create(usuario);
 
@@ -122,26 +129,38 @@ export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
   }
 };
 
-export const _login = async (usuario_id: number, contraseña: string) => {
+export const _login = async (dni: string, contraseña: string) => {
   try {
     const usuario = await Usuario.findOne({
-      where: { usuario_id: usuario_id },
+      where: { dni: dni },
     });
 
-    if (!usuario || usuario.contraseña === contraseña) {
+    if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
       return {
-        msg: "usuario o contraseña incorrecto",
+        msg: "dni o contraseña incorrecto",
         succes: false,
         status: 400,
       };
     }
 
+    const token = jwt.sign(
+      {
+        usuario_id: usuario.usuario_id,
+        nombre: usuario.nombre,
+        dni: usuario.dni,
+      },
+      process.env.SECRET_KEY || "as"
+    );
+
     return {
       msg: `bienvenido ${usuario.nombre}`,
+      token,
       succes: true,
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "_login",
       succes: false,
