@@ -3,7 +3,7 @@ import { Categoria } from "../models/categoria";
 
 export const _getCategorias = async (tipo: string) => {
   try {
-    const items = await Categoria.findAll({ where: { tipo: tipo } });
+    const items = await Categoria.findAll();
     return {
       items,
       succes: true,
@@ -43,7 +43,7 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
   try {
     if (
       await Categoria.findOne({
-        where: { tipo: categoria.tipo, categoria: categoria.categoria },
+        where: { categoria: categoria.categoria },
       })
     ) {
       return {
@@ -56,14 +56,13 @@ export const _createCategoria = async (categoria: CategoriaInterface) => {
     await Categoria.create(categoria);
 
     return {
-      msg: `Categoria de ${categoria.tipo} creada => ${categoria.categoria}`,
+      msg: `Categoria creada => ${categoria.categoria}`,
       succes: true,
       status: 200,
     };
   } catch (error) {
     return {
       msg: "error _createCategoria",
-
       error,
       succes: false,
       status: 400,
@@ -116,7 +115,7 @@ export const _updateCategoria = async (categoria: CategoriaInterface) => {
     });
 
     return {
-      msg: `Categoria tipo ${categoria.tipo} con id ${categoria.categoria_id} a sido actualizada`,
+      msg: `Categoria con id ${categoria.categoria_id} a sido actualizada`,
       succes: true,
       status: 200,
     };
