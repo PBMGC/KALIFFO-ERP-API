@@ -1,20 +1,18 @@
 import { DataTypes, Model } from "sequelize";
-import { Categoria as CategoriaInterface } from "../interface/categoria";
 import sequelize from "../db/connection";
+import { Puesto as PuestoInterface } from "../interface/puesto";
 
-export interface CategoriaModel
-  extends Model<CategoriaInterface>,
-    CategoriaInterface {}
+export interface PuestoModel extends Model<PuestoInterface>, PuestoInterface {}
 
-export const Categoria = sequelize.define<CategoriaModel>(
-  "categoria",
+export const Puesto = sequelize.define<PuestoModel>(
+  "puesto",
   {
-    categoria_id: {
+    puesto_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    categoria: {
+    puesto: {
       type: DataTypes.STRING,
       allowNull: false,
     },

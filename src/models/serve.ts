@@ -6,6 +6,10 @@ import { Cliente } from "./cliente";
 import { Producto } from "./producto";
 import { Venta } from "./venta";
 import { DetalleVenta } from "./detalleVenta";
+import { Puesto } from "./puesto";
+import { Tienda } from "./tienda";
+import { Usuario } from "./usuario";
+import { Horario } from "./horario";
 
 class Serve {
   app: express.Application;
@@ -39,10 +43,15 @@ class Serve {
   async db() {
     try {
       await Categoria.sync();
-      await Cliente.sync();
-      await Producto.sync();
-      await Venta.sync();
-      await DetalleVenta.sync();
+      await Puesto.sync();
+      await Tienda.sync();
+      await Usuario.sync();
+      await Horario.sync();
+
+      // await Cliente.sync();
+      // await Producto.sync();
+      // await Venta.sync();
+      // await DetalleVenta.sync();
     } catch (error) {
       console.log(error);
     }
