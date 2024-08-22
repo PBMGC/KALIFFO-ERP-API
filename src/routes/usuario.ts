@@ -6,6 +6,7 @@ import {
   getUsuarios,
   horaEntrada,
   horaSalida,
+  horasTrabajadas,
   loginUsuario,
   updateUsuario,
 } from "../controller/usuario";
@@ -23,5 +24,7 @@ router.get("/horaEntrada", validateToken, horaEntrada);
 router.get("/horaSalida", validateToken, horaSalida);
 
 router.get("search/:usuario_id", getUsuario);
+
+router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
 
 export { router };

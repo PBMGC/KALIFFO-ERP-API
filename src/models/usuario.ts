@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import { Usuario as UsuarioInteface } from "../interface/usuario";
 import sequelize from "../db/connection";
 import { Tienda } from "./tienda";
-import { Puesto } from "./puesto";
+import { Rol } from "./rol";
 
 export interface UsuarioModel extends Model<UsuarioInteface>, UsuarioInteface {}
 
@@ -27,9 +27,8 @@ export const Usuario = sequelize.define<UsuarioModel>(
       allowNull: false,
     },
     fecha_nacimiento: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false,
-      unique: true,
     },
     dni: {
       type: DataTypes.STRING,
@@ -43,8 +42,9 @@ export const Usuario = sequelize.define<UsuarioModel>(
     tienda_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: null,
     },
-    puesto_id: {
+    rol_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -58,6 +58,6 @@ Usuario.belongsTo(Tienda, {
   foreignKey: "tienda_id",
 });
 
-Usuario.belongsTo(Puesto, {
-  foreignKey: "puesto_id",
+Usuario.belongsTo(Rol, {
+  foreignKey: "rol_id",
 });

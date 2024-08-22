@@ -7,6 +7,6 @@ export interface Usuario {
   dni: string;
   contraseña: string;
 
-  puesto_id?: number;
+  rol_id?: number;
   tienda_id?: number;
 }

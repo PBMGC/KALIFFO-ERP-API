@@ -27,6 +27,8 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       error: "_createUsuario",
       succes: false,
@@ -172,11 +174,26 @@ export const _login = async (dni: string, contraseña: string) => {
 export const _horaEntrada = async (usuario_id: number) => {
   try {
     const now = new Date();
+    const fecha = now.toLocaleDateString("en-CA");
+    const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
+
+    const asistenciaExistente = await Horario.findOne({
+      where: { fecha: fecha },
+    });
+
+    if (asistenciaExistente?.hora_salida === null) {
+      return {
+        msg: "Asistencia sin terminar",
+        asistenciaExistente,
+        succes: false,
+        status: 400,
+      };
+    }
 
     const newHorario = await Horario.create({
-      hora_entrada: now.toLocaleTimeString("en-US", { hour12: false }),
+      hora_entrada: horaEntrada,
       hora_salida: null,
-      fecha: now.toLocaleDateString("en-CA"),
+      fecha: fecha,
       usuario_id,
     });
 
@@ -198,24 +215,38 @@ export const _horaEntrada = async (usuario_id: number) => {
 
 export const _horaSalida = async (usuario_id: number) => {
   const now = new Date();
+  const fecha = now.toLocaleDateString("en-CA");
+  const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
 
   const asistencia = await Horario.findOne({
-    where: { usuario_id: usuario_id, fecha: now.toLocaleDateString("en-CA") },
+    where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
   });
 
   if (!asistencia) {
     return {
-      msg: "error",
+      msg: "Iniciar asistencia primero",
       succes: false,
       status: 400,
     };
   }
 
-  asistencia.hora_salida = now.toLocaleTimeString("en-US", { hour12: false });
+  asistencia.hora_salida = horaSalida;
   await asistencia.save();
 
   return {
     msg: asistencia,
+    succes: true,
+    status: 200,
+  };
+};
+
+export const _horasTrabajadas = async (usuario_id: number) => {
+  const horasTrabajadas = await Horario.findAll({
+    where: { usuario_id: usuario_id },
+  });
+
+  return {
+    msg: horasTrabajadas,
     succes: true,
     status: 200,
   };

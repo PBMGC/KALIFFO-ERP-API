@@ -7,6 +7,7 @@ import {
   _getUsuarios,
   _horaEntrada,
   _horaSalida,
+  _horasTrabajadas,
   _login,
   _updateUsuario,
 } from "../service/usuario";
@@ -20,7 +21,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     dni,
     contraseña,
     tienda_id,
-    puesto_id,
+    rol_id,
   } = req.body;
 
   const newUsuario: Usuario = {
@@ -31,7 +32,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     dni,
     contraseña,
     tienda_id,
-    puesto_id,
+    rol_id,
   };
 
   try {
@@ -82,7 +83,7 @@ export const updateUsuario = async (req: Request, res: Response) => {
     dni,
     contraseña,
     tienda_id,
-    puesto_id,
+    rol_id,
   } = req.body;
 
   const updateUsuario: Partial<Usuario> = {
@@ -93,7 +94,7 @@ export const updateUsuario = async (req: Request, res: Response) => {
     dni,
     contraseña,
     tienda_id,
-    puesto_id,
+    rol_id,
   };
 
   try {
@@ -140,6 +141,17 @@ export const horaSalida = async (req: Request, res: Response) => {
   const usuario_id = req.decodeToken.usuario_id;
   try {
     const response = await _horaSalida(usuario_id);
+    res.status(response.status).json(response);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+export const horasTrabajadas = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
+
+  try {
+    const response = await _horasTrabajadas(Number(usuario_id));
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);

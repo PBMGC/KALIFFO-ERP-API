@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { _createPuesto, _getPuestos } from "../service/puesto";
+import { _createPuesto, _getPuestos } from "../service/rol";
 import { _createTienda, _getTiendas } from "../service/tienda";
 
 export const createTienda = async (req: Request, res: Response) => {
