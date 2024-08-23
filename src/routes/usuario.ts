@@ -23,7 +23,7 @@ router.post("/login", loginUsuario);
 router.get("/horaEntrada", validateToken, horaEntrada);
 router.get("/horaSalida", validateToken, horaSalida);
 
-router.get("search/:usuario_id", getUsuario);
+router.get("/search/:dni", getUsuario);
 
 router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
 

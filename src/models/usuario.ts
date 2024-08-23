@@ -30,6 +30,10 @@ export const Usuario = sequelize.define<UsuarioModel>(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    telefono: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     dni: {
       type: DataTypes.STRING,
       allowNull: false,

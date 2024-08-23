@@ -19,6 +19,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     ap_materno,
     fecha_nacimiento,
     dni,
+    telefono,
     contraseña,
     tienda_id,
     rol_id,
@@ -30,6 +31,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     ap_materno,
     fecha_nacimiento,
     dni,
+    telefono,
     contraseña,
     tienda_id,
     rol_id,
@@ -44,8 +46,23 @@ export const createUsuario = async (req: Request, res: Response) => {
 };
 
 export const getUsuarios = async (req: Request, res: Response) => {
+  // const { inicio, final, rol_id } = req.params;
+  const rol_id = req.query.rol_id;
+  const inicio = req.query.inicio;
+  const final = req.query.final;
+  const nombre = req.query.nombre as string;
+
+  console.log("rol_id => ", rol_id);
+  console.log("inicio => ", inicio);
+  console.log("final => ", final);
+
   try {
-    const response = await _getUsuarios();
+    const response = await _getUsuarios(
+      Number(inicio),
+      Number(final),
+      nombre,
+      Number(rol_id)
+    );
     res.status(response.status).json(response.items);
   } catch (error) {
     res.status(400).json(error);
@@ -75,24 +92,11 @@ export const deleteUsuario = async (req: Request, res: Response) => {
 };
 
 export const updateUsuario = async (req: Request, res: Response) => {
-  const {
-    usuario_id,
-    nombre,
-    ap_paterno,
-    ap_materno,
-    dni,
-    contraseña,
-    tienda_id,
-    rol_id,
-  } = req.body;
+  const { usuario_id, telefono, tienda_id, rol_id } = req.body;
 
   const updateUsuario: Partial<Usuario> = {
     usuario_id,
-    nombre,
-    ap_paterno,
-    ap_materno,
-    dni,
-    contraseña,
+    telefono,
     tienda_id,
     rol_id,
   };
@@ -106,8 +110,6 @@ export const updateUsuario = async (req: Request, res: Response) => {
 };
 
 export const loginUsuario = async (req: Request, res: Response) => {
-  console.log("asdas");
-
   const { dni, contraseña } = req.body;
 
   try {
