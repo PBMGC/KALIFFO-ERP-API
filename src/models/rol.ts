@@ -1,20 +1,18 @@
 import { DataTypes, Model } from "sequelize";
-import { Categoria as CategoriaInterface } from "../interface/categoria";
 import sequelize from "../db/connection";
+import { Rol as RolInterface } from "../interface/rol";
 
-export interface CategoriaModel
-  extends Model<CategoriaInterface>,
-    CategoriaInterface {}
+export interface RolModel extends Model<RolInterface>, RolInterface {}
 
-export const Categoria = sequelize.define<CategoriaModel>(
-  "categoria",
+export const Rol = sequelize.define<RolModel>(
+  "rol",
   {
-    categoria_id: {
+    rol_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    categoria: {
+    rol: {
       type: DataTypes.STRING,
       allowNull: false,
     },

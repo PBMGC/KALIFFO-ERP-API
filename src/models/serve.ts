@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { router } from "../routes";
-import { Categoria } from "./categoria";
-import { Cliente } from "./cliente";
-import { Producto } from "./producto";
-import { Venta } from "./venta";
-import { DetalleVenta } from "./detalleVenta";
+
+import { Tienda } from "./tienda";
+import { Usuario } from "./usuario";
+import { Horario } from "./horario";
+import cookieParser from "cookie-parser";
+import { Rol } from "./rol";
+import { Incidencia } from "./incidencia";
 
 class Serve {
   app: express.Application;
@@ -30,6 +32,7 @@ class Serve {
   midddlewares() {
     this.app.use(express.json());
     this.app.use(cors());
+    this.app.use(cookieParser());
   }
 
   route() {
@@ -38,11 +41,11 @@ class Serve {
 
   async db() {
     try {
-      await Categoria.sync();
-      await Cliente.sync();
-      await Producto.sync();
-      await Venta.sync();
-      await DetalleVenta.sync();
+      await Rol.sync();
+      await Tienda.sync();
+      await Usuario.sync();
+      await Horario.sync();
+      await Incidencia.sync();
     } catch (error) {
       console.log(error);
     }

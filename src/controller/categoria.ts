@@ -9,10 +9,9 @@ import {
 import { Categoria } from "../interface/categoria";
 
 export const createCategoria = async (req: Request, res: Response) => {
-  const { tipo, categoria } = req.body;
+  const { categoria } = req.body;
 
   const newCategoria: Categoria = {
-    tipo,
     categoria,
   };
 
@@ -65,11 +64,10 @@ export const deleteCategoria = async (req: Request, res: Response) => {
 };
 
 export const updateCategoria = async (req: Request, res: Response) => {
-  const { categoria_id, tipo, categoria } = req.params;
+  const { categoria_id, categoria } = req.params;
 
   const catego: Categoria = {
     categoria_id: Number(categoria_id),
-    tipo,
     categoria,
   };
   try {
