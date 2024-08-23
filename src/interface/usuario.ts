@@ -4,6 +4,7 @@ export interface Usuario {
   ap_paterno: string;
   ap_materno: string;
   fecha_nacimiento: string;
+  telefono: string;
   dni: string;
   contraseña: string;
 

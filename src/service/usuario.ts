@@ -4,6 +4,7 @@ import { Usuario } from "../models/usuario";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Op } from "sequelize";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -37,9 +38,28 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
   }
 };
 
-export const _getUsuarios = async () => {
+export const _getUsuarios = async (
+  inicio?: number,
+  final?: number,
+  nombre?: string,
+  rol_id?: number
+) => {
   try {
-    const items = await Usuario.findAll();
+    const filtros: any = {
+      where: {},
+      offset: inicio || 0,
+      limit: final ? final - (inicio || 0) : undefined,
+    };
+
+    if (nombre) {
+      filtros.where = { nombre: { [Op.like]: `%${nombre}%` } };
+    }
+
+    if (rol_id) {
+      filtros.where = { rol_id: rol_id };
+    }
+
+    const items = await Usuario.findAll(filtros);
     return {
       items,
       succes: true,
@@ -104,7 +124,7 @@ export const _deleteUsuario = async (dni: string) => {
 export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
   try {
     const updateUsuario = await Usuario.findOne({
-      where: { dni: usuario.dni },
+      where: { usuario_id: usuario.usuario_id },
     });
 
     if (!updateUsuario) {
@@ -118,7 +138,7 @@ export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
     await updateUsuario.update(usuario);
 
     return {
-      msg: "Usuario actualizado",
+      msg: updateUsuario,
       success: true,
       status: 200,
     };
