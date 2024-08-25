@@ -16,6 +16,19 @@ export const Tienda = sequelize.define<TiendaModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    direccion: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    telefono: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    estado: {
+      type: DataTypes.STRING,
+      defaultValue: "activo",
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

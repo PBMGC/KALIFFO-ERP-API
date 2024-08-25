@@ -8,6 +8,7 @@ import { Horario } from "./horario";
 import cookieParser from "cookie-parser";
 import { Rol } from "./rol";
 import { Incidencia } from "./incidencia";
+import { scriptInicio } from "../util/script";
 
 class Serve {
   app: express.Application;
@@ -46,6 +47,7 @@ class Serve {
       await Usuario.sync();
       await Horario.sync();
       await Incidencia.sync();
+      scriptInicio();
     } catch (error) {
       console.log(error);
     }

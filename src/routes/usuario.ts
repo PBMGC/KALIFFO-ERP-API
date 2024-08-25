@@ -11,20 +11,21 @@ import {
   updateUsuario,
 } from "../controller/usuario";
 import { validateToken } from "../middleware/validateToken";
+import { ValidateCreateUsuario, ValidateLogin } from "../validation/usuario";
 
 const router = Router();
 
-router.post("/create", createUsuario);
 router.get("/", getUsuarios);
-router.delete("/delete/:dni", deleteUsuario);
-router.put("/update", updateUsuario);
-
-router.post("/login", loginUsuario);
 router.get("/horaEntrada", validateToken, horaEntrada);
 router.get("/horaSalida", validateToken, horaSalida);
-
 router.get("/search/:dni", getUsuario);
-
 router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
+
+router.post("/create", ValidateCreateUsuario, createUsuario);
+router.post("/login", ValidateLogin, loginUsuario);
+
+router.put("/update", updateUsuario);
+
+router.delete("/delete/:dni", deleteUsuario);
 
 export { router };

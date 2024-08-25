@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Op } from "sequelize";
+import { Rol } from "../models/rol";
+import { Tienda } from "../models/tienda";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -15,6 +17,26 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
         succes: false,
         status: 400,
       };
+    }
+
+    if (!(await Rol.findOne({ where: { rol_id: usuario.rol_id } }))) {
+      return {
+        msg: "Este rol no existes",
+        succes: false,
+        status: 400,
+      };
+    }
+
+    if (usuario.tienda_id) {
+      if (
+        !(await Tienda.findOne({ where: { tienda_id: usuario.tienda_id } }))
+      ) {
+        return {
+          msg: "Esta tienda no existe",
+          succes: false,
+          status: 400,
+        };
+      }
     }
 
     const hashPassword = await bcrypt.hash(usuario.contraseña, 8);

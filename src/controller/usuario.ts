@@ -52,10 +52,6 @@ export const getUsuarios = async (req: Request, res: Response) => {
   const final = req.query.final;
   const nombre = req.query.nombre as string;
 
-  console.log("rol_id => ", rol_id);
-  console.log("inicio => ", inicio);
-  console.log("final => ", final);
-
   try {
     const response = await _getUsuarios(
       Number(inicio),
