@@ -68,6 +68,8 @@ export const _getUsuarios = async (
   rol_id?: number
 ) => {
   try {
+    console.log(rol_id);
+
     const filtros: any = {
       include: {
         model: Tienda,
@@ -80,11 +82,11 @@ export const _getUsuarios = async (
     };
 
     if (nombre) {
-      filtros.where = { nombre: { [Op.like]: `%${nombre}%` } };
+      filtros.where.nombre = { [Op.like]: `%${nombre}%` };
     }
 
     if (rol_id) {
-      filtros.where = { rol_id: rol_id };
+      filtros.where.rol_id = rol_id;
     }
 
     const items = await Usuario.findAll(filtros);
