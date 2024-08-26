@@ -68,6 +68,7 @@ export const _getUsuarios = async (
 ) => {
   try {
     const filtros: any = {
+      include: { model: Tienda },
       where: {},
       offset: inicio || 0,
       limit: final ? final - (inicio || 0) : undefined,

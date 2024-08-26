@@ -10,9 +10,9 @@ import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
 
 const roles: RolInterface[] = [
-  { rol: "admin" },
-  { rol: "vendedora" },
-  { rol: "costurero" },
+  { rol: "ventas" },
+  { rol: "talleres" },
+  { rol: "miselaneas" },
 ];
 
 const tiendas: TiendaInterface[] = [
