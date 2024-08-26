@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { Op } from "sequelize";
 import { Rol } from "../models/rol";
 import { Tienda } from "../models/tienda";
+import { raw } from "mysql2";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -82,7 +83,13 @@ export const _getUsuarios = async (
       filtros.where = { rol_id: rol_id };
     }
 
-    const items = await Usuario.findAll(filtros);
+    const items = await Usuario.findAll({
+      include: {
+        model: Tienda,
+        attributes: ["tienda_id", "tienda"],
+      },
+      raw: true,
+    });
     return {
       items,
       succes: true,
