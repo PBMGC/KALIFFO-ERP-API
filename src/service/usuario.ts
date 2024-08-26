@@ -69,10 +69,14 @@ export const _getUsuarios = async (
 ) => {
   try {
     const filtros: any = {
-      include: { model: Tienda },
+      include: {
+        model: Tienda,
+        attributes: ["tienda_id", "tienda"],
+      },
       where: {},
       offset: inicio || 0,
       limit: final ? final - (inicio || 0) : undefined,
+      raw: true,
     };
 
     if (nombre) {
@@ -83,13 +87,7 @@ export const _getUsuarios = async (
       filtros.where = { rol_id: rol_id };
     }
 
-    const items = await Usuario.findAll({
-      include: {
-        model: Tienda,
-        attributes: ["tienda_id", "tienda"],
-      },
-      raw: true,
-    });
+    const items = await Usuario.findAll(filtros);
     return {
       items,
       succes: true,
