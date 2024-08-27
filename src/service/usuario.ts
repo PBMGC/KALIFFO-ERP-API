@@ -78,7 +78,6 @@ export const _getUsuarios = async (
       where: {},
       offset: inicio || 0,
       limit: final ? final - (inicio || 0) : undefined,
-      raw: true,
     };
 
     if (nombre) {
@@ -90,8 +89,19 @@ export const _getUsuarios = async (
     }
 
     const items = await Usuario.findAll(filtros);
+
+    // Transform the result to flatten the tienda attributes
+    const transformedItems = items.map((item: any) => {
+      const tienda = item.tienda;
+      return {
+        ...item.toJSON(), // Convert the Sequelize instance to a plain object
+        tienda_id: tienda ? tienda.tienda_id : null,
+        tienda: tienda ? tienda.tienda : null,
+      };
+    });
+
     return {
-      items,
+      items: transformedItems,
       succes: true,
       status: 200,
     };
