@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import { Op } from "sequelize";
 import { Rol } from "../models/rol";
 import { Tienda } from "../models/tienda";
-import { raw } from "mysql2";
+import sequelize from "../db/connection";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -115,16 +115,29 @@ export const _getUsuarios = async (
 };
 
 export const _getUsuario = async (dni: string) => {
+  console.log("dasd");
+
   try {
     const item = await Usuario.findOne({
       where: { dni: dni },
     });
+
+    if (!item) {
+      return {
+        msg: "No se encontro usuario con este dni",
+        succes: false,
+        status: 400,
+      };
+    }
+
     return {
       item,
       succes: true,
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       error: "_getUsuario",
       succes: false,
@@ -300,14 +313,33 @@ export const _horaSalida = async (usuario_id: number) => {
   };
 };
 
-export const _horasTrabajadas = async (usuario_id: number) => {
+export const _horasTrabajadas = async (
+  usuario_id: number,
+  fechaInicio: string,
+  fechaFin: string
+) => {
   const horasTrabajadas = await Horario.findAll({
-    where: { usuario_id: usuario_id },
+    where: {
+      usuario_id: usuario_id,
+      fecha: {
+        [Op.between]: [fechaFin, fechaInicio],
+      },
+    },
+    attributes: [
+      [
+        sequelize.fn(
+          "SUM",
+          sequelize.literal("TIMESTAMPDIFF(HOUR, hora_entrada, hora_salida)")
+        ),
+        "totalHoras",
+      ],
+    ],
+    raw: true,
   });
 
   return {
     msg: horasTrabajadas,
-    succes: true,
+    success: true,
     status: 200,
   };
 };

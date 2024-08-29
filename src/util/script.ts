@@ -1,7 +1,9 @@
 import { createUsuario } from "../controller/usuario";
+import sequelize from "../db/connection";
 import { Rol as RolInterface } from "../interface/rol";
 import { Tienda as TiendaInterface } from "../interface/tienda";
 import { Usuario as UsuarioInterface } from "../interface/usuario";
+import { Horario } from "../models/horario";
 import { Rol } from "../models/rol";
 import { Tienda } from "../models/tienda";
 import { Usuario } from "../models/usuario";
@@ -98,5 +100,14 @@ export const scriptInicio = async () => {
     if (!usuarioExistente) {
       await _createUsuario(usuario);
     }
+  }
+
+  if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
+    sequelize.query(`
+      insert into horario(hora_entrada,hora_salida,fecha,usuario_id) values 
+      ("9:00:00", "16:00:00","2024-08-20",1),
+      ("9:00:00", "17:00:00","2024-08-19",1),
+      ("9:00:00", "14:00:00","2024-08-18",1),
+      ("9:00:00", "12:00:00","2024-08-14",1);`);
   }
 };

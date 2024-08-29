@@ -46,13 +46,11 @@ export const createUsuario = async (req: Request, res: Response) => {
 };
 
 export const getUsuarios = async (req: Request, res: Response) => {
-  // const { inicio, final, rol_id } = req.params;
   const rol_id = req.query.rol_id;
   const inicio = req.query.inicio;
   const final = req.query.final;
   const nombre = req.query.nombre as string;
 
-  
   try {
     const response = await _getUsuarios(
       Number(inicio),
@@ -69,9 +67,11 @@ export const getUsuarios = async (req: Request, res: Response) => {
 export const getUsuario = async (req: Request, res: Response) => {
   const { dni } = req.params;
 
+  console.log(dni);
+
   try {
     const response = await _getUsuario(dni);
-    res.status(response.status).json(response.item);
+    res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -147,10 +147,14 @@ export const horaSalida = async (req: Request, res: Response) => {
 };
 
 export const horasTrabajadas = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
+  const { usuario_id, fecha_inicio, fecha_final } = req.body;
 
   try {
-    const response = await _horasTrabajadas(Number(usuario_id));
+    const response = await _horasTrabajadas(
+      Number(usuario_id),
+      fecha_final,
+      fecha_inicio
+    );
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);

@@ -18,11 +18,11 @@ const router = Router();
 router.get("/", getUsuarios);
 router.get("/horaEntrada", validateToken, horaEntrada);
 router.get("/horaSalida", validateToken, horaSalida);
-router.get("/search/:dni", getUsuario);
-router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
+router.get("/:dni", getUsuario);
 
 router.post("/create", ValidateCreateUsuario, createUsuario);
 router.post("/login", ValidateLogin, loginUsuario);
+router.post("/horasTrabajadas", horasTrabajadas);
 
 router.put("/update", updateUsuario);
 

@@ -16,12 +16,11 @@ class Serve {
 
   constructor() {
     this.app = express();
-    this.PORT = process.env.PORT || "";
+    this.PORT = process.env.PORT || "3000";
 
-    this.listen();
     this.midddlewares();
     this.route();
-    this.db();
+    this.db().then(() => this.listen());
   }
 
   listen() {

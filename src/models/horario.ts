@@ -14,15 +14,15 @@ export const Horario = sequelize.define<HorarioModel>(
       autoIncrement: true,
     },
     hora_entrada: {
-      type: DataTypes.STRING,
+      type: DataTypes.TIME,
       allowNull: false,
     },
     hora_salida: {
-      type: DataTypes.STRING,
+      type: DataTypes.TIME,
       allowNull: true,
     },
     fecha: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     usuario_id: {
