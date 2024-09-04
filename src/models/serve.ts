@@ -6,9 +6,10 @@ import { Tienda } from "./tienda";
 import { Usuario } from "./usuario";
 import { Horario } from "./horario";
 import cookieParser from "cookie-parser";
-import { Rol } from "./rol";
 import { Incidencia } from "./incidencia";
 import { scriptInicio } from "../util/script";
+import { Producto } from "./producto";
+import { ProductoDetalle } from "./productoDetalle";
 
 class Serve {
   app: express.Application;
@@ -41,11 +42,12 @@ class Serve {
 
   async db() {
     try {
-      await Rol.sync();
       await Tienda.sync();
       await Usuario.sync();
       await Horario.sync();
       await Incidencia.sync();
+      await Producto.sync();
+      await ProductoDetalle.sync();
       scriptInicio();
     } catch (error) {
       console.log(error);

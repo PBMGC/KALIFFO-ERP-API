@@ -1,21 +1,11 @@
-import { createUsuario } from "../controller/usuario";
 import sequelize from "../db/connection";
-import { Rol as RolInterface } from "../interface/rol";
 import { Tienda as TiendaInterface } from "../interface/tienda";
 import { Usuario as UsuarioInterface } from "../interface/usuario";
 import { Horario } from "../models/horario";
-import { Rol } from "../models/rol";
 import { Tienda } from "../models/tienda";
 import { Usuario } from "../models/usuario";
-import { _createRol } from "../service/rol";
 import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
-
-const roles: RolInterface[] = [
-  { rol: "ventas" },
-  { rol: "talleres" },
-  { rol: "miselaneas" },
-];
 
 const tiendas: TiendaInterface[] = [
   {
@@ -35,55 +25,49 @@ const usuarios: UsuarioInterface[] = [
     nombre: "Juan",
     ap_paterno: "Pérez",
     ap_materno: "Gómez",
-    fecha_nacimiento: "01-01-2000",
+    fecha_nacimiento: "2000-01-01",
     dni: "73214567",
     telefono: "987654321",
     contraseña: "juan1234",
-    rol_id: 1,
+    rol: 1,
   },
   {
     nombre: "María",
     ap_paterno: "López",
     ap_materno: "Hernández",
-    fecha_nacimiento: "22-07-1992",
+    fecha_nacimiento: "1992-07-02",
     dni: "65478932",
     telefono: "912345678",
     contraseña: "maria2021",
-    rol_id: 2,
+    rol: 2,
     tienda_id: 2,
   },
   {
     nombre: "Carlos",
     ap_paterno: "Fernández",
     ap_materno: "Ramírez",
-    fecha_nacimiento: "08-11-1978",
+    fecha_nacimiento: "1978-11-08",
     dni: "87654321",
     telefono: "976543210",
     contraseña: "carlos78",
-    rol_id: 2,
+    rol: 2,
     tienda_id: 1,
   },
   {
     nombre: "Lucía",
     ap_paterno: "García",
     ap_materno: "Mendoza",
-    fecha_nacimiento: "30-05-1995",
+    fecha_nacimiento: "1995-05-15",
+
     dni: "78945612",
     telefono: "934567890",
     contraseña: "lucia95",
-    rol_id: 2,
+    rol: 2,
     tienda_id: 2,
   },
 ];
 
 export const scriptInicio = async () => {
-  for (const rol of roles) {
-    const rolExistente = await Rol.findOne({ where: { rol: rol.rol } });
-    if (!rolExistente) {
-      await _createRol(rol);
-    }
-  }
-
   for (const tienda of tiendas) {
     const tiendaExistente = await Tienda.findOne({
       where: { tienda: tienda.tienda },

@@ -22,7 +22,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     telefono,
     contraseña,
     tienda_id,
-    rol_id,
+    rol,
   } = req.body;
 
   const newUsuario: Usuario = {
@@ -34,7 +34,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     telefono,
     contraseña,
     tienda_id,
-    rol_id,
+    rol,
   };
 
   try {
@@ -65,12 +65,10 @@ export const getUsuarios = async (req: Request, res: Response) => {
 };
 
 export const getUsuario = async (req: Request, res: Response) => {
-  const { dni } = req.params;
-
-  console.log(dni);
+  const { usuario_id } = req.params;
 
   try {
-    const response = await _getUsuario(dni);
+    const response = await _getUsuario(usuario_id);
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     res.status(400).json(error);
@@ -78,10 +76,10 @@ export const getUsuario = async (req: Request, res: Response) => {
 };
 
 export const deleteUsuario = async (req: Request, res: Response) => {
-  const { dni } = req.params;
+  const { usuario_id } = req.params;
 
   try {
-    const response = await _deleteUsuario(dni);
+    const response = await _deleteUsuario(usuario_id);
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);
@@ -89,13 +87,14 @@ export const deleteUsuario = async (req: Request, res: Response) => {
 };
 
 export const updateUsuario = async (req: Request, res: Response) => {
-  const { usuario_id, telefono, tienda_id, rol_id } = req.body;
+  const { usuario_id } = req.params;
+  const { telefono, tienda_id, rol } = req.body;
 
   const updateUsuario: Partial<Usuario> = {
-    usuario_id,
+    usuario_id: Number(usuario_id),
     telefono,
     tienda_id,
-    rol_id,
+    rol,
   };
 
   try {
@@ -124,7 +123,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
   }
 };
 
-export const horaEntrada = async (req: Request, res: Response) => {
+export const inicioAsistencia = async (req: Request, res: Response) => {
   const usuario_id = req.decodeToken.usuario_id;
 
   try {
@@ -136,7 +135,7 @@ export const horaEntrada = async (req: Request, res: Response) => {
   }
 };
 
-export const horaSalida = async (req: Request, res: Response) => {
+export const finalAsitencia = async (req: Request, res: Response) => {
   const usuario_id = req.decodeToken.usuario_id;
   try {
     const response = await _horaSalida(usuario_id);

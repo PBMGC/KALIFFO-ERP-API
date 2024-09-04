@@ -38,4 +38,5 @@ export const Horario = sequelize.define<HorarioModel>(
 
 Horario.belongsTo(Usuario, {
   foreignKey: "usuario_id",
+  onDelete: "CASCADE",
 });

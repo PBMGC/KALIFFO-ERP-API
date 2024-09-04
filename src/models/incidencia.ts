@@ -15,8 +15,8 @@ export const Incidencia = sequelize.define<IncidenciaModel>(
       primaryKey: true,
       autoIncrement: true,
     },
-    titulo: {
-      type: DataTypes.STRING,
+    tipo: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     descripcion: {

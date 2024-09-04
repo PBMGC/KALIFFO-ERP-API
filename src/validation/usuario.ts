@@ -10,7 +10,7 @@ export const ValidateCreateUsuario: any = [
     .exists()
     .not()
     .isEmpty()
-    .isDate({ format: "DD-MM-YYYY", strictMode: true }),
+    .isDate({ format: "YYYY-MM-DD", strictMode: true }),
   check("dni")
     .exists()
     .not()
@@ -19,7 +19,7 @@ export const ValidateCreateUsuario: any = [
     .withMessage("DNI debe tener 8 digitos"),
   check("telefono").exists().not().isEmpty().isLength({ min: 9, max: 9 }),
   check("contraseña").exists().not().isEmpty(),
-  check("rol_id").exists(),
+  check("rol").exists(),
   (req: Request, res: Response, next: NextFunction) => {
     validateResult(req, res, next);
   },

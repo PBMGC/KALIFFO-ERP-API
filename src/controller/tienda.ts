@@ -27,3 +27,5 @@ export const getTiendas = async (req: Request, res: Response) => {
     res.status(400).json(error);
   }
 };
+
+export const getProductosTienda = async (req: Request, res: Response) => {};

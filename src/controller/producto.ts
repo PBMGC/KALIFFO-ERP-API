@@ -28,16 +28,13 @@ export const getProducto = async (req: Request, res: Response) => {
 };
 
 export const createProducto = async (req: Request, res: Response) => {
-  const { nombre, descripcion, stock, precio, descuento, categoria_id } =
-    req.body;
+  const { nombre, precio, descuento, stockGeneral } = req.body;
 
   const producto: Producto = {
     nombre,
-    descripcion,
-    stock,
     precio,
     descuento,
-    categoria_id,
+    stockGeneral,
   };
 
   try {
@@ -60,24 +57,14 @@ export const deleteProducto = async (req: Request, res: Response) => {
 };
 
 export const updateProducto = async (req: Request, res: Response) => {
-  const {
-    producto_id,
-    nombre,
-    descripcion,
-    stock,
-    precio,
-    descuento,
-    categoria_id,
-  } = req.body;
+  const { producto_id, nombre, precio, descuento, stockGeneral } = req.body;
 
   const producto: Producto = {
     producto_id,
     nombre,
-    descripcion,
-    stock,
     precio,
     descuento,
-    categoria_id,
+    stockGeneral,
   };
 
   try {

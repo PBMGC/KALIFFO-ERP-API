@@ -5,9 +5,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Op } from "sequelize";
-import { Rol } from "../models/rol";
 import { Tienda } from "../models/tienda";
 import sequelize from "../db/connection";
+import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
+import { Incidencia } from "../models/incidencia";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -15,14 +16,6 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
     if (await Usuario.findOne({ where: { dni: usuario.dni } })) {
       return {
         msg: "este dni ya esta en uso",
-        succes: false,
-        status: 400,
-      };
-    }
-
-    if (!(await Rol.findOne({ where: { rol_id: usuario.rol_id } }))) {
-      return {
-        msg: "Este rol no existes",
         succes: false,
         status: 400,
       };
@@ -68,8 +61,6 @@ export const _getUsuarios = async (
   rol_id?: number
 ) => {
   try {
-    console.log(rol_id);
-
     const filtros: any = {
       include: {
         model: Tienda,
@@ -90,11 +81,13 @@ export const _getUsuarios = async (
 
     const items = await Usuario.findAll(filtros);
 
-    // Transform the result to flatten the tienda attributes
     const transformedItems = items.map((item: any) => {
       const tienda = item.tienda;
+      const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
+        item.toJSON(); // Exclude contraseña
+
       return {
-        ...item.toJSON(), // Convert the Sequelize instance to a plain object
+        ...userWithoutPassword,
         tienda_id: tienda ? tienda.tienda_id : null,
         tienda: tienda ? tienda.tienda : null,
       };
@@ -114,17 +107,15 @@ export const _getUsuarios = async (
   }
 };
 
-export const _getUsuario = async (dni: string) => {
-  console.log("dasd");
-
+export const _getUsuario = async (usuario_id: string) => {
   try {
     const item = await Usuario.findOne({
-      where: { dni: dni },
+      where: { usuario_id: usuario_id },
     });
 
     if (!item) {
       return {
-        msg: "No se encontro usuario con este dni",
+        msg: "No se encontro usuario",
         succes: false,
         status: 400,
       };
@@ -146,13 +137,15 @@ export const _getUsuario = async (dni: string) => {
   }
 };
 
-export const _deleteUsuario = async (dni: string) => {
+export const _deleteUsuario = async (usuario_id: string) => {
   try {
-    const usuario = await Usuario.findOne({ where: { dni } });
+    const usuario = await Usuario.findOne({
+      where: { usuario_id: usuario_id },
+    });
 
     if (!usuario) {
       return {
-        msg: "No existe usuario con este DNI",
+        msg: "No existe usuario",
         success: false,
         status: 404,
       };
@@ -166,6 +159,8 @@ export const _deleteUsuario = async (dni: string) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "_deleteUsuario",
       success: false,

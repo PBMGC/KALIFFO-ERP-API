@@ -8,6 +8,6 @@ export interface Usuario {
   dni: string;
   contraseña: string;
 
-  rol_id?: number;
+  rol: number;
   tienda_id?: number;
 }

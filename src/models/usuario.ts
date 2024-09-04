@@ -2,7 +2,6 @@ import { DataTypes, Model } from "sequelize";
 import { Usuario as UsuarioInteface } from "../interface/usuario";
 import sequelize from "../db/connection";
 import { Tienda } from "./tienda";
-import { Rol } from "./rol";
 
 export interface UsuarioModel extends Model<UsuarioInteface>, UsuarioInteface {}
 
@@ -27,7 +26,7 @@ export const Usuario = sequelize.define<UsuarioModel>(
       allowNull: false,
     },
     fecha_nacimiento: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     telefono: {
@@ -48,7 +47,7 @@ export const Usuario = sequelize.define<UsuarioModel>(
       allowNull: true,
       defaultValue: null,
     },
-    rol_id: {
+    rol: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -60,8 +59,4 @@ export const Usuario = sequelize.define<UsuarioModel>(
 
 Usuario.belongsTo(Tienda, {
   foreignKey: "tienda_id",
-});
-
-Usuario.belongsTo(Rol, {
-  foreignKey: "rol_id",
 });

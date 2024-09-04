@@ -1,7 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { Cliente as ClienteInterface } from "../interface/cliente";
 import sequelize from "../db/connection";
-import { Categoria } from "./categoria";
 
 export interface ClienteModel
   extends Model<ClienteInterface>,
