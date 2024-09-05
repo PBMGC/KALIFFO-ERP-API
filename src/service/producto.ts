@@ -1,120 +1,33 @@
 import { Producto as ProductoInterface } from "../interface/producto";
+import { ProductoDetalle as ProductoDetalleInterface } from "../interface/productoDetalle";
 import { Producto } from "../models/producto";
+import { ProductoDetalle } from "../models/productoDetalle";
 
-export const _getProductos = async () => {
-  const items = await Producto.findAll();
-
+export const _createProducto = async (
+  producto: ProductoInterface,
+  detalles: ProductoDetalleInterface[]
+) => {
   try {
-    return {
-      items,
-      succes: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      msg: "error _getProductos",
-      error,
-      succes: false,
-      status: 400,
-    };
-  }
-};
+    const newProducto = await Producto.create(producto);
 
-export const _getProducto = async (producto_id: string) => {
-  const item = await Producto.findOne({ where: { producto_id: producto_id } });
-
-  try {
-    return {
-      item,
-      succes: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      msg: "error _getProducto",
-      error,
-      succes: false,
-      status: 400,
-    };
-  }
-};
-
-export const _createProducto = async (producto: ProductoInterface) => {
-  try {
-    await Producto.create(producto);
-
-    return {
-      msg: `Producto ${producto.nombre} creado`,
-      succes: true,
-      status: 200,
-    };
-  } catch (error) {
-    console.log(error);
-
-    return {
-      msg: "error _createProducto",
-      error,
-      succes: false,
-      status: 400,
-    };
-  }
-};
-
-export const _deleteProducto = async (producto_id: string) => {
-  try {
-    if (!(await Producto.findOne({ where: { producto_id: producto_id } }))) {
-      return {
-        msg: `El cliente con id ${producto_id} no existe`,
-        succes: false,
-        status: 400,
-      };
-    }
-    await Producto.destroy({ where: { producto_id: producto_id } });
-
-    return {
-      msg: `El cliente con id ${producto_id} a sido eliminado`,
-      succes: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      msg: "error _deleteProducto",
-      error,
-      succes: false,
-      status: 400,
-    };
-  }
-};
-
-export const _updateProducto = async (producto: ProductoInterface) => {
-  try {
-    if (
-      !(await Producto.findOne({
-        where: { producto_id: producto.producto_id },
-      }))
-    ) {
-      return {
-        msg: `El producto con id => ${producto.producto_id} no existe`,
-        succes: false,
-        status: 400,
-      };
+    for (const detalle of detalles) {
+      detalle.producto_id = newProducto.producto_id || 0;
+      await ProductoDetalle.create(detalle);
+      newProducto.stockGeneral += detalle.stock;
     }
 
-    await Producto.update(producto, {
-      where: { producto_id: producto.producto_id },
-    });
+    await newProducto.save();
 
     return {
-      msg: `El producto ${producto.producto_id} ha sido actualizado con exito`,
+      msg: "producto creado",
       succes: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: "error _updateProducto",
-      error,
-      succes: false,
-      status: 400,
+      msg: "_createProducto",
+      succes: true,
+      status: 200,
     };
   }
 };

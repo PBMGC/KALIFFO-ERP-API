@@ -1,74 +1,18 @@
 import { Request, Response } from "express";
-import {
-  _createProducto,
-  _deleteProducto,
-  _getProducto,
-  _getProductos,
-  _updateProducto,
-} from "../service/producto";
 import { Producto } from "../interface/producto";
-
-export const getProductos = async (req: Request, res: Response) => {
-  try {
-    const response = await _getProductos();
-    res.status(response.status).json(response.items);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export const getProducto = async (req: Request, res: Response) => {
-  const { producto_id } = req.params;
-  try {
-    const response = await _getProducto(producto_id);
-    res.status(response.status).json(response.item);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
+import { _createProducto } from "../service/producto";
 
 export const createProducto = async (req: Request, res: Response) => {
-  const { nombre, precio, descuento, stockGeneral } = req.body;
-
-  const producto: Producto = {
+  const { nombre, precio, descuento, detalles } = req.body;
+  const newProducto: Producto = {
     nombre,
     precio,
     descuento,
-    stockGeneral,
+    stockGeneral: 0,
   };
 
   try {
-    const response = await _createProducto(producto);
-    res.status(response.status).json(response);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export const deleteProducto = async (req: Request, res: Response) => {
-  const { producto_id } = req.params;
-
-  try {
-    const response = await _deleteProducto(producto_id);
-    res.status(response.status).json(response);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export const updateProducto = async (req: Request, res: Response) => {
-  const { producto_id, nombre, precio, descuento, stockGeneral } = req.body;
-
-  const producto: Producto = {
-    producto_id,
-    nombre,
-    precio,
-    descuento,
-    stockGeneral,
-  };
-
-  try {
-    const response = await _updateProducto(producto);
+    const response = await _createProducto(newProducto, detalles);
     res.status(response.status).json(response);
   } catch (error) {
     res.status(400).json(error);

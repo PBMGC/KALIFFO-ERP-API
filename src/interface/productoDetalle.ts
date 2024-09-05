@@ -1,6 +1,6 @@
 export interface ProductoDetalle {
-  productoDetalle_id: number;
-  codigo: string;
+  productoDetalle_id?: number;
+  codigo?: string;
   talla: string;
   color: string;
   stock: number;
