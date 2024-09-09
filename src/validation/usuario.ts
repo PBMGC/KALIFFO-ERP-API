@@ -3,31 +3,82 @@ import { check } from "express-validator";
 import { validateResult } from "../util/validation";
 
 export const ValidateCreateUsuario: any = [
-  check("nombre").exists().not().isEmpty(),
-  check("ap_paterno").exists().not().isEmpty(),
-  check("ap_materno").exists().not().isEmpty(),
+  check("nombre")
+    .exists()
+    .withMessage("EL campo 'nombre' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("Este campo 'nombre' no debe ser vacio."),
+
+  check("ap_paterno")
+    .exists()
+    .withMessage("EL campo 'ap_paterno' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'ap_paterno' no debe ser vacio."),
+
+  check("ap_materno")
+    .exists()
+    .withMessage("EL campo 'ap_materno' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'ap_materno' no debe ser vacio."),
+
   check("fecha_nacimiento")
     .exists()
+    .withMessage("EL campo 'fecha_nacimiento' es obligatorio.")
     .not()
     .isEmpty()
-    .isDate({ format: "YYYY-MM-DD", strictMode: true }),
+    .withMessage("El campo 'fecha_nacimiento' no debe ser vacio.")
+    .isDate({ format: "YYYY-MM-DD", strictMode: true })
+    .withMessage("Formato de fecha 'YYYY-MM-DD'"),
+
   check("dni")
     .exists()
+    .withMessage("EL campo 'dni' es obligatorio.")
     .not()
     .isEmpty()
+    .withMessage("El campo 'dni' no debe ser vacio.")
     .isLength({ min: 8, max: 8 })
-    .withMessage("DNI debe tener 8 digitos"),
-  check("telefono").exists().not().isEmpty().isLength({ min: 9, max: 9 }),
-  check("contraseña").exists().not().isEmpty(),
-  check("rol").exists(),
+    .withMessage("El campo 'dni' debe tener 8 digitos"),
+
+  check("telefono")
+    .exists()
+    .withMessage("EL campo 'telefono' es obligatorio.")
+    .not()
+    .withMessage("El campo 'telefono' no debe ser vacio.")
+    .isEmpty()
+    .isLength({ min: 9, max: 9 })
+    .withMessage("El campo 'telefono' debe tener 9 digitos."),
+
+  check("contraseña")
+    .exists()
+    .withMessage("EL campo 'contraseña' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'contraseña' no debe ser vacio."),
+
+  check("rol").exists().withMessage("EL campo 'contraseña' es obligatorio."),
+
   (req: Request, res: Response, next: NextFunction) => {
     validateResult(req, res, next);
   },
 ];
 
 export const ValidateLogin: any = [
-  check("dni").exists().not().isEmpty(),
-  check("contraseña").exists().not().isEmpty(),
+  check("dni")
+    .exists()
+    .withMessage("EL campo 'dni' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'dni' no debe ser vacio."),
+  check("contraseña")
+    .exists()
+    .withMessage("EL campo 'contraseña' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'contraseña' no debe ser vacio."),
+
   (req: Request, res: Response, next: NextFunction) => {
     validateResult(req, res, next);
   },

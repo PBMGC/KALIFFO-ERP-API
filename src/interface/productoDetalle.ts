@@ -8,3 +8,5 @@ export interface ProductoDetalle {
   producto_id: number;
   tienda_id: number;
 }
+
+// talla color codigo

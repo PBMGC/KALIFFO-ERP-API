@@ -46,17 +46,19 @@ export const createUsuario = async (req: Request, res: Response) => {
 };
 
 export const getUsuarios = async (req: Request, res: Response) => {
-  const rol_id = req.query.rol_id;
+  const rol = req.query.rol;
   const inicio = req.query.inicio;
   const final = req.query.final;
   const nombre = req.query.nombre as string;
+
+  console.log(rol);
 
   try {
     const response = await _getUsuarios(
       Number(inicio),
       Number(final),
       nombre,
-      Number(rol_id)
+      Number(rol)
     );
     res.status(response.status).json(response.items);
   } catch (error) {

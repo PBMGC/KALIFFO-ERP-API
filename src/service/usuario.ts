@@ -7,8 +7,6 @@ import dotenv from "dotenv";
 import { Op } from "sequelize";
 import { Tienda } from "../models/tienda";
 import sequelize from "../db/connection";
-import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
-import { Incidencia } from "../models/incidencia";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -58,7 +56,7 @@ export const _getUsuarios = async (
   inicio?: number,
   final?: number,
   nombre?: string,
-  rol_id?: number
+  rol?: number
 ) => {
   try {
     const filtros: any = {
@@ -75,8 +73,8 @@ export const _getUsuarios = async (
       filtros.where.nombre = { [Op.like]: `%${nombre}%` };
     }
 
-    if (rol_id) {
-      filtros.where.rol_id = rol_id;
+    if (rol) {
+      filtros.where.rol = rol;
     }
 
     const items = await Usuario.findAll(filtros);
@@ -100,7 +98,7 @@ export const _getUsuarios = async (
     };
   } catch (error) {
     return {
-      error: "_getUsuarios",
+      msg: "_getUsuarios",
       succes: false,
       status: 400,
     };
