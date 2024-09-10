@@ -90,10 +90,24 @@ export const deleteUsuario = async (req: Request, res: Response) => {
 
 export const updateUsuario = async (req: Request, res: Response) => {
   const { usuario_id } = req.params;
-  const { telefono, tienda_id, rol } = req.body;
+  const {
+    nombre,
+    ap_paterno,
+    ap_materno,
+    fecha_nacimiento,
+    dni,
+    telefono,
+    tienda_id,
+    rol,
+  } = req.body;
 
   const updateUsuario: Partial<Usuario> = {
     usuario_id: Number(usuario_id),
+    nombre,
+    ap_paterno,
+    ap_materno,
+    fecha_nacimiento,
+    dni,
     telefono,
     tienda_id,
     rol,

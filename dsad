@@ -1,0 +1,26 @@
+[33m7fc192a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rpc[m[33m, [m[1;32mrpc[m[33m)[m rpc => agregando producto
+[33mf1fefab[m[33m ([m[1;31morigin/main[m[33m)[m main => agregar modelos para productos y funcion de crear
+[33m290b952[m rpc => arreglando errores
+[33m177cbc9[m rpc => mejorando funciones de usuario
+[33m727942f[m aaaaaaaaa
+[33m7eda35b[m x2 arreglando errores
+[33mc38670f[m arreglando errror
+[33m8120514[m cambiando getUsuarios
+[33m11aa97c[m rpc arreglando getUsuarios
+[33mf70a7a1[m rpc => agregando express-validators y script con data al inicio
+[33ma892c48[m rpc => agregar a la tabla usuario y filtros a getUsusrio
+[33m9f07969[m rpc => agregar a la tabla usuario y filtros a getUsusrio
+[33meb95dd8[m cambio import desde service/rol
+[33mc687158[m arreglando errores
+[33mbd19738[m agregando login
+[33mfbba7fd[m Merge branch 'rpc'
+[33mdab2fdf[m agregando usuarios
+[33ma4362ec[m Merge branch 'main' of https://github.com/PBMGC/KALIFFO-ERP-API
+[33m7a1b431[m .
+[33ma86a685[m Merge pull request #1 from PBMGC/rpc
+[33mbe22e39[m documentar api
+[33m1f685d4[m first commit rama roc
+[33m9a9dac1[m agregar codigo a cliente
+[33m4790f4e[m Dsadsa
+[33me4b2822[m agregando categorias
+[33m56c0725[m[33m ([m[1;32mmaster[m[33m)[m first commit
