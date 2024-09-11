@@ -37,4 +37,5 @@ export const Incidencia = sequelize.define<IncidenciaModel>(
 
 Incidencia.belongsTo(Usuario, {
   foreignKey: "usuario_id",
+  onDelete: "CASCADE",
 });
