@@ -1,0 +1,8 @@
+npm i
+npm audit fix
+npm i nodemon -G
+npm i typescript -g
+npm run type
+
+en otra terminal
+npm run dev
