@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { Producto as ProductoInterface } from "../interface/producto";
 import sequelize from "../db/connection";
+import { ProductoDetalle } from "./productoDetalle";
 
 export interface ProductoModel
   extends Model<ProductoInterface>,
@@ -34,5 +35,6 @@ export const Producto = sequelize.define<ProductoModel>(
   },
   {
     freezeTableName: true,
+    timestamps: false,
   }
 );

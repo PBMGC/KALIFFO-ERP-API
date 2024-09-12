@@ -25,8 +25,16 @@ export const createProducto = async (req: Request, res: Response) => {
 };
 
 export const getProductos = async (req: Request, res: Response) => {
+  const nombre = req.query.nombre as string;
+  const talla = req.query.talla as string;
+  const color = req.query.color as string;
+
+  console.log(nombre);
+  console.log(color);
+  console.log(talla);
+
   try {
-    const response = await _getProductos();
+    const response = await _getProductos(nombre, talla, color);
     res.status(response.status).json(response.items);
   } catch (error) {
     res.status(400).json(error);
