@@ -35,12 +35,15 @@ export const _createProducto = async (
 export const _getProductos = async () => {
   try {
     const items = await Producto.findAll();
+
     return {
       items,
       success: true,
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "_getProductos",
       success: true,
@@ -54,12 +57,19 @@ export const _getProducto = async (producto_id: number) => {
     const item = await Producto.findOne({
       where: { producto_id: producto_id },
     });
+
+    const detalles = await ProductoDetalle.findAll({
+      where: { producto_id: producto_id },
+    });
+
     return {
-      item,
+      item: { ...item?.dataValues, detalles },
       success: true,
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: "_getProducto",
       success: true,
