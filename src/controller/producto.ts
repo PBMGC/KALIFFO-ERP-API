@@ -34,7 +34,7 @@ export const getProductos = async (req: Request, res: Response) => {
   console.log(talla);
 
   try {
-    const response = await _getProductos(nombre, talla, color);
+    const response = await _getProductos();
     res.status(response.status).json(response.items);
   } catch (error) {
     res.status(400).json(error);
