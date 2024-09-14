@@ -1,33 +1,48 @@
+import { Model } from "sequelize";
 import { Producto as ProductoInterface } from "../interface/producto";
-import { ProductoDetalle as ProductoDetalleInterface } from "../interface/productoDetalle";
 import { Producto } from "../models/producto";
 import { ProductoDetalle } from "../models/productoDetalle";
+import { ProductoTienda } from "../models/productoTienda";
+import { Color } from "../models/color";
 
 export const _createProducto = async (
   producto: ProductoInterface,
-  detalles: ProductoDetalleInterface[]
+  detalles: any
 ) => {
   try {
+    console.log("Detalles => ", detalles);
+
     const newProducto = await Producto.create(producto);
 
     for (const detalle of detalles) {
-      detalle.producto_id = newProducto.producto_id || 0;
-      await ProductoDetalle.create(detalle);
-      newProducto.stockGeneral += detalle.stock;
-    }
+      const newDetalle = await ProductoDetalle.create({
+        codigo: detalle.codigo,
+        talla: detalle.talla,
+        color_id: detalle.color_id,
+        producto_id: newProducto.producto_id || 0,
+      });
 
+      for (const tienda of detalle.tiendas) {
+        await ProductoTienda.create({
+          stock: tienda.stock,
+          productoDetalle_id: newDetalle.productoDetalle_id || 0,
+          tienda_id: tienda.tienda_id,
+        });
+        newProducto.stockGeneral += Number(tienda.stock);
+      }
+    }
     await newProducto.save();
 
     return {
-      msg: "producto creado",
+      nsg: newProducto,
       success: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: "_createProducto",
-      success: true,
-      status: 200,
+      message: "_createProducto",
+      success: false,
+      status: 400,
     };
   }
 };
@@ -58,8 +73,22 @@ export const _getProducto = async (producto_id: number) => {
       where: { producto_id: producto_id },
     });
 
-    const detalles = await ProductoDetalle.findAll({
-      where: { producto_id: producto_id },
+    // const detalles = await ProductoDetalle.findAll({
+    //   where: { producto_id: producto_id },
+    // });
+
+    const detalles = await ProductoTienda.findAll({
+      include: [
+        {
+          model: ProductoDetalle,
+          where: { producto_id: producto_id },
+          include: [
+            {
+              model: Color,
+            },
+          ],
+        },
+      ],
     });
 
     return {
@@ -81,7 +110,7 @@ export const _getProducto = async (producto_id: number) => {
 export const _updateProducto = async (
   producto_id: number,
   updatedProducto: ProductoInterface,
-  detalles: ProductoDetalleInterface[]
+  detalles: any
 ) => {
   try {
     const producto = await Producto.findByPk(producto_id);
@@ -94,22 +123,60 @@ export const _updateProducto = async (
       };
     }
 
+    updatedProducto.stockGeneral = 0;
+
     for (let detalle of detalles) {
-      if (detalle.productoDetalle_id == null) {
-        delete detalle.productoDetalle_id;
-        await ProductoDetalle.create({ ...detalle, producto_id: producto_id });
-      } else {
-        await ProductoDetalle.update(detalle, {
-          where: { productoDetalle_id: detalle.productoDetalle_id },
+      let newDetalle;
+
+      if (!detalle.productoDetalle_id) {
+        newDetalle = await ProductoDetalle.create({
+          codigo: detalle.codigo,
+          talla: detalle.talla,
+          color_id: detalle.color_id,
+          producto_id: producto_id,
         });
+      } else {
+        newDetalle = await ProductoDetalle.findByPk(detalle.productoDetalle_id);
+
+        if (newDetalle) {
+          await newDetalle.update({
+            codigo: detalle.codigo,
+            talla: detalle.talla,
+            color_id: detalle.color_id,
+          });
+        }
       }
-      updatedProducto.stockGeneral += detalle.stock;
+
+      for (const tienda of detalle.tiendas) {
+        let productoTienda = await ProductoTienda.findOne({
+          where: {
+            productoDetalle_id: newDetalle?.productoDetalle_id,
+            tienda_id: tienda.tienda_id,
+          },
+        });
+
+        if (productoTienda) {
+          await productoTienda.update({
+            stock: tienda.stock,
+          });
+        } else {
+          await ProductoTienda.create({
+            stock: tienda.stock,
+            productoDetalle_id: newDetalle?.productoDetalle_id || 0,
+            tienda_id: tienda.tienda_id,
+          });
+        }
+
+        updatedProducto.stockGeneral += Number(tienda.stock);
+        console.log(updatedProducto.stockGeneral);
+      }
     }
 
     await producto.update(updatedProducto);
+    console.log(producto);
 
     return {
-      msg: "Producto actualizado",
+      msg: producto,
       success: true,
       status: 200,
     };

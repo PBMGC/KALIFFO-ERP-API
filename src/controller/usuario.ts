@@ -50,6 +50,7 @@ export const getUsuarios = async (req: Request, res: Response) => {
   const inicio = req.query.inicio;
   const final = req.query.final;
   const nombre = req.query.nombre as string;
+  const tienda_id = req.query.tienda_id;
 
   console.log(rol);
 
@@ -58,7 +59,8 @@ export const getUsuarios = async (req: Request, res: Response) => {
       Number(inicio),
       Number(final),
       nombre,
-      Number(rol)
+      Number(rol),
+      Number(tienda_id)
     );
     res.status(response.status).json(response.items);
   } catch (error) {

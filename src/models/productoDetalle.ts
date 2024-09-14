@@ -3,6 +3,8 @@ import { ProductoDetalle as ProductoDetalleInterface } from "../interface/produc
 import sequelize from "../db/connection";
 import { Producto } from "./producto";
 import { Tienda } from "./tienda";
+import { ProductoTienda } from "./productoTienda";
+import { Color } from "./color";
 
 export interface ProductoDetalleModel
   extends Model<ProductoDetalleInterface>,
@@ -24,11 +26,7 @@ export const ProductoDetalle = sequelize.define<ProductoDetalleModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    color: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    stock: {
+    color_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -36,18 +34,14 @@ export const ProductoDetalle = sequelize.define<ProductoDetalleModel>(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    tienda_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
-  { freezeTableName: true }
+  { freezeTableName: true, timestamps: false }
 );
 
 ProductoDetalle.belongsTo(Producto, {
   foreignKey: "producto_id",
 });
 
-ProductoDetalle.belongsTo(Tienda, {
-  foreignKey: "tienda_id",
+ProductoDetalle.belongsTo(Color, {
+  foreignKey: "color_id",
 });

@@ -1,11 +1,14 @@
 import sequelize from "../db/connection";
+import { Color as ColorInterface } from "../interface/color";
 import { Producto as ProductoInterface } from "../interface/producto";
 import { Tienda as TiendaInterface } from "../interface/tienda";
 import { Usuario as UsuarioInterface } from "../interface/usuario";
+import { Color } from "../models/color";
 import { Horario } from "../models/horario";
 import { Producto } from "../models/producto";
 import { Tienda } from "../models/tienda";
 import { Usuario } from "../models/usuario";
+import { _createColor } from "../service/color";
 import { _createProducto } from "../service/producto";
 import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
@@ -75,116 +78,222 @@ const usuarios: UsuarioInterface[] = [
   },
 ];
 
-const productos: any = [
+const colores: ColorInterface[] = [
+  { nombre: "Rojo", codigo: "FF0000" },
+  { nombre: "Verde", codigo: "00FF00" },
+  { nombre: "Azul", codigo: "0000FF" },
+  { nombre: "Amarillo", codigo: "FFFF00" },
+  { nombre: "Naranja", codigo: "FFA500" },
+  { nombre: "Violeta", codigo: "EE82EE" },
+  { nombre: "Negro", codigo: "000000" },
+  { nombre: "Blanco", codigo: "FFFFFF" },
+  { nombre: "Gris", codigo: "808080" },
+  { nombre: "Marrón", codigo: "A52A2A" },
+  { nombre: "Rosa", codigo: "FFC0CB" },
+  { nombre: "Celeste", codigo: "87CEEB" },
+  { nombre: "Cian", codigo: "00FFFF" },
+  { nombre: "Magenta", codigo: "FF00FF" },
+  { nombre: "Dorado", codigo: "FFD700" },
+  { nombre: "Plateado", codigo: "C0C0C0" },
+  { nombre: "Púrpura", codigo: "800080" },
+  { nombre: "Azul Marino", codigo: "000080" },
+  { nombre: "Verde Oliva", codigo: "808000" },
+  { nombre: "Lavanda", codigo: "E6E6FA" },
+  { nombre: "Turquesa", codigo: "40E0D0" },
+  { nombre: "Salmón", codigo: "FA8072" },
+  { nombre: "Aguamarina", codigo: "7FFFD4" },
+  { nombre: "Coral", codigo: "FF7F50" },
+  { nombre: "Caqui", codigo: "F0E68C" },
+  { nombre: "Azul Cobalto", codigo: "0047AB" },
+  { nombre: "Verde Lima", codigo: "32CD32" },
+  { nombre: "Marfil", codigo: "FFFFF0" },
+  { nombre: "Fucsia", codigo: "FF00FF" },
+  { nombre: "Verde Menta", codigo: "98FF98" },
+];
+
+const productos: any[] = [
   {
-    nombre: "jean clásico",
-    precio: 10.0,
-    descuento: 15,
-    detalles: [
-      {
-        codigo: "JEAN-001",
-        talla: "M",
-        color: "Rojo",
-        stock: 6,
-        tienda_id: 1,
-      },
-      {
-        codigo: "JEAN-001",
-        talla: "M",
-        color: "Rojo",
-        stock: 30,
-        tienda_id: 2,
-      },
-      {
-        codigo: "JEAN-002",
-        talla: "L",
-        color: "Rojo",
-        stock: 4,
-        tienda_id: 1,
-      },
-    ],
-  },
-  {
-    nombre: "jean slim fit",
-    precio: 12.0,
+    nombre: "Jeans Slim Fit",
+    precio: 49.99,
     descuento: 10,
     detalles: [
       {
-        codigo: "JEAN-003",
-        talla: "S",
-        color: "Azul",
-        stock: 20,
-        tienda_id: 1,
+        codigo: "j001",
+        talla: "32",
+        color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 20,
+          },
+          {
+            tienda_id: 2,
+            stock: 30,
+          },
+        ],
       },
       {
-        codigo: "JEAN-004",
-        talla: "M",
-        color: "Azul",
-        stock: 15,
-        tienda_id: 2,
+        codigo: "j002",
+        talla: "34",
+        color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 15,
+          },
+          {
+            tienda_id: 2,
+            stock: 25,
+          },
+        ],
       },
     ],
   },
   {
-    nombre: "jean desgastado",
-    precio: 14.0,
+    nombre: "Jeans Regular Fit",
+    precio: 54.99,
     descuento: 5,
     detalles: [
       {
-        codigo: "JEAN-005",
-        talla: "L",
-        color: "Negro",
-        stock: 10,
-        tienda_id: 1,
+        codigo: "j003",
+        talla: "32",
+        color_id: 2,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 18,
+          },
+          {
+            tienda_id: 2,
+            stock: 28,
+          },
+        ],
       },
       {
-        codigo: "JEAN-006",
-        talla: "XL",
-        color: "Negro",
-        stock: 8,
-        tienda_id: 2,
-      },
-    ],
-  },
-  {
-    nombre: "jean recto",
-    precio: 18.0,
-    descuento: 12,
-    detalles: [
-      {
-        codigo: "JEAN-007",
-        talla: "M",
-        color: "Gris",
-        stock: 25,
-        tienda_id: 1,
-      },
-      {
-        codigo: "JEAN-008",
-        talla: "L",
-        color: "Gris",
-        stock: 22,
-        tienda_id: 2,
+        codigo: "j004",
+        talla: "34",
+        color_id: 2,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 12,
+          },
+          {
+            tienda_id: 2,
+            stock: 22,
+          },
+        ],
       },
     ],
   },
   {
-    nombre: "jean de tiro alto",
-    precio: 16.0,
-    descuento: 8,
+    nombre: "Jeans Relaxed Fit",
+    precio: 59.99,
+    descuento: 15,
     detalles: [
       {
-        codigo: "JEAN-009",
-        talla: "M",
-        color: "Azul claro",
-        stock: 18,
-        tienda_id: 1,
+        codigo: "j005",
+        talla: "36",
+        color_id: 3,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 25,
+          },
+          {
+            tienda_id: 2,
+            stock: 35,
+          },
+        ],
       },
       {
-        codigo: "JEAN-010",
-        talla: "S",
-        color: "Azul claro",
-        stock: 12,
-        tienda_id: 2,
+        codigo: "j006",
+        talla: "38",
+        color_id: 3,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 20,
+          },
+          {
+            tienda_id: 2,
+            stock: 30,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Skinny Fit",
+    precio: 44.99,
+    descuento: 20,
+    detalles: [
+      {
+        codigo: "j007",
+        talla: "30",
+        color_id: 4,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 22,
+          },
+          {
+            tienda_id: 2,
+            stock: 32,
+          },
+        ],
+      },
+      {
+        codigo: "j008",
+        talla: "32",
+        color_id: 4,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 18,
+          },
+          {
+            tienda_id: 2,
+            stock: 28,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Bootcut",
+    precio: 69.99,
+    descuento: 25,
+    detalles: [
+      {
+        codigo: "j009",
+        talla: "34",
+        color_id: 5,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 30,
+          },
+          {
+            tienda_id: 2,
+            stock: 40,
+          },
+        ],
+      },
+      {
+        codigo: "j010",
+        talla: "36",
+        color_id: 5,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 28,
+          },
+          {
+            tienda_id: 2,
+            stock: 38,
+          },
+        ],
       },
     ],
   },
@@ -216,6 +325,20 @@ export const scriptInicio = async () => {
       ("9:00:00", "17:00:00","2024-08-19",1),
       ("9:00:00", "14:00:00","2024-08-18",1),
       ("9:00:00", "12:00:00","2024-08-14",1);`);
+  }
+
+  for (const color of colores) {
+    const colorExistente = await Color.findOne({
+      where: { nombre: color.nombre },
+    });
+
+    const newColor = {
+      nombre: color.nombre,
+      codigo: color.codigo,
+    };
+    if (!colorExistente) {
+      await _createColor(newColor);
+    }
   }
 
   for (const producto of productos) {
