@@ -4,14 +4,15 @@ import { Color } from "../models/color";
 export const _createColor = async (color: ColorInterface) => {
   try {
     const newColor = await Color.create(color);
+
     return {
-      msg: newColor,
+      message: newColor,
       success: true,
-      status: 200,
+      status: 201,
     };
   } catch (error) {
     return {
-      msg: error,
+      message: error,
       success: false,
       status: 400,
     };
@@ -28,9 +29,9 @@ export const _getColores = async () => {
     };
   } catch (error) {
     return {
-      msg: error,
+      message: error,
       success: false,
-      status: 400,
+      status: 500,
     };
   }
 };

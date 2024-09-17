@@ -1,4 +1,3 @@
-import { Model } from "sequelize";
 import { Producto as ProductoInterface } from "../interface/producto";
 import { Producto } from "../models/producto";
 import { ProductoDetalle } from "../models/productoDetalle";
@@ -10,8 +9,6 @@ export const _createProducto = async (
   detalles: any
 ) => {
   try {
-    console.log("Detalles => ", detalles);
-
     const newProducto = await Producto.create(producto);
 
     for (const detalle of detalles) {
@@ -34,15 +31,15 @@ export const _createProducto = async (
     await newProducto.save();
 
     return {
-      nsg: newProducto,
+      message: newProducto,
       success: true,
-      status: 200,
+      status: 201,
     };
   } catch (error) {
     return {
-      message: "_createProducto",
+      message: "error _createProducto",
       success: false,
-      status: 400,
+      status: 500,
     };
   }
 };
@@ -50,19 +47,16 @@ export const _createProducto = async (
 export const _getProductos = async () => {
   try {
     const items = await Producto.findAll();
-
     return {
       items,
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_getProductos",
-      success: true,
-      status: 200,
+      msg: "error _getProductos",
+      success: false,
+      status: 500,
     };
   }
 };
@@ -73,9 +67,13 @@ export const _getProducto = async (producto_id: number) => {
       where: { producto_id: producto_id },
     });
 
-    // const detalles = await ProductoDetalle.findAll({
-    //   where: { producto_id: producto_id },
-    // });
+    if (!item) {
+      return {
+        message: `No se encotro producto con id => ${producto_id}`,
+        success: false,
+        status: 404,
+      };
+    }
 
     const detalles = await ProductoTienda.findAll({
       include: [
@@ -97,10 +95,8 @@ export const _getProducto = async (producto_id: number) => {
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_getProducto",
+      message: "_getProducto",
       success: true,
       status: 200,
     };
@@ -117,7 +113,7 @@ export const _updateProducto = async (
 
     if (!producto) {
       return {
-        msg: "Producto no encontrado",
+        message: `No se encotro producto con id => ${producto_id}`,
         success: false,
         status: 404,
       };
@@ -168,23 +164,19 @@ export const _updateProducto = async (
         }
 
         updatedProducto.stockGeneral += Number(tienda.stock);
-        console.log(updatedProducto.stockGeneral);
       }
     }
 
     await producto.update(updatedProducto);
-    console.log(producto);
 
     return {
-      msg: producto,
+      message: producto,
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_updateProducto",
+      message: "error _updateProducto",
       success: false,
       status: 500,
     };

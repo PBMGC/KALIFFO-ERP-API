@@ -297,6 +297,43 @@ const productos: any[] = [
       },
     ],
   },
+  {
+    nombre: "Jeans Slim Fit12",
+    precio: 49.99,
+    descuento: 10,
+    detalles: [
+      {
+        codigo: "j001",
+        talla: "32",
+        color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 20,
+          },
+          {
+            tienda_id: 3,
+            stock: 30,
+          },
+        ],
+      },
+      {
+        codigo: "j002",
+        talla: "34",
+        color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 15,
+          },
+          {
+            tienda_id: 3,
+            stock: 25,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const scriptInicio = async () => {

@@ -32,11 +32,19 @@ export const Usuario = sequelize.define<UsuarioModel>(
     telefono: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [9, 9],
+        isNumeric: true,
+      },
     },
     dni: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        len: [8, 8],
+        isNumeric: true,
+      },
     },
     contraseña: {
       type: DataTypes.STRING,

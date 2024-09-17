@@ -13,8 +13,8 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
   try {
     if (await Usuario.findOne({ where: { dni: usuario.dni } })) {
       return {
-        msg: "este dni ya esta en uso",
-        succes: false,
+        message: "Este DNI ya está en uso",
+        success: false,
         status: 400,
       };
     }
@@ -24,8 +24,8 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
         !(await Tienda.findOne({ where: { tienda_id: usuario.tienda_id } }))
       ) {
         return {
-          msg: "Esta tienda no existe",
-          succes: false,
+          message: "Esta tienda no existe",
+          success: false,
           status: 400,
         };
       }
@@ -37,17 +37,17 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
     const newUsuario = await Usuario.create(usuario);
 
     return {
-      msg: newUsuario,
-      succes: true,
-      status: 200,
+      message: "Usuario creado exitosamente",
+      data: newUsuario,
+      success: true,
+      status: 201,
     };
   } catch (error) {
-    console.log(error);
-
+    console.error("Error al crear el usuario:", error);
     return {
-      error: "_createUsuario",
-      succes: false,
-      status: 400,
+      message: "error _createUsuario",
+      success: false,
+      status: 500,
     };
   }
 };
@@ -87,7 +87,7 @@ export const _getUsuarios = async (
     const transformedItems = items.map((item: any) => {
       const tienda = item.tienda;
       const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
-        item.toJSON(); // Exclude contraseña
+        item.toJSON();
 
       return {
         ...userWithoutPassword,
@@ -98,14 +98,14 @@ export const _getUsuarios = async (
 
     return {
       items: transformedItems,
-      succes: true,
+      success: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: "_getUsuarios",
-      succes: false,
-      status: 400,
+      message: "error _getUsuarios",
+      success: false,
+      status: 500,
     };
   }
 };
@@ -118,24 +118,22 @@ export const _getUsuario = async (usuario_id: string) => {
 
     if (!item) {
       return {
-        msg: "No se encontro usuario",
-        succes: false,
-        status: 400,
+        message: "Usuario no encontrado",
+        success: false,
+        status: 404,
       };
     }
 
     return {
       item,
-      succes: true,
+      success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      error: "_getUsuario",
-      succes: false,
-      status: 400,
+      message: "error _getUsuario",
+      success: false,
+      status: 500,
     };
   }
 };
@@ -148,7 +146,7 @@ export const _deleteUsuario = async (usuario_id: string) => {
 
     if (!usuario) {
       return {
-        msg: "No existe usuario",
+        message: "Usuario no encontrado",
         success: false,
         status: 404,
       };
@@ -157,15 +155,13 @@ export const _deleteUsuario = async (usuario_id: string) => {
     await usuario.destroy();
 
     return {
-      msg: "usuario eliminado",
+      message: "Usuario eliminado exitosamente",
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_deleteUsuario",
+      message: "error _deleteUsuario",
       success: false,
       status: 500,
     };
@@ -180,7 +176,7 @@ export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
 
     if (!updateUsuario) {
       return {
-        msg: "No se encontró un usuario con este DNI",
+        message: "Usuario no encontrado",
         success: false,
         status: 404,
       };
@@ -189,13 +185,13 @@ export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
     await updateUsuario.update(usuario);
 
     return {
-      msg: updateUsuario,
+      message: updateUsuario,
       success: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: "_updateUsuario",
+      message: "error _updateUsuario",
       success: false,
       status: 500,
     };
@@ -210,8 +206,8 @@ export const _login = async (dni: string, contraseña: string) => {
 
     if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
       return {
-        msg: "dni o contraseña incorrecto",
-        succes: false,
+        message: "DNI o contraseña incorrectos",
+        success: false,
         status: 400,
       };
     }
@@ -222,22 +218,20 @@ export const _login = async (dni: string, contraseña: string) => {
         nombre: usuario.nombre,
         dni: usuario.dni,
       },
-      process.env.SECRET_KEY || "as"
+      process.env.SECRET_KEY || "default_secret_key"
     );
 
     return {
-      msg: `bienvenido ${usuario.nombre}`,
+      message: `Bienvenido ${usuario.nombre}`,
       token,
-      succes: true,
+      success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_login",
-      succes: false,
-      status: 400,
+      message: "error _login",
+      success: false,
+      status: 500,
     };
   }
 };
@@ -249,14 +243,13 @@ export const _horaEntrada = async (usuario_id: number) => {
     const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
 
     const asistenciaExistente = await Horario.findOne({
-      where: { fecha: fecha },
+      where: { fecha: fecha, usuario_id: usuario_id, hora_salida: null },
     });
 
-    if (asistenciaExistente?.hora_salida === null) {
+    if (asistenciaExistente) {
       return {
-        msg: "Asistencia sin terminar",
-        asistenciaExistente,
-        succes: false,
+        message: "Asistencia ya registrada para hoy",
+        success: false,
         status: 400,
       };
     }
@@ -269,46 +262,52 @@ export const _horaEntrada = async (usuario_id: number) => {
     });
 
     return {
-      msg: newHorario,
-      succes: true,
+      message: newHorario,
+      success: true,
       status: 200,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_horaEntrada",
-      succes: false,
-      status: 400,
+      message: "error _horaEntrada",
+      success: false,
+      status: 500,
     };
   }
 };
 
 export const _horaSalida = async (usuario_id: number) => {
-  const now = new Date();
-  const fecha = now.toLocaleDateString("en-CA");
-  const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
+  try {
+    const now = new Date();
+    const fecha = now.toLocaleDateString("en-CA");
+    const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
 
-  const asistencia = await Horario.findOne({
-    where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
-  });
+    const asistencia = await Horario.findOne({
+      where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
+    });
 
-  if (!asistencia) {
+    if (!asistencia) {
+      return {
+        message: "Primero debes registrar la hora de entrada",
+        success: false,
+        status: 400,
+      };
+    }
+
+    asistencia.hora_salida = horaSalida;
+    await asistencia.save();
+
     return {
-      msg: "Iniciar asistencia primero",
-      succes: false,
-      status: 400,
+      message: asistencia,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message: "error _ horaSalida",
+      success: false,
+      status: 500,
     };
   }
-
-  asistencia.hora_salida = horaSalida;
-  await asistencia.save();
-
-  return {
-    msg: asistencia,
-    succes: true,
-    status: 200,
-  };
 };
 
 export const _horasTrabajadas = async (
@@ -316,28 +315,36 @@ export const _horasTrabajadas = async (
   fechaInicio: string,
   fechaFin: string
 ) => {
-  const horasTrabajadas = await Horario.findAll({
-    where: {
-      usuario_id: usuario_id,
-      fecha: {
-        [Op.between]: [fechaFin, fechaInicio],
+  try {
+    const horasTrabajadas = await Horario.findAll({
+      where: {
+        usuario_id: usuario_id,
+        fecha: {
+          [Op.between]: [fechaInicio, fechaFin],
+        },
       },
-    },
-    attributes: [
-      [
-        sequelize.fn(
-          "SUM",
-          sequelize.literal("TIMESTAMPDIFF(HOUR, hora_entrada, hora_salida)")
-        ),
-        "totalHoras",
+      attributes: [
+        [
+          sequelize.fn(
+            "SUM",
+            sequelize.literal("TIMESTAMPDIFF(HOUR, hora_entrada, hora_salida)")
+          ),
+          "totalHoras",
+        ],
       ],
-    ],
-    raw: true,
-  });
+      raw: true,
+    });
 
-  return {
-    msg: horasTrabajadas,
-    success: true,
-    status: 200,
-  };
+    return {
+      message: horasTrabajadas,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message: "error _horasTrabajadas",
+      success: false,
+      status: 500,
+    };
+  }
 };
