@@ -53,46 +53,13 @@ export const _getTiendas = async () => {
 export const _getTienda = async (tienda_id: number) => {
   try {
     const item = await Tienda.findOne({ where: { tienda_id } });
-
-    const productos = await ProductoTienda.findAll({
+    const nroUsuarios = await Usuario.count({ where: { tienda_id } });
+    const stockTotal = await ProductoTienda.sum("stock", {
       where: { tienda_id },
-      include: [
-        {
-          model: ProductoDetalle,
-          attributes: [],
-          include: [
-            {
-              model: Producto,
-              attributes: [],
-            },
-          ],
-        },
-      ],
-      attributes: [
-        "tienda_id",
-        "productoDetalle.producto.producto_id",
-        "productoDetalle.producto.nombre",
-        "productoDetalle.producto.precio",
-        "productoDetalle.producto.descuento",
-      ],
-      group: "producto_id",
-      raw: true,
     });
-
-    const usuarios = await Usuario.findAll({
-      where: { tienda_id },
-      attributes: { exclude: ["contraseña", "createdAt", "updatedAt"] },
-    });
-    if (!item) {
-      return {
-        msg: "Tienda no encontrada",
-        success: false,
-        status: 404,
-      };
-    }
 
     return {
-      item: { ...item.dataValues, productos, usuarios },
+      item: { ...item?.dataValues, nroUsuarios, stockTotal },
       success: true,
       status: 200,
     };
