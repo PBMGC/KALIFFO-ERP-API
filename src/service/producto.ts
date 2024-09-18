@@ -193,6 +193,7 @@ export const _getProductoDetalle = async (tienda_id: string) => {
         "productoDetalle.producto.producto_id",
         "productoDetalle.producto.precio",
         "productoDetalle.producto.descuento",
+        "productoDetalle.producto.nombre",
         [
           sequelize.fn("GROUP_CONCAT", sequelize.col("productoDetalle.talla")),
           "tallas",
