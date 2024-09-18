@@ -67,6 +67,7 @@ export const _getUsuarios = async (
         attributes: ["tienda_id", "tienda"],
       },
       where: {},
+
       offset: inicio || 0,
       limit: final ? final - (inicio || 0) : undefined,
     };
@@ -82,7 +83,6 @@ export const _getUsuarios = async (
     if (tienda_id) {
       filtros.where.tienda_id = tienda_id;
     }
-
 
     const items = await Usuario.findAll(filtros);
 
