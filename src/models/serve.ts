@@ -10,6 +10,8 @@ import { Incidencia } from "./incidencia";
 import { scriptInicio } from "../util/script";
 import { Producto } from "./producto";
 import { ProductoDetalle } from "./productoDetalle";
+import { ProductoTienda } from "./productoTienda";
+import { Color } from "./color";
 
 class Serve {
   app: express.Application;
@@ -47,7 +49,10 @@ class Serve {
       await Horario.sync();
       await Incidencia.sync();
       await Producto.sync();
+      await Color.sync();
+
       await ProductoDetalle.sync();
+      await ProductoTienda.sync();
       scriptInicio();
     } catch (error) {
       console.log(error);

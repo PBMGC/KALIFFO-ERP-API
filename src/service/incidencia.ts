@@ -7,17 +7,15 @@ export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
     const newIncidencia = await Incidencia.create(incidencia);
 
     return {
-      msg: newIncidencia,
-      succes: true,
-      status: 200,
+      message: newIncidencia,
+      success: true,
+      status: 201,
     };
   } catch (error) {
-    console.log(error);
-
     return {
-      msg: "_createIncidencia",
+      msg: "error _createIncidencia",
       succes: false,
-      status: 400,
+      status: 500,
     };
   }
 };

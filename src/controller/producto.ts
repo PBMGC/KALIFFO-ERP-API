@@ -3,13 +3,15 @@ import { Producto } from "../interface/producto";
 import {
   _createProducto,
   _getProducto,
+  _getProductoDetalle,
   _getProductos,
   _updateProducto,
 } from "../service/producto";
+import { handleHttp } from "../util/error.handler";
 
 export const createProducto = async (req: Request, res: Response) => {
   const { nombre, precio, descuento, detalles } = req.body;
-  const newProducto: Producto = {
+  const producto: Producto = {
     nombre,
     precio,
     descuento,
@@ -17,27 +19,19 @@ export const createProducto = async (req: Request, res: Response) => {
   };
 
   try {
-    const response = await _createProducto(newProducto, detalles);
+    const response = await _createProducto(producto, detalles);
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_createProducto", 500);
   }
 };
 
 export const getProductos = async (req: Request, res: Response) => {
-  const nombre = req.query.nombre as string;
-  const talla = req.query.talla as string;
-  const color = req.query.color as string;
-
-  console.log(nombre);
-  console.log(color);
-  console.log(talla);
-
   try {
     const response = await _getProductos();
     res.status(response.status).json(response.items);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_getProductos", 500);
   }
 };
 
@@ -48,7 +42,7 @@ export const getProducto = async (req: Request, res: Response) => {
     const response = await _getProducto(Number(producto_id));
     res.status(response.status).json(response.item);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_getProducto", 500);
   }
 };
 
@@ -71,6 +65,17 @@ export const updateProducto = async (req: Request, res: Response) => {
     );
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_updateProducto", 500);
+  }
+};
+
+export const getProductoDetalle = async (req: Request, res: Response) => {
+  const tienda_id = req.query.tienda_id as string;
+
+  try {
+    const response = await _getProductoDetalle(tienda_id);
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error_getProductoDetalle", 500);
   }
 };

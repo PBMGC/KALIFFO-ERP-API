@@ -9,11 +9,11 @@ export const ValidateCreateProducto: any = [
     .withMessage("El campo 'nombre' es obligatorio")
     .not()
     .isEmpty()
-    .withMessage("El campo 'nombre' no debe ser vacio"),
+    .withMessage("El campo 'nombre' no debe ser vacío"),
 
   check("precio")
     .exists()
-    .withMessage("El campo 'precio' es obligatorio.")
+    .withMessage("El campo 'precio' es obligatorio")
     .isFloat({ min: 0 })
     .withMessage("El campo 'precio' debe ser un número positivo.")
     .custom((value) => {
@@ -27,42 +27,55 @@ export const ValidateCreateProducto: any = [
 
   check("descuento")
     .exists()
-    .withMessage("El campo 'descuento' no debe ser vacio")
-    .isInt({ gt: 0 })
-    .withMessage("Eñ campo 'descuento' debe ser un numero entero positivo"),
+    .withMessage("El campo 'descuento' es obligatorio.")
+    .custom((value) => {
+      if (!/^\d+%?$/.test(value)) {
+        throw new Error("El campo 'descuento' debe ser un porcentaje válido.");
+      }
+      return true;
+    }),
 
   check("detalles")
     .exists()
     .withMessage("El campo 'detalles' es obligatorio")
     .isArray()
-    .withMessage("El campo 'detalles' es un array"),
+    .withMessage("El campo 'detalles' debe ser un array"),
+
+  body("detalles.*.codigo")
+    .exists()
+    .withMessage("El campo 'detalles[codigo]' es obligatorio")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'detalles[codigo]' no debe ser vacío"),
 
   body("detalles.*.talla")
     .exists()
     .withMessage("El campo 'detalles[talla]' es obligatorio")
     .not()
     .isEmpty()
-    .withMessage("El campo 'detalles[talla]' no debe ser vacio"),
-  body("detalles.*.color")
-    .exists()
-    .withMessage("El campo 'detalles[color]' es obligatorio")
-    .not()
-    .isEmpty()
-    .withMessage("El campo 'detalles[color]' no debe ser vacio"),
+    .withMessage("El campo 'detalles[talla]' no debe ser vacío"),
 
-  body("detalles.*.stock")
+  body("detalles.*.color_id")
     .exists()
-    .withMessage("El campo 'detalles[stock]' no debe ser vacio")
+    .withMessage("El campo 'detalles[color_id]' es obligatorio")
     .isInt({ gt: 0 })
     .withMessage(
-      "Eñ campo 'detalles[stock]' debe ser un numero entero positivo"
+      "El campo 'detalles[color_id]' debe ser un número entero positivo"
     ),
 
-  body("detalles.*.tienda_id")
+  body("detalles.*.tiendas")
     .exists()
-    .withMessage("El campo 'detalles[tienda_id]' es obligatorio.")
+    .withMessage("El campo 'detalles[tiendas]' es obligatorio")
+    .isArray()
+    .withMessage("El campo 'detalles[tiendas]' debe ser un array"),
+
+  body("detalles.*.tiendas.*.tienda_id")
+    .exists()
+    .withMessage("El campo 'detalles[tiendas][tienda_id]' es obligatorio")
     .isInt()
-    .withMessage("El campo 'detalles[tienda_id]' debe ser un número entero.")
+    .withMessage(
+      "El campo 'detalles[tiendas][tienda_id]' debe ser un número entero."
+    )
     .custom(async (value) => {
       const tienda = await Tienda.findOne({ where: { tienda_id: value } });
       if (!tienda) {
@@ -70,6 +83,15 @@ export const ValidateCreateProducto: any = [
       }
       return true;
     }),
+
+  body("detalles.*.tiendas.*.stock")
+    .exists()
+    .withMessage("El campo 'detalles[tiendas][stock]' es obligatorio")
+    .isInt({ gt: 0 })
+    .withMessage(
+      "El campo 'detalles[tiendas][stock]' debe ser un número entero positivo"
+    ),
+
   (req: Request, res: Response, next: NextFunction) => {
     validateResult(req, res, next);
   },

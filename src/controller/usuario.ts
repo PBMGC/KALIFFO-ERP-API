@@ -11,6 +11,7 @@ import {
   _login,
   _updateUsuario,
 } from "../service/usuario";
+import { handleHttp } from "../util/error.handler";
 
 export const createUsuario = async (req: Request, res: Response) => {
   const {
@@ -41,7 +42,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     const response = await _createUsuario(newUsuario);
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_createUsuario");
   }
 };
 
@@ -50,19 +51,19 @@ export const getUsuarios = async (req: Request, res: Response) => {
   const inicio = req.query.inicio;
   const final = req.query.final;
   const nombre = req.query.nombre as string;
-
-  console.log(rol);
+  const tienda_id = req.query.tienda_id;
 
   try {
     const response = await _getUsuarios(
       Number(inicio),
       Number(final),
       nombre,
-      Number(rol)
+      Number(rol),
+      Number(tienda_id)
     );
     res.status(response.status).json(response.items);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_getUsuarios", 500);
   }
 };
 
@@ -73,7 +74,7 @@ export const getUsuario = async (req: Request, res: Response) => {
     const response = await _getUsuario(usuario_id);
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_getUsuario", 500);
   }
 };
 
@@ -84,7 +85,7 @@ export const deleteUsuario = async (req: Request, res: Response) => {
     const response = await _deleteUsuario(usuario_id);
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_deleteUsuario", 500);
   }
 };
 
@@ -117,7 +118,7 @@ export const updateUsuario = async (req: Request, res: Response) => {
     const response = await _updateUsuario(updateUsuario);
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_updateUsuario", 500);
   }
 };
 
@@ -135,7 +136,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
     delete response.token;
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(400);
+    handleHttp(res, "error_loginUsusrio", 500);
   }
 };
 
@@ -147,7 +148,7 @@ export const inicioAsistencia = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
     // res.status(200).json("das");
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_iniciarAsistencia", 500);
   }
 };
 
@@ -157,7 +158,7 @@ export const finalAsitencia = async (req: Request, res: Response) => {
     const response = await _horaSalida(usuario_id);
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_finalAsistencia", 500);
   }
 };
 
@@ -172,6 +173,6 @@ export const horasTrabajadas = async (req: Request, res: Response) => {
     );
     res.status(response.status).json(response);
   } catch (error) {
-    res.status(400).json(error);
+    handleHttp(res, "error_horasTrabajadas", 500);
   }
 };
