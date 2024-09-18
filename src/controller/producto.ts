@@ -37,9 +37,10 @@ export const getProductos = async (req: Request, res: Response) => {
 
 export const getProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
+  const tienda_id = req.query.tienda_id as string;
 
   try {
-    const response = await _getProducto(Number(producto_id));
+    const response = await _getProducto(Number(producto_id), tienda_id);
     res.status(response.status).json(response.item);
   } catch (error) {
     handleHttp(res, "error_getProducto", 500);
