@@ -3,6 +3,7 @@ import { Producto } from "../interface/producto";
 import {
   _createProducto,
   _getProducto,
+  _getProductoDetalle,
   _getProductos,
   _updateProducto,
 } from "../service/producto";
@@ -65,5 +66,16 @@ export const updateProducto = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_updateProducto", 500);
+  }
+};
+
+export const getProductoDetalle = async (req: Request, res: Response) => {
+  const tienda_id = req.query.tienda_id as string;
+
+  try {
+    const response = await _getProductoDetalle(tienda_id);
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error_getProductoDetalle", 500);
   }
 };

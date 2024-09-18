@@ -3,6 +3,8 @@ import { Producto } from "../models/producto";
 import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
+import sequelize from "../db/connection";
+import { Model } from "sequelize";
 
 export const _createProducto = async (
   producto: ProductoInterface,
@@ -177,6 +179,55 @@ export const _updateProducto = async (
   } catch (error) {
     return {
       message: "error _updateProducto",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getProductoDetalle = async (tienda_id: string) => {
+  try {
+    const items = await ProductoTienda.findAll({
+      attributes: [
+        // [sequelize.fn("sum", sequelize.col("stock")), "total_stock"],
+        "productoDetalle.producto.producto_id",
+        "productoDetalle.producto.precio",
+        "productoDetalle.producto.descuento",
+        [
+          sequelize.fn("GROUP_CONCAT", sequelize.col("productoDetalle.talla")),
+          "tallas",
+        ],
+        [
+          sequelize.fn(
+            "GROUP_CONCAT",
+            sequelize.col("productoDetalle.color_id")
+          ),
+          "colores",
+        ],
+        [sequelize.fn("SUM", sequelize.col("stock")), "total_stock"],
+      ],
+      where: { tienda_id: tienda_id },
+      include: [
+        {
+          model: ProductoDetalle,
+          attributes: [],
+          include: [{ model: Producto, attributes: [] }],
+        },
+      ],
+      group: ["productoDetalle.producto_id"],
+
+      raw: true,
+    });
+    return {
+      items,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      message: "error _getProductoDetalle",
       success: false,
       status: 500,
     };
