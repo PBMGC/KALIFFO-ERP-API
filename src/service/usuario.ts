@@ -57,7 +57,8 @@ export const _getUsuarios = async (
   inicio?: number,
   final?: number,
   nombre?: string,
-  rol?: number
+  rol?: number,
+  tienda_id?:number
 ) => {
   try {
     const filtros: any = {
@@ -77,6 +78,11 @@ export const _getUsuarios = async (
     if (rol) {
       filtros.where.rol = rol;
     }
+
+    if (tienda_id) {
+      filtros.where.tienda_id = tienda_id;
+    }
+
 
     const items = await Usuario.findAll(filtros);
 
