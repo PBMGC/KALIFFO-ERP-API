@@ -4,7 +4,6 @@ import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
 import sequelize from "../db/connection";
-import { Model } from "sequelize";
 
 export const _createProducto = async (
   producto: ProductoInterface,
@@ -63,8 +62,27 @@ export const _getProductos = async () => {
   }
 };
 
-export const _getProducto = async (producto_id: number) => {
+export const _getProducto = async (producto_id: number, tienda_id?: string) => {
   try {
+    const filtros: any = {
+      where: {},
+      include: [
+        {
+          model: ProductoDetalle,
+          where: { producto_id: producto_id },
+          include: [
+            {
+              model: Color,
+            },
+          ],
+        },
+      ],
+    };
+
+    if (tienda_id) {
+      filtros.where.tienda_id = tienda_id;
+    }
+
     const item = await Producto.findOne({
       where: { producto_id: producto_id },
     });
@@ -77,19 +95,7 @@ export const _getProducto = async (producto_id: number) => {
       };
     }
 
-    const detalles = await ProductoTienda.findAll({
-      include: [
-        {
-          model: ProductoDetalle,
-          where: { producto_id: producto_id },
-          include: [
-            {
-              model: Color,
-            },
-          ],
-        },
-      ],
-    });
+    const detalles = await ProductoTienda.findAll(filtros);
 
     return {
       item: { ...item?.dataValues, detalles },
