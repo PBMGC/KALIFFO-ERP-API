@@ -3,7 +3,6 @@ import { Producto } from "../interface/producto";
 import {
   _createProducto,
   _getProducto,
-  _getProductoDetalle,
   _getProductos,
   _updateProducto,
 } from "../service/producto";
@@ -27,8 +26,22 @@ export const createProducto = async (req: Request, res: Response) => {
 };
 
 export const getProductos = async (req: Request, res: Response) => {
+  const nombre = req.query.nombre as string;
+  const talla = req.query.talla as string;
+  const color = req.query.color as string;
+  const offset = req.query.offset as string;
+  const limit = req.query.limit as string;
+  const tienda_id = req.query.tienda_id as string;
+
   try {
-    const response = await _getProductos();
+    const response = await _getProductos(
+      Number(offset),
+      Number(limit),
+      nombre,
+      color,
+      talla,
+      Number(tienda_id)
+    );
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getProductos", 500);
@@ -67,16 +80,5 @@ export const updateProducto = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_updateProducto", 500);
-  }
-};
-
-export const getProductoDetalle = async (req: Request, res: Response) => {
-  const tienda_id = req.query.tienda_id as string;
-
-  try {
-    const response = await _getProductoDetalle(tienda_id);
-    res.status(response.status).json(response.items);
-  } catch (error) {
-    handleHttp(res, "error_getProductoDetalle", 500);
   }
 };

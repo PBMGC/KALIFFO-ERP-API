@@ -2,8 +2,6 @@ import { DataTypes, Model } from "sequelize";
 import { ProductoDetalle as ProductoDetalleInterface } from "../interface/productoDetalle";
 import sequelize from "../db/connection";
 import { Producto } from "./producto";
-import { Tienda } from "./tienda";
-import { ProductoTienda } from "./productoTienda";
 import { Color } from "./color";
 
 export interface ProductoDetalleModel
