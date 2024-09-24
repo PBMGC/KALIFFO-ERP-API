@@ -308,11 +308,11 @@ const productos = [
         color_id: 6,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 20,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 35,
           },
         ],
@@ -323,11 +323,11 @@ const productos = [
         color_id: 1,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 10,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 25,
           },
         ],
@@ -345,11 +345,11 @@ const productos = [
         color_id: 7,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 20,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 40,
           },
         ],
@@ -360,11 +360,11 @@ const productos = [
         color_id: 3,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 25,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 30,
           },
         ],
@@ -382,11 +382,11 @@ const productos = [
         color_id: 8,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 15,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 25,
           },
         ],
@@ -397,11 +397,11 @@ const productos = [
         color_id: 9,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 20,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 35,
           },
         ],
@@ -419,11 +419,11 @@ const productos = [
         color_id: 9,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 18,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 28,
           },
         ],
@@ -434,11 +434,11 @@ const productos = [
         color_id: 5,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 22,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 32,
           },
         ],
@@ -456,11 +456,11 @@ const productos = [
         color_id: 10,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 30,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 40,
           },
         ],
@@ -471,11 +471,11 @@ const productos = [
         color_id: 1,
         tiendas: [
           {
-            tienda_id: 1,
+            tienda_id: 2,
             stock: 28,
           },
           {
-            tienda_id: 2,
+            tienda_id: 3,
             stock: 38,
           },
         ],

@@ -4,7 +4,7 @@ import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
 import sequelize from "../db/connection";
-import { Op, where } from "sequelize";
+import { col, Op, where } from "sequelize";
 import { Tienda } from "../models/tienda";
 
 export const _createProducto = async (
@@ -53,7 +53,8 @@ export const _getProductos = async (
   nombre?: string,
   color?: string,
   talla?: string,
-  tienda_id?: number
+  tienda_id?: number,
+  antiTienda_id?: number
 ) => {
   try {
     const filtrosProducto: any = {};
@@ -140,6 +141,10 @@ export const _getProductos = async (
       filtros.where.tienda_id = tienda_id;
     }
 
+    if (antiTienda_id) {
+      filtros.where.tienda_id = { [Op.ne]: antiTienda_id };
+    }
+
     const items = await ProductoTienda.findAll(filtros);
 
     return {
@@ -162,8 +167,18 @@ export const _getProductos = async (
   }
 };
 
-export const _getProducto = async (producto_id: number, tienda_id?: string) => {
+export const _getProducto = async (
+  producto_id: number,
+  tienda_id?: string,
+  color?: string
+) => {
   try {
+    const filtroColor: any = {};
+
+    if (color) {
+      filtroColor.nombre = color;
+    }
+
     const filtros: any = {
       where: {},
       include: [
@@ -173,10 +188,12 @@ export const _getProducto = async (producto_id: number, tienda_id?: string) => {
           include: [
             {
               model: Color,
+              where: filtroColor,
             },
           ],
         },
       ],
+      group: ["productoDetalle_id"],
     };
 
     if (tienda_id) {
@@ -203,6 +220,8 @@ export const _getProducto = async (producto_id: number, tienda_id?: string) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       message: "_getProducto",
       success: true,
