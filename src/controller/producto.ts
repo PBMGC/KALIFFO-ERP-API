@@ -32,6 +32,7 @@ export const getProductos = async (req: Request, res: Response) => {
   const offset = req.query.offset as string;
   const limit = req.query.limit as string;
   const tienda_id = req.query.tienda_id as string;
+  const antiTienda_id = req.query.antiTienda_id as string;
 
   try {
     const response = await _getProductos(
@@ -40,7 +41,8 @@ export const getProductos = async (req: Request, res: Response) => {
       nombre,
       color,
       talla,
-      Number(tienda_id)
+      Number(tienda_id),
+      Number(antiTienda_id)
     );
     res.status(response.status).json(response.items);
   } catch (error) {
@@ -51,9 +53,10 @@ export const getProductos = async (req: Request, res: Response) => {
 export const getProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
   const tienda_id = req.query.tienda_id as string;
+  const color = req.query.color as string;
 
   try {
-    const response = await _getProducto(Number(producto_id), tienda_id);
+    const response = await _getProducto(Number(producto_id), tienda_id, color);
     res.status(response.status).json(response.item);
   } catch (error) {
     handleHttp(res, "error_getProducto", 500);
