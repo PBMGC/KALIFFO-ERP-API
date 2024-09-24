@@ -11,7 +11,7 @@ import { ValidateCreateProducto } from "../validation/producto";
 const router = Router();
 
 router.get("/", getProductos);
-router.get("/lose", loseProducto);
+router.get("/lose/:tienda_id", loseProducto);
 
 router.get("/:producto_id", getProducto);
 

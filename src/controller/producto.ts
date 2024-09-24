@@ -88,8 +88,10 @@ export const updateProducto = async (req: Request, res: Response) => {
 };
 
 export const loseProducto = async (req: Request, res: Response) => {
+  const { tienda_id } = req.params;
+
   try {
-    const response = await _loseProductos();
+    const response = await _loseProductos(tienda_id);
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_updateProducto", 500);

@@ -330,7 +330,7 @@ export const _updateProducto = async (
   }
 };
 
-export const _loseProductos = async () => {
+export const _loseProductos = async (tienda_id: string) => {
   try {
     const consulta = await sequelize.query(`
       
@@ -343,9 +343,9 @@ LEFT JOIN (
     FROM productoTienda pt2
     INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
     INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
-    WHERE pt2.tienda_id = 3
+    WHERE pt2.tienda_id = ${tienda_id}
 ) AS excluidos ON excluidos.producto_id = p.producto_id
-WHERE pt.tienda_id != 3 AND excluidos.producto_id IS NULL
+WHERE pt.tienda_id != ${tienda_id} AND excluidos.producto_id IS NULL
 group by p.producto_id;
 `);
 
