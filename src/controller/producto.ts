@@ -4,6 +4,7 @@ import {
   _createProducto,
   _getProducto,
   _getProductos,
+  _loseProductos,
   _updateProducto,
 } from "../service/producto";
 import { handleHttp } from "../util/error.handler";
@@ -81,6 +82,17 @@ export const updateProducto = async (req: Request, res: Response) => {
       detalles
     );
     res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_updateProducto", 500);
+  }
+};
+
+export const loseProducto = async (req: Request, res: Response) => {
+  const { tienda_id } = req.params;
+
+  try {
+    const response = await _loseProductos(tienda_id);
+    res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_updateProducto", 500);
   }

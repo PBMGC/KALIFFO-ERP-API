@@ -4,7 +4,7 @@ import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
 import sequelize from "../db/connection";
-import { col, Op, where } from "sequelize";
+import { Op, literal } from "sequelize";
 import { Tienda } from "../models/tienda";
 
 export const _createProducto = async (
@@ -180,20 +180,40 @@ export const _getProducto = async (
     }
 
     const filtros: any = {
+      attributes: [
+        "productoTienda_id",
+        "tienda_id",
+        "tienda.tienda",
+        "stock",
+        "productoDetalle.codigo",
+        "productoDetalle.productoDetalle_id",
+        "productoDetalle.talla",
+        "productoDetalle.color.nombre",
+        "productoDetalle.color.codigo",
+      ],
       where: {},
       include: [
         {
           model: ProductoDetalle,
+          attributes: [],
           where: { producto_id: producto_id },
           include: [
             {
               model: Color,
               where: filtroColor,
+              attributes: [],
             },
           ],
         },
+        {
+          model: Tienda,
+          attributes: [],
+        },
       ],
-      group: ["productoDetalle_id"],
+
+      group: ["productoTienda.productoDetalle_id"],
+
+      raw: true,
     };
 
     if (tienda_id) {
@@ -306,6 +326,38 @@ export const _updateProducto = async (
       message: "error _updateProducto",
       success: false,
       status: 500,
+    };
+  }
+};
+
+export const _loseProductos = async (tienda_id: string) => {
+  try {
+    const consulta = await sequelize.query(`
+      
+SELECT DISTINCT p.producto_id, p.nombre
+FROM productoTienda pt
+INNER JOIN productoDetalle pd ON pd.productoDetalle_id = pt.productoDetalle_id
+INNER JOIN producto p ON p.producto_id = pd.producto_id
+LEFT JOIN (
+    SELECT p2.producto_id
+    FROM productoTienda pt2
+    INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
+    INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
+    WHERE pt2.tienda_id = ${tienda_id}
+) AS excluidos ON excluidos.producto_id = p.producto_id
+WHERE pt.tienda_id != ${tienda_id} AND excluidos.producto_id IS NULL
+group by p.producto_id;
+`);
+
+    return {
+      items: consulta[0],
+      status: 202,
+    };
+  } catch (error) {
+    console.error(error); // Para ayudar a depurar errores
+    return {
+      message: "_loseProductos",
+      status: 404,
     };
   }
 };
