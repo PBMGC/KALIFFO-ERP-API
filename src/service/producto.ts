@@ -4,9 +4,8 @@ import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
 import sequelize from "../db/connection";
-import { col, Op, where } from "sequelize";
+import { Op, literal } from "sequelize";
 import { Tienda } from "../models/tienda";
-import { raw } from "mysql2";
 
 export const _createProducto = async (
   producto: ProductoInterface,
@@ -327,6 +326,38 @@ export const _updateProducto = async (
       message: "error _updateProducto",
       success: false,
       status: 500,
+    };
+  }
+};
+
+export const _loseProductos = async () => {
+  try {
+    const consulta = await sequelize.query(`
+      
+SELECT DISTINCT p.producto_id, p.nombre
+FROM productoTienda pt
+INNER JOIN productoDetalle pd ON pd.productoDetalle_id = pt.productoDetalle_id
+INNER JOIN producto p ON p.producto_id = pd.producto_id
+LEFT JOIN (
+    SELECT p2.producto_id
+    FROM productoTienda pt2
+    INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
+    INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
+    WHERE pt2.tienda_id = 3
+) AS excluidos ON excluidos.producto_id = p.producto_id
+WHERE pt.tienda_id != 3 AND excluidos.producto_id IS NULL
+group by p.producto_id;
+`);
+
+    return {
+      items: consulta[0],
+      status: 202,
+    };
+  } catch (error) {
+    console.error(error); // Para ayudar a depurar errores
+    return {
+      message: "_loseProductos",
+      status: 404,
     };
   }
 };
