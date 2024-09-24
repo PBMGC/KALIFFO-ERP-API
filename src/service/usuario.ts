@@ -7,7 +7,6 @@ import dotenv from "dotenv";
 import { Op } from "sequelize";
 import { Tienda } from "../models/tienda";
 import sequelize from "../db/connection";
-import { ProductoTienda } from "../models/productoTienda";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -58,7 +57,8 @@ export const _getUsuarios = async (
   final?: number,
   nombre?: string,
   rol?: number,
-  tienda_id?: number
+  tienda_id?: number,
+  antiTienda_id?: number
 ) => {
   try {
     const filtros: any = {
@@ -82,6 +82,10 @@ export const _getUsuarios = async (
 
     if (tienda_id) {
       filtros.where.tienda_id = tienda_id;
+    }
+
+    if (antiTienda_id) {
+      filtros.where.tienda_id = { [Op.ne]: antiTienda_id };
     }
 
     const items = await Usuario.findAll(filtros);
