@@ -6,6 +6,7 @@ import { Color } from "../models/color";
 import sequelize from "../db/connection";
 import { col, Op, where } from "sequelize";
 import { Tienda } from "../models/tienda";
+import { raw } from "mysql2";
 
 export const _createProducto = async (
   producto: ProductoInterface,
@@ -180,20 +181,40 @@ export const _getProducto = async (
     }
 
     const filtros: any = {
+      attributes: [
+        "productoTienda_id",
+        "tienda_id",
+        "tienda.tienda",
+        "stock",
+        "productoDetalle.codigo",
+        "productoDetalle.productoDetalle_id",
+        "productoDetalle.talla",
+        "productoDetalle.color.nombre",
+        "productoDetalle.color.codigo",
+      ],
       where: {},
       include: [
         {
           model: ProductoDetalle,
+          attributes: [],
           where: { producto_id: producto_id },
           include: [
             {
               model: Color,
               where: filtroColor,
+              attributes: [],
             },
           ],
         },
+        {
+          model: Tienda,
+          attributes: [],
+        },
       ],
-      group: ["productoDetalle_id"],
+
+      group: ["productoTienda.productoDetalle_id"],
+
+      raw: true,
     };
 
     if (tienda_id) {
