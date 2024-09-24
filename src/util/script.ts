@@ -111,7 +111,7 @@ const colores: ColorInterface[] = [
   { nombre: "Verde Menta", codigo: "98FF98" },
 ];
 
-const productos: any[] = [
+const productos = [
   {
     nombre: "Jeans Slim Fit",
     precio: 49.99,
@@ -135,7 +135,7 @@ const productos: any[] = [
       {
         codigo: "j002",
         talla: "34",
-        color_id: 1,
+        color_id: 7,
         tiendas: [
           {
             tienda_id: 1,
@@ -172,7 +172,7 @@ const productos: any[] = [
       {
         codigo: "j004",
         talla: "34",
-        color_id: 2,
+        color_id: 4,
         tiendas: [
           {
             tienda_id: 1,
@@ -209,7 +209,7 @@ const productos: any[] = [
       {
         codigo: "j006",
         talla: "38",
-        color_id: 3,
+        color_id: 8,
         tiendas: [
           {
             tienda_id: 1,
@@ -246,7 +246,7 @@ const productos: any[] = [
       {
         codigo: "j008",
         talla: "32",
-        color_id: 4,
+        color_id: 7,
         tiendas: [
           {
             tienda_id: 1,
@@ -268,7 +268,7 @@ const productos: any[] = [
       {
         codigo: "j009",
         talla: "34",
-        color_id: 5,
+        color_id: 9,
         tiendas: [
           {
             tienda_id: 1,
@@ -298,37 +298,185 @@ const productos: any[] = [
     ],
   },
   {
-    nombre: "Jeans Slim Fit12",
-    precio: 49.99,
-    descuento: 10,
+    nombre: "Jeans Super Skinny Fit",
+    precio: 52.99,
+    descuento: 12,
     detalles: [
       {
-        codigo: "j001",
+        codigo: "j011",
         talla: "32",
-        color_id: 1,
+        color_id: 6,
         tiendas: [
           {
             tienda_id: 1,
             stock: 20,
           },
           {
-            tienda_id: 3,
-            stock: 30,
+            tienda_id: 2,
+            stock: 35,
           },
         ],
       },
       {
-        codigo: "j002",
+        codigo: "j012",
         talla: "34",
         color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 10,
+          },
+          {
+            tienda_id: 2,
+            stock: 25,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Loose Fit",
+    precio: 39.99,
+    descuento: 18,
+    detalles: [
+      {
+        codigo: "j013",
+        talla: "36",
+        color_id: 7,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 20,
+          },
+          {
+            tienda_id: 2,
+            stock: 40,
+          },
+        ],
+      },
+      {
+        codigo: "j014",
+        talla: "38",
+        color_id: 3,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 25,
+          },
+          {
+            tienda_id: 2,
+            stock: 30,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Straight Fit",
+    precio: 45.99,
+    descuento: 10,
+    detalles: [
+      {
+        codigo: "j015",
+        talla: "32",
+        color_id: 8,
         tiendas: [
           {
             tienda_id: 1,
             stock: 15,
           },
           {
-            tienda_id: 3,
+            tienda_id: 2,
             stock: 25,
+          },
+        ],
+      },
+      {
+        codigo: "j016",
+        talla: "34",
+        color_id: 9,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 20,
+          },
+          {
+            tienda_id: 2,
+            stock: 35,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Cropped Fit",
+    precio: 55.99,
+    descuento: 8,
+    detalles: [
+      {
+        codigo: "j017",
+        talla: "30",
+        color_id: 9,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 18,
+          },
+          {
+            tienda_id: 2,
+            stock: 28,
+          },
+        ],
+      },
+      {
+        codigo: "j018",
+        talla: "32",
+        color_id: 5,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 22,
+          },
+          {
+            tienda_id: 2,
+            stock: 32,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    nombre: "Jeans Wide Leg Fit",
+    precio: 64.99,
+    descuento: 15,
+    detalles: [
+      {
+        codigo: "j019",
+        talla: "34",
+        color_id: 10,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 30,
+          },
+          {
+            tienda_id: 2,
+            stock: 40,
+          },
+        ],
+      },
+      {
+        codigo: "j020",
+        talla: "36",
+        color_id: 1,
+        tiendas: [
+          {
+            tienda_id: 1,
+            stock: 28,
+          },
+          {
+            tienda_id: 2,
+            stock: 38,
           },
         ],
       },

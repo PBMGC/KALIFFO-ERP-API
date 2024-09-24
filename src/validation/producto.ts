@@ -24,7 +24,6 @@ export const ValidateCreateProducto: any = [
       }
       return true;
     }),
-
   check("descuento")
     .exists()
     .withMessage("El campo 'descuento' es obligatorio.")
