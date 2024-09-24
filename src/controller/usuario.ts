@@ -52,6 +52,7 @@ export const getUsuarios = async (req: Request, res: Response) => {
   const final = req.query.final;
   const nombre = req.query.nombre as string;
   const tienda_id = req.query.tienda_id;
+  const antiTienda_id = req.query.antiTienda_id as string;
 
   try {
     const response = await _getUsuarios(
@@ -59,7 +60,8 @@ export const getUsuarios = async (req: Request, res: Response) => {
       Number(final),
       nombre,
       Number(rol),
-      Number(tienda_id)
+      Number(tienda_id),
+      Number(antiTienda_id)
     );
     res.status(response.status).json(response.items);
   } catch (error) {
