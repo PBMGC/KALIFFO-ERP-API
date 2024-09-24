@@ -4,6 +4,8 @@ import { ProductoDetalle } from "../models/productoDetalle";
 import { ProductoTienda } from "../models/productoTienda";
 import { Color } from "../models/color";
 import sequelize from "../db/connection";
+import { Op, where } from "sequelize";
+import { Tienda } from "../models/tienda";
 
 export const _createProducto = async (
   producto: ProductoInterface,
@@ -45,19 +47,117 @@ export const _createProducto = async (
   }
 };
 
-export const _getProductos = async () => {
+export const _getProductos = async (
+  offset?: number,
+  limit?: number,
+  nombre?: string,
+  color?: string,
+  talla?: string,
+  tienda_id?: number
+) => {
   try {
-    const items = await Producto.findAll();
+    const filtrosProducto: any = {};
+    const filtrosProductoDetalle: any = {};
+    const filtrosColores: any = {};
+
+    if (nombre) {
+      filtrosProducto.nombre = { [Op.like]: `%${nombre}%` };
+    }
+
+    if (color) {
+      filtrosColores.nombre = color;
+    }
+
+    if (talla) {
+      filtrosProductoDetalle.talla = talla;
+    }
+
+    const filtros: any = {
+      attributes: [
+        "productoDetalle.producto.producto_id",
+        "productoDetalle.producto.nombre",
+        "productoDetalle.producto.precio",
+        "productoDetalle.producto.descuento",
+        [sequelize.fn("SUM", sequelize.col("stock")), "stock"],
+        [
+          sequelize.fn(
+            "GROUP_CONCAT",
+            sequelize.fn("DISTINCT", sequelize.col("productoDetalle.talla"))
+          ),
+          "tallas",
+        ],
+        [
+          sequelize.fn(
+            "GROUP_CONCAT",
+            sequelize.fn(
+              "DISTINCT",
+              sequelize.col("productoDetalle.color.nombre")
+            )
+          ),
+          "colores",
+        ],
+        [
+          sequelize.fn(
+            "GROUP_CONCAT",
+            sequelize.fn("DISTINCT", sequelize.col("productoDetalle.codigo"))
+          ),
+          "codigos",
+        ],
+        [
+          sequelize.fn(
+            "GROUP_CONCAT",
+            sequelize.fn("DISTINCT", sequelize.col("tienda.tienda"))
+          ),
+          "tiendas",
+        ],
+      ],
+      include: [
+        {
+          model: ProductoDetalle,
+          attributes: [],
+          where: filtrosProductoDetalle,
+          include: [
+            {
+              model: Producto,
+              where: filtrosProducto,
+              required: true,
+              attributes: [],
+            },
+            { model: Color, where: filtrosColores, attributes: [] },
+          ],
+          required: true,
+        },
+        { model: Tienda, attributes: [] },
+      ],
+      where: {},
+      group: "productoDetalle.producto_id",
+      offset: offset || 0,
+      limit: limit ? limit - (offset || 0) : undefined,
+      raw: true,
+    };
+
+    if (tienda_id) {
+      filtros.where.tienda_id = tienda_id;
+    }
+
+    const items = await ProductoTienda.findAll(filtros);
+
     return {
-      items,
+      items: items.map((item: any) => ({
+        ...item,
+        tallas: item.tallas ? item.tallas.split(",") : [],
+        colores: item.colores ? item.colores.split(",") : [],
+        codigos: item.codigos ? item.codigos.split(",") : [],
+        tiendas: item.tiendas ? item.tiendas.split(",") : [],
+      })),
       success: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: "error _getProductos",
-      success: false,
-      status: 500,
+      message: "_getProductos",
+      success: true,
+      status: 200,
     };
   }
 };
@@ -185,56 +285,6 @@ export const _updateProducto = async (
   } catch (error) {
     return {
       message: "error _updateProducto",
-      success: false,
-      status: 500,
-    };
-  }
-};
-
-export const _getProductoDetalle = async (tienda_id: string) => {
-  try {
-    const items = await ProductoTienda.findAll({
-      attributes: [
-        // [sequelize.fn("sum", sequelize.col("stock")), "total_stock"],
-        "productoDetalle.producto.producto_id",
-        "productoDetalle.producto.precio",
-        "productoDetalle.producto.descuento",
-        "productoDetalle.producto.nombre",
-        [
-          sequelize.fn("GROUP_CONCAT", sequelize.col("productoDetalle.talla")),
-          "tallas",
-        ],
-        [
-          sequelize.fn(
-            "GROUP_CONCAT",
-            sequelize.col("productoDetalle.color_id")
-          ),
-          "colores",
-        ],
-        [sequelize.fn("SUM", sequelize.col("stock")), "total_stock"],
-      ],
-      where: { tienda_id: tienda_id },
-      include: [
-        {
-          model: ProductoDetalle,
-          attributes: [],
-          include: [{ model: Producto, attributes: [] }],
-        },
-      ],
-      group: ["productoDetalle.producto_id"],
-
-      raw: true,
-    });
-    return {
-      items,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    console.log(error);
-
-    return {
-      message: "error _getProductoDetalle",
       success: false,
       status: 500,
     };
