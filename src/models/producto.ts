@@ -13,10 +13,12 @@ export const Producto = sequelize.define<ProductoModel>(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      
     },
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique:true
     },
 
     precio: {
@@ -35,5 +37,12 @@ export const Producto = sequelize.define<ProductoModel>(
   {
     freezeTableName: true,
     timestamps: false,
-  }
+    indexes:[
+      {
+        name:"I_nombre",
+        fields:["nombre"]
+      }
+    ]
+  },
+  
 );

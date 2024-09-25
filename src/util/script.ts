@@ -40,6 +40,7 @@ const usuarios: UsuarioInterface[] = [
     dni: "73214567",
     telefono: "987654321",
     contraseña: "juan1234",
+    tienda_id:1,
     rol: 1,
   },
   {
@@ -51,7 +52,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "912345678",
     contraseña: "maria2021",
     rol: 2,
-    tienda_id: 2,
   },
   {
     nombre: "Carlos",
@@ -62,7 +62,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "976543210",
     contraseña: "carlos78",
     rol: 2,
-    tienda_id: 1,
   },
   {
     nombre: "Lucía",
@@ -74,7 +73,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "934567890",
     contraseña: "lucia95",
     rol: 2,
-    tienda_id: 2,
   },
 ];
 

@@ -33,6 +33,20 @@ export const ProductoTienda = sequelize.define<ProductoTiendaModel>(
   {
     freezeTableName: true,
     timestamps: false,
+    indexes:[
+      {
+        name:"I_stock",
+        fields:["stock"]
+      },
+      {
+        name:"I_productoDetalleid",
+        fields:["productoDetalle_id"]
+      },
+      {
+        name:"I_tiendaid",
+        fields:["tienda_id"]
+      }
+    ]
   }
 );
 
