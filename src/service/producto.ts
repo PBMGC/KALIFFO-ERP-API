@@ -333,21 +333,20 @@ export const _updateProducto = async (
 export const _loseProductos = async (tienda_id: string) => {
   try {
     const consulta = await sequelize.query(`
-      
-SELECT DISTINCT p.producto_id, p.nombre
-FROM productoTienda pt
-INNER JOIN productoDetalle pd ON pd.productoDetalle_id = pt.productoDetalle_id
-INNER JOIN producto p ON p.producto_id = pd.producto_id
-LEFT JOIN (
-    SELECT p2.producto_id
-    FROM productoTienda pt2
-    INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
-    INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
-    WHERE pt2.tienda_id = ${tienda_id}
-) AS excluidos ON excluidos.producto_id = p.producto_id
-WHERE pt.tienda_id != ${tienda_id} AND excluidos.producto_id IS NULL
-group by p.producto_id;
-`);
+      SELECT DISTINCT p.producto_id, p.nombre
+      FROM productoTienda pt
+      INNER JOIN productoDetalle pd ON pd.productoDetalle_id = pt.productoDetalle_id
+      INNER JOIN producto p ON p.producto_id = pd.producto_id
+      LEFT JOIN (
+          SELECT p2.producto_id
+          FROM productoTienda pt2
+          INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
+          INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
+          WHERE pt2.tienda_id = ${tienda_id}
+      ) AS excluidos ON excluidos.producto_id = p.producto_id
+      WHERE pt.tienda_id != ${tienda_id} AND excluidos.producto_id IS NULL
+      group by p.producto_id;
+    `);
 
     return {
       items: consulta[0],
@@ -364,21 +363,18 @@ group by p.producto_id;
 
 
 //SQL PURO
-export const _getColoresProducto = async (tienda_id: number) => {
+export const _getColoresProducto = async (producto_id: number) => {
   try {
-    const data = await ProductoDetalle.findAll({
-      include: [{
-        model: Color,
-      }],
-    });
+    
+    const [data] = await sequelize.query(`CALL SP_ColoresProductos(${producto_id});`);
 
     return {
-      data,
+      data, 
       success: true,
       status: 200,
     };
   } catch (error) {
-      console.log(error)
+    console.log(error);
     return {
       message: error,
       success: false,

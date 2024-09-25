@@ -5,4 +5,7 @@ npm i typescript -g
 npm run type
 
 en otra terminal
+npm run type
+
+en otra terminal
 npm run dev

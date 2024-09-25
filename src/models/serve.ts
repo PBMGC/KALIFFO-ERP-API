@@ -12,6 +12,10 @@ import { Producto } from "./producto";
 import { ProductoDetalle } from "./productoDetalle";
 import { ProductoTienda } from "./productoTienda";
 import { Color } from "./color";
+import { Pago } from "./pago";
+import { Factura } from "./factura";
+import { DetalleFactura } from "./detalleFactura";
+import { initProcedure } from "../util/initProcedure";
 
 class Serve {
   app: express.Application;
@@ -53,7 +57,12 @@ class Serve {
 
       await ProductoDetalle.sync();
       await ProductoTienda.sync();
+      await Pago.sync();
+      await Factura.sync();
+      await DetalleFactura.sync();
+
       scriptInicio();
+      initProcedure();
     } catch (error) {
       console.log(error);
     }
