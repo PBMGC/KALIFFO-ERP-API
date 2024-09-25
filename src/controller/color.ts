@@ -27,3 +27,4 @@ export const getColores = async (req: Request, res: Response) => {
     handleHttp(res, "error_getColores", 500);
   }
 };
+

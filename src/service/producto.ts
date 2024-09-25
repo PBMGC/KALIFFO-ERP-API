@@ -361,3 +361,28 @@ group by p.producto_id;
     };
   }
 };
+
+
+//SQL PURO
+export const _getColoresProducto = async (tienda_id: number) => {
+  try {
+    const data = await ProductoDetalle.findAll({
+      include: [{
+        model: Color,
+      }],
+    });
+
+    return {
+      data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+      console.log(error)
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};
