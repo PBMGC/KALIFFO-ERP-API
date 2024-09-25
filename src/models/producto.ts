@@ -18,7 +18,6 @@ export const Producto = sequelize.define<ProductoModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
-
     precio: {
       type: DataTypes.FLOAT(5, 2),
       allowNull: false,
