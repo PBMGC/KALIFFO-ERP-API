@@ -32,7 +32,24 @@ export const Incidencia = sequelize.define<IncidenciaModel>(
       allowNull: false,
     },
   },
-  { freezeTableName: true, timestamps: false }
+  { 
+    freezeTableName: true, 
+    timestamps: false,
+    indexes:[
+      {
+        name:"I_tipo",
+        fields:["tipo"]
+      },
+      {
+        name:"I_usuarioID",
+        fields:["usuario_id"]
+      },
+      {
+        name:"I_fechacreacion",
+        fields:["fecha_creacion"]
+      }
+    ] 
+  }
 );
 
 Incidencia.belongsTo(Usuario, {

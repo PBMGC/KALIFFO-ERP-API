@@ -17,9 +17,10 @@ export const Producto = sequelize.define<ProductoModel>(
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     precio: {
-      type: DataTypes.FLOAT(5, 2),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     descuento: {
@@ -34,5 +35,11 @@ export const Producto = sequelize.define<ProductoModel>(
   {
     freezeTableName: true,
     timestamps: false,
+    indexes: [
+      {
+        name: "I_nombre",
+        fields: ["nombre"],
+      },
+    ],
   }
 );

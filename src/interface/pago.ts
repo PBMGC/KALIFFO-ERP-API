@@ -1,5 +1,5 @@
 export interface Pago {
-  pago_id: number;
+  pago_id?: number;
   montoPagado: number;
   montoFaltante: number;
   fecha: Date;

@@ -1,14 +1,17 @@
 import sequelize from "../db/connection";
 import { Color as ColorInterface } from "../interface/color";
+import { Pago as PagoInterface } from "../interface/pago";
 import { Producto as ProductoInterface } from "../interface/producto";
 import { Tienda as TiendaInterface } from "../interface/tienda";
 import { Usuario as UsuarioInterface } from "../interface/usuario";
 import { Color } from "../models/color";
 import { Horario } from "../models/horario";
+import { Pago } from "../models/pago";
 import { Producto } from "../models/producto";
 import { Tienda } from "../models/tienda";
 import { Usuario } from "../models/usuario";
 import { _createColor } from "../service/color";
+import { _createPago } from "../service/pago";
 import { _createProducto } from "../service/producto";
 import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
@@ -40,6 +43,7 @@ const usuarios: UsuarioInterface[] = [
     dni: "73214567",
     telefono: "987654321",
     contraseña: "juan1234",
+    tienda_id: 1,
     rol: 1,
   },
   {
@@ -51,7 +55,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "912345678",
     contraseña: "maria2021",
     rol: 2,
-    tienda_id: 2,
   },
   {
     nombre: "Carlos",
@@ -62,7 +65,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "976543210",
     contraseña: "carlos78",
     rol: 2,
-    tienda_id: 1,
   },
   {
     nombre: "Lucía",
@@ -74,7 +76,6 @@ const usuarios: UsuarioInterface[] = [
     telefono: "934567890",
     contraseña: "lucia95",
     rol: 2,
-    tienda_id: 2,
   },
 ];
 
@@ -484,7 +485,94 @@ const productos = [
   },
 ];
 
-export const scriptInicio = async () => {
+const pagos: PagoInterface[] = [
+  {
+    montoPagado: 100.0,
+    montoFaltante: 80.0,
+    fecha: new Date("2024-01-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 120.0,
+    montoFaltante: 60.0,
+    fecha: new Date("2024-02-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 110.0,
+    montoFaltante: 70.0,
+    fecha: new Date("2024-03-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 150.0,
+    montoFaltante: 50.0,
+    fecha: new Date("2024-04-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 130.0,
+    montoFaltante: 30.0,
+    fecha: new Date("2024-05-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 140.0,
+    montoFaltante: 20.0,
+    fecha: new Date("2024-06-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 160.0,
+    montoFaltante: 10.0,
+    fecha: new Date("2024-07-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 170.0,
+    montoFaltante: 0.0,
+    fecha: new Date("2024-08-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 150.0,
+    montoFaltante: 5.0,
+    fecha: new Date("2024-09-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 180.0,
+    montoFaltante: 15.0,
+    fecha: new Date("2024-10-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 190.0,
+    montoFaltante: 25.0,
+    fecha: new Date("2024-11-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 200.0,
+    montoFaltante: 30.0,
+    fecha: new Date("2024-12-15"),
+    estado: 1,
+    usuario_id: 1,
+  },
+];
+
+const createTienda = async () => {
   for (const tienda of tiendas) {
     const tiendaExistente = await Tienda.findOne({
       where: { tienda: tienda.tienda },
@@ -493,7 +581,9 @@ export const scriptInicio = async () => {
       await _createTienda(tienda);
     }
   }
+};
 
+const createUsuario = async () => {
   for (const usuario of usuarios) {
     const usuarioExistente = await Usuario.findOne({
       where: { dni: usuario.dni },
@@ -502,7 +592,11 @@ export const scriptInicio = async () => {
       await _createUsuario(usuario);
     }
   }
+  createHorario();
+  createPago();
+};
 
+const createHorario = async () => {
   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
     sequelize.query(`
       insert into horario(hora_entrada,hora_salida,fecha,usuario_id) values 
@@ -511,7 +605,9 @@ export const scriptInicio = async () => {
       ("9:00:00", "14:00:00","2024-08-18",1),
       ("9:00:00", "12:00:00","2024-08-14",1);`);
   }
+};
 
+const createColores = async () => {
   for (const color of colores) {
     const colorExistente = await Color.findOne({
       where: { nombre: color.nombre },
@@ -525,7 +621,9 @@ export const scriptInicio = async () => {
       await _createColor(newColor);
     }
   }
+};
 
+const createProducto = async () => {
   for (const producto of productos) {
     const productoExistente = await Producto.findOne({
       where: { nombre: producto.nombre },
@@ -541,4 +639,23 @@ export const scriptInicio = async () => {
       await _createProducto(newProducto, producto.detalles);
     }
   }
+};
+
+const createPago = async () => {
+  for (const pago of pagos) {
+    const pagoExistente = await Pago.findOne({
+      where: { fecha: pago.fecha },
+    });
+
+    if (!pagoExistente) {
+      await _createPago(pago);
+    }
+  }
+};
+
+export const scriptInicio = async () => {
+  createTienda();
+  createUsuario();
+  createColores();
+  createProducto();
 };

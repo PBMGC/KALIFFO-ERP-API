@@ -6,7 +6,7 @@ export interface Factura {
   ruc: string;
   direccion: string;
   telefono: string;
-  subtotal: number;
+  subTotal: number;
   igv: number;
   total: number;
   metodoPago: number;

@@ -14,11 +14,11 @@ export const Pago = sequelize.define<PagoModel>(
       autoIncrement: true,
     },
     montoPagado: {
-      type: DataTypes.FLOAT(5, 2),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     montoFaltante: {
-      type: DataTypes.FLOAT(5, 2),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     fecha: {

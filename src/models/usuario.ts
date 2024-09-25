@@ -36,6 +36,7 @@ export const Usuario = sequelize.define<UsuarioModel>(
         len: [9, 9],
         isNumeric: true,
       },
+      unique: true,
     },
     dni: {
       type: DataTypes.STRING,
@@ -62,6 +63,20 @@ export const Usuario = sequelize.define<UsuarioModel>(
   },
   {
     freezeTableName: true,
+    indexes: [
+      {
+        name: "I_dni",
+        fields: ["dni"],
+      },
+      {
+        name: "I_tiendaid",
+        fields: ["tienda_id"],
+      },
+      {
+        name: "I_rol",
+        fields: ["rol"],
+      },
+    ],
   }
 );
 
