@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { createIncidencia } from "../controller/incidencia";
+import { createIncidencia, getIncidencia } from "../controller/incidencia";
 
 const router = Router();
+
+router.get("", getIncidencia);
 
 router.post("/create", createIncidencia);
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Incidencia } from "../interface/incidencia";
-import { _createIncidencia } from "../service/incidencia";
+import { _createIncidencia, _getIncidencia } from "../service/incidencia";
 import { handleHttp } from "../util/error.handler";
 
 export const createIncidencia = async (req: Request, res: Response) => {
@@ -17,5 +17,16 @@ export const createIncidencia = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createIncidencia", 500);
+  }
+};
+
+export const getIncidencia = async (req: Request, res: Response) => {
+  try {
+    const response = await _getIncidencia();
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getIncidencia", 500);
   }
 };
