@@ -616,25 +616,25 @@ const incidencias: IncidenciaInterface[] = [
     tipo: 1,
     descripcion: "Permiso para atender asuntos familiares urgentes",
     fecha_creacion: new Date("2024-09-19"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 2,
     descripcion: "Ausencia por hospitalización",
     fecha_creacion: new Date("2024-09-18"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 3,
     descripcion: "Permiso para asuntos personales fuera de la ciudad",
     fecha_creacion: new Date("2024-09-17"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 1,
     descripcion: "Ausencia por evento familiar importante",
     fecha_creacion: new Date("2024-09-16"),
-    usuario_id: 1,
+    usuario_id: 3,
   },
 ];
 
@@ -672,9 +672,9 @@ const createHorario = async () => {
       ('09:00:00', '14:00:00', '2024-08-18', 1),
       ('09:00:00', '12:00:00', '2024-08-14', 1);
     `);
+
   }
 };
-
 const createColores = async () => {
   for (const color of colores) {
     const colorExistente = await Color.findOne({

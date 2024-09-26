@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { Op } from "sequelize";
 import { Tienda } from "../models/tienda";
 import sequelize from "../db/connection";
+import { Incidencia } from "../models/incidencia";
 dotenv.config();
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
@@ -122,6 +123,8 @@ export const _getUsuario = async (usuario_id: string) => {
       where: { usuario_id: usuario_id },
     });
 
+    const countIncidencias = await Incidencia.count({ where: { usuario_id } });
+
     if (!item) {
       return {
         message: "Usuario no encontrado",
@@ -131,7 +134,7 @@ export const _getUsuario = async (usuario_id: string) => {
     }
 
     return {
-      item,
+      item: { ...item.dataValues, nroIncidencias: countIncidencias },
       success: true,
       status: 200,
     };
@@ -316,33 +319,27 @@ export const _horaSalida = async (usuario_id: number) => {
   }
 };
 
-export const _horasTrabajadas = async (
-  usuario_id: number,
-  fechaInicio: string,
-  fechaFin: string
-) => {
+export const _horasTrabajadas = async (usuario_id: number) => {
   try {
-    const horasTrabajadas = await Horario.findAll({
-      where: {
-        usuario_id: usuario_id,
-        fecha: {
-          [Op.between]: [fechaInicio, fechaFin],
-        },
-      },
+    const items = await Horario.findAll({
       attributes: [
+        "horario_id",
+        "hora_entrada",
+        "hora_salida",
+        "fecha",
+        "usuario_id",
         [
-          sequelize.fn(
-            "SUM",
-            sequelize.literal("TIMESTAMPDIFF(HOUR, hora_entrada, hora_salida)")
+          sequelize.literal(
+            'TIME_FORMAT(TIMEDIFF(hora_salida, hora_entrada), "%H:%i:%s")'
           ),
-          "totalHoras",
+          "horas_trabajadas",
         ],
       ],
-      raw: true,
+      where: { usuario_id },
     });
 
     return {
-      message: horasTrabajadas,
+      items,
       success: true,
       status: 200,
     };

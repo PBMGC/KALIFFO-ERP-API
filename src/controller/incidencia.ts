@@ -20,9 +20,22 @@ export const createIncidencia = async (req: Request, res: Response) => {
   }
 };
 
-export const getIncidencia = async (req: Request, res: Response) => {
+export const getIncidencias = async (req: Request, res: Response) => {
   try {
-    const response = await _getIncidencia();
+    const response = await _getIncidencias();
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getIncidencias", 500);
+  }
+};
+
+export const getIncidencia = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
+
+  try {
+    const response = await _getIncidencia(usuario_id);
     res
       .status(response.status)
       .json(response.items ? response.items : response);

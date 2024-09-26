@@ -11,6 +11,6 @@ const router = Router();
 router.get("/inicio", validateToken, inicioAsistencia);
 router.get("/final", validateToken, finalAsitencia);
 
-router.post("/horasTrabajadas", horasTrabajadas);
+router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
 
 export { router };

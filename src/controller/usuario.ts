@@ -148,7 +148,6 @@ export const inicioAsistencia = async (req: Request, res: Response) => {
   try {
     const response = await _horaEntrada(usuario_id);
     res.status(response.status).json(response);
-    // res.status(200).json("das");
   } catch (error) {
     handleHttp(res, "error_iniciarAsistencia", 500);
   }
@@ -165,16 +164,16 @@ export const finalAsitencia = async (req: Request, res: Response) => {
 };
 
 export const horasTrabajadas = async (req: Request, res: Response) => {
-  const { usuario_id, fecha_inicio, fecha_final } = req.body;
+  const { usuario_id } = req.params;
 
   try {
-    const response = await _horasTrabajadas(
-      Number(usuario_id),
-      fecha_final,
-      fecha_inicio
-    );
-    res.status(response.status).json(response);
+    const response = await _horasTrabajadas(Number(usuario_id));
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
   } catch (error) {
     handleHttp(res, "error_horasTrabajadas", 500);
   }
 };
+
+//horario correo coun de horario de incidencia
