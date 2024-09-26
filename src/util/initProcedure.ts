@@ -37,6 +37,35 @@ export const initProcedureColoresProductos = async () => {
   await crearProcedimiento("SP_ColoresProductos", queryColoresProductos,"IN id_p INT");
 };
 
+const queryUpdateIncidencias = `
+   UPDATE incidencia
+   SET
+     tipo = IFNULL(p_tipo, tipo),
+     descripcion = IFNULL(p_descripcion, descripcion),
+     fecha_creacion = IFNULL(p_fecha, fecha_creacion)
+   WHERE incidencia_id = i_id;
+`;
+
+export const initProcedureUpdateIncidencia = async () => {
+  await eliminarProcedimiento("SP_UpdateIncidencia");
+  await crearProcedimiento(
+    "SP_UpdateIncidencia",
+    queryUpdateIncidencias,
+    "IN i_id INT, IN p_tipo INT, IN p_descripcion VARCHAR(50), IN p_fecha DATETIME"
+  );
+};
+
+const queryDeleteIncidencia = `
+  DELETE FROM incidencia WHERE incidencia_id = i_id;
+`;
+
+export const initProcedureDeleteIncidencia = async () => {
+  await eliminarProcedimiento("SP_DeleteIncidencia");
+  await crearProcedimiento("SP_DeleteIncidencia", queryDeleteIncidencia, "IN i_id INT");
+};
+
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
+  await initProcedureUpdateIncidencia();
+  await initProcedureDeleteIncidencia()
 };
