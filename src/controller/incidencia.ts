@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { Incidencia } from "../interface/incidencia";
-import { _createIncidencia, _getIncidencia } from "../service/incidencia";
+import {
+  _createIncidencia,
+  _getIncidencia,
+  _getIncidencias,
+} from "../service/incidencia";
 import { handleHttp } from "../util/error.handler";
 
 export const createIncidencia = async (req: Request, res: Response) => {
@@ -20,9 +24,22 @@ export const createIncidencia = async (req: Request, res: Response) => {
   }
 };
 
-export const getIncidencia = async (req: Request, res: Response) => {
+export const getIncidencias = async (req: Request, res: Response) => {
   try {
-    const response = await _getIncidencia();
+    const response = await _getIncidencias();
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getIncidencias", 500);
+  }
+};
+
+export const getIncidencia = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
+
+  try {
+    const response = await _getIncidencia(usuario_id);
     res
       .status(response.status)
       .json(response.items ? response.items : response);

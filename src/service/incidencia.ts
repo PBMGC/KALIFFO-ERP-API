@@ -1,4 +1,5 @@
 import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
+import { Horario } from "../models/horario";
 import { Incidencia } from "../models/incidencia";
 import { Usuario } from "../models/usuario";
 
@@ -21,9 +22,29 @@ export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
   }
 };
 
-export const _getIncidencia = async () => {
+export const _getIncidencias = async () => {
   try {
     const items = await Incidencia.findAll();
+    return {
+      items,
+      success: true,
+      status: 201,
+    };
+  } catch (error) {
+    return {
+      msg: "error _getIncidencias",
+      succes: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getIncidencia = async (usuario_id: string) => {
+  try {
+    const items = await Incidencia.findAll({
+      where: { usuario_id: usuario_id },
+    });
+
     return {
       items,
       success: true,

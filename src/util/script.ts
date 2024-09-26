@@ -616,25 +616,25 @@ const incidencias: IncidenciaInterface[] = [
     tipo: 1,
     descripcion: "Permiso para atender asuntos familiares urgentes",
     fecha_creacion: new Date("2024-09-19"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 2,
     descripcion: "Ausencia por hospitalización",
     fecha_creacion: new Date("2024-09-18"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 3,
     descripcion: "Permiso para asuntos personales fuera de la ciudad",
     fecha_creacion: new Date("2024-09-17"),
-    usuario_id: 1,
+    usuario_id: 2,
   },
   {
     tipo: 1,
     descripcion: "Ausencia por evento familiar importante",
     fecha_creacion: new Date("2024-09-16"),
-    usuario_id: 1,
+    usuario_id: 3,
   },
 ];
 
@@ -665,15 +665,14 @@ const createUsuario = async () => {
 
 const createHorario = async () => {
   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
-    sequelize.query(`
-      insert into horario(hora_entrada,hora_salida,fecha,usuario_id) values 
-      ("9:00:00", "16:00:00","20new Date(24-08-20",1)),
-      ("9:00:00", "17:00:00","20new Date(24-08-19",1)),
-      ("9:00:00", "14:00:00","20new Date(24-08-18",1)),
-      ("9:00:00", "12:00:00","2024-08-14",1);`);
+    await sequelize.query(`
+      insert into horario(hora_entrada, hora_salida, fecha, usuario_id) values 
+      ("9:00:00", "16:00:00", "2024-08-20", 1),
+      ("9:00:00", "17:00:00", "2024-08-19", 1),
+      ("9:00:00", "14:00:00", "2024-08-18", 1),
+      ("9:00:00", "12:00:00", "2024-08-14", 1);`);
   }
 };
-
 const createColores = async () => {
   for (const color of colores) {
     const colorExistente = await Color.findOne({
