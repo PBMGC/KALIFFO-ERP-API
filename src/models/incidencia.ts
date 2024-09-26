@@ -24,7 +24,7 @@ export const Incidencia = sequelize.define<IncidenciaModel>(
       allowNull: false,
     },
     fecha_creacion: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     usuario_id: {
@@ -32,23 +32,23 @@ export const Incidencia = sequelize.define<IncidenciaModel>(
       allowNull: false,
     },
   },
-  { 
-    freezeTableName: true, 
+  {
+    freezeTableName: true,
     timestamps: false,
-    indexes:[
+    indexes: [
       {
-        name:"I_tipo",
-        fields:["tipo"]
+        name: "I_tipo",
+        fields: ["tipo"],
       },
       {
-        name:"I_usuarioID",
-        fields:["usuario_id"]
+        name: "I_usuarioID",
+        fields: ["usuario_id"],
       },
       {
-        name:"I_fechacreacion",
-        fields:["fecha_creacion"]
-      }
-    ] 
+        name: "I_fechacreacion",
+        fields: ["fecha_creacion"],
+      },
+    ],
   }
 );
 

@@ -6,3 +6,6 @@ const router = Router();
 router.get("/:usuario_id", getPagos);
 
 export { router };
+
+//crear, ver
+//usuario agregar pago

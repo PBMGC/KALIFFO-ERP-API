@@ -1,16 +1,19 @@
 import sequelize from "../db/connection";
 import { Color as ColorInterface } from "../interface/color";
+import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
 import { Pago as PagoInterface } from "../interface/pago";
 import { Producto as ProductoInterface } from "../interface/producto";
 import { Tienda as TiendaInterface } from "../interface/tienda";
 import { Usuario as UsuarioInterface } from "../interface/usuario";
 import { Color } from "../models/color";
 import { Horario } from "../models/horario";
+import { Incidencia } from "../models/incidencia";
 import { Pago } from "../models/pago";
 import { Producto } from "../models/producto";
 import { Tienda } from "../models/tienda";
 import { Usuario } from "../models/usuario";
 import { _createColor } from "../service/color";
+import { _createIncidencia } from "../service/incidencia";
 import { _createPago } from "../service/pago";
 import { _createProducto } from "../service/producto";
 import { _createTienda } from "../service/tienda";
@@ -19,7 +22,7 @@ import { _createUsuario } from "../service/usuario";
 const tiendas: TiendaInterface[] = [
   {
     tienda: "Almacen",
-    direccion: "Av. Siempre Viva 122, Lima",
+    direccion: "Av. Siempre Viva 12, Lima",
     telefono: "987654322",
   },
   {
@@ -572,7 +575,79 @@ const pagos: PagoInterface[] = [
   },
 ];
 
-const createTienda = async () => {};
+const incidencias: IncidenciaInterface[] = [
+  {
+    tipo: 1,
+    descripcion: "Permiso familiar para cuidar a un hijo enfermo",
+    fecha_creacion: new Date("2024-09-25"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 2,
+    descripcion: "Visita médica de urgencia",
+    fecha_creacion: new Date("2024-09-24"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 3,
+    descripcion: "Día personal para resolver asuntos bancarios",
+    fecha_creacion: new Date("2024-09-23"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 1,
+    descripcion: "Ausencia por ceremonia familiar",
+    fecha_creacion: new Date("2024-09-22"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 2,
+    descripcion: "Chequeo médico anual",
+    fecha_creacion: new Date("2024-09-21"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 3,
+    descripcion: "Día personal por trámites legales",
+    fecha_creacion: new Date("2024-09-20"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 1,
+    descripcion: "Permiso para atender asuntos familiares urgentes",
+    fecha_creacion: new Date("2024-09-19"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 2,
+    descripcion: "Ausencia por hospitalización",
+    fecha_creacion: new Date("2024-09-18"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 3,
+    descripcion: "Permiso para asuntos personales fuera de la ciudad",
+    fecha_creacion: new Date("2024-09-17"),
+    usuario_id: 1,
+  },
+  {
+    tipo: 1,
+    descripcion: "Ausencia por evento familiar importante",
+    fecha_creacion: new Date("2024-09-16"),
+    usuario_id: 1,
+  },
+];
+
+const createTienda = async () => {
+  for (const tienda of tiendas) {
+    const tiendaExistente = await Tienda.findOne({
+      where: { tienda: tienda.tienda },
+    });
+    if (!tiendaExistente) {
+      await _createTienda(tienda);
+    }
+  }
+};
 
 const createUsuario = async () => {
   for (const usuario of usuarios) {
@@ -585,15 +660,16 @@ const createUsuario = async () => {
   }
   createHorario();
   createPago();
+  createIncidencias();
 };
 
 const createHorario = async () => {
   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
     sequelize.query(`
       insert into horario(hora_entrada,hora_salida,fecha,usuario_id) values 
-      ("9:00:00", "16:00:00","2024-08-20",1),
-      ("9:00:00", "17:00:00","2024-08-19",1),
-      ("9:00:00", "14:00:00","2024-08-18",1),
+      ("9:00:00", "16:00:00","20new Date(24-08-20",1)),
+      ("9:00:00", "17:00:00","20new Date(24-08-19",1)),
+      ("9:00:00", "14:00:00","20new Date(24-08-18",1)),
       ("9:00:00", "12:00:00","2024-08-14",1);`);
   }
 };
@@ -644,15 +720,20 @@ const createPago = async () => {
   }
 };
 
-export const scriptInicio = async () => {
-  for (const tienda of tiendas) {
-    const tiendaExistente = await Tienda.findOne({
-      where: { tienda: tienda.tienda },
+const createIncidencias = async () => {
+  for (const incidencia of incidencias) {
+    const incidenciaExistente = await Incidencia.findOne({
+      where: { descripcion: incidencia.descripcion },
     });
-    if (!tiendaExistente) {
-      await _createTienda(tienda);
+
+    if (!incidenciaExistente) {
+      await _createIncidencia(incidencia);
     }
   }
+};
+
+export const scriptInicio = async () => {
+  createTienda();
   createUsuario();
   createColores();
   createProducto();
