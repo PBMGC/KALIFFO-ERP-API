@@ -361,3 +361,25 @@ export const _loseProductos = async (tienda_id: string) => {
     };
   }
 };
+
+
+//SQL PURO
+export const _getColoresProducto = async (producto_id: number) => {
+  try {
+    
+    const [data] = await sequelize.query(`CALL SP_ColoresProductos(${producto_id});`);
+
+    return {
+      data, 
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createIncidencia, getIncidencia } from "../controller/incidencia";
+import { Incidencia } from "../models/incidencia";
 
 const router = Router();
 

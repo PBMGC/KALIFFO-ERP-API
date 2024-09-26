@@ -37,6 +37,20 @@ export const Pago = sequelize.define<PagoModel>(
   {
     freezeTableName: true,
     timestamps: false,
+    indexes:[
+      {
+        name:"I_fecha",
+        fields:["fecha"]
+      },
+      {
+        name:"I_estado",
+        fields:["estado"]
+      },
+      {
+        name:"I_usuarioid",
+        fields:["usuario_id"]
+      }
+    ]
   }
 );
 
