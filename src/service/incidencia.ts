@@ -23,13 +23,7 @@ export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
 
 export const _getIncidencia = async () => {
   try {
-    const items = await Incidencia.findAll({
-      attributes: { exclude: ["usuario_id"] },
-      include: {
-        model: Usuario,
-        attributes: { exclude: ["contraseña", "createdAt", "updatedAt"] },
-      },
-    });
+    const items = await Incidencia.findAll();
     return {
       items,
       success: true,
