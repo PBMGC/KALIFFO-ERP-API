@@ -665,12 +665,13 @@ const createUsuario = async () => {
 
 const createHorario = async () => {
   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
-    sequelize.query(`
-      insert into horario(hora_entrada,hora_salida,fecha,usuario_id) values 
-      ("9:00:00", "16:00:00","20new Date(24-08-20",1)),
-      ("9:00:00", "17:00:00","20new Date(24-08-19",1)),
-      ("9:00:00", "14:00:00","20new Date(24-08-18",1)),
-      ("9:00:00", "12:00:00","2024-08-14",1);`);
+    await sequelize.query(`
+      INSERT INTO horario (hora_entrada, hora_salida, fecha, usuario_id) VALUES 
+      ('09:00:00', '16:00:00', '2024-08-24', 1),
+      ('09:00:00', '17:00:00', '2024-08-19', 1),
+      ('09:00:00', '14:00:00', '2024-08-18', 1),
+      ('09:00:00', '12:00:00', '2024-08-14', 1);
+    `);
   }
 };
 

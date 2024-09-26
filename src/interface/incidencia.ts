@@ -3,7 +3,7 @@ export interface Incidencia {
   tipo: number;
   descripcion: string;
   fecha_creacion?: Date;
-  usuario_id: number;
+  usuario_id?: number;
 }
 
 // 1 => familiar
