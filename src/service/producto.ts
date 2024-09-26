@@ -330,6 +330,7 @@ export const _updateProducto = async (
   }
 };
 
+//orm
 export const _loseProductos = async (tienda_id: string) => {
   try {
     const consulta = await sequelize.query(`

@@ -19,8 +19,8 @@ import { _createUsuario } from "../service/usuario";
 const tiendas: TiendaInterface[] = [
   {
     tienda: "Almacen",
-    direccion: "Av. Siempre Viva 123, Lima",
-    telefono: "987654321",
+    direccion: "Av. Siempre Viva 122, Lima",
+    telefono: "987654322",
   },
   {
     tienda: "Tienda 1",
@@ -572,16 +572,7 @@ const pagos: PagoInterface[] = [
   },
 ];
 
-const createTienda = async () => {
-  for (const tienda of tiendas) {
-    const tiendaExistente = await Tienda.findOne({
-      where: { tienda: tienda.tienda },
-    });
-    if (!tiendaExistente) {
-      await _createTienda(tienda);
-    }
-  }
-};
+const createTienda = async () => {};
 
 const createUsuario = async () => {
   for (const usuario of usuarios) {
@@ -654,7 +645,14 @@ const createPago = async () => {
 };
 
 export const scriptInicio = async () => {
-  createTienda();
+  for (const tienda of tiendas) {
+    const tiendaExistente = await Tienda.findOne({
+      where: { tienda: tienda.tienda },
+    });
+    if (!tiendaExistente) {
+      await _createTienda(tienda);
+    }
+  }
   createUsuario();
   createColores();
   createProducto();
