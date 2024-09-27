@@ -1,7 +1,6 @@
 import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
-import { Horario } from "../models/horario";
+
 import { Incidencia } from "../models/incidencia";
-import { Usuario } from "../models/usuario";
 
 export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
   try {
