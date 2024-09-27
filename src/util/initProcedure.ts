@@ -108,7 +108,7 @@ LEFT JOIN
      FROM horario 
      GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id 
 LEFT JOIN 
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ")") ORDER BY tipo SEPARATOR "; ") AS incidencias 
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion,", ",fecha_creacion,")") ORDER BY tipo SEPARATOR "; ") AS incidencias 
      FROM incidencia 
      GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id 
 LEFT JOIN 
