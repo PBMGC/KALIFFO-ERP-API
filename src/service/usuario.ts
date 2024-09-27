@@ -11,7 +11,6 @@ import { Incidencia } from "../models/incidencia";
 
 dotenv.config();
 
-
 export const _createUsuario = async (usuario: UsuarioInterface) => {
   try {
     if (await Usuario.findOne({ where: { dni: usuario.dni } })) {
@@ -126,6 +125,19 @@ export const _getUsuario = async (usuario_id: string) => {
     });
 
     const countIncidencias = await Incidencia.count({ where: { usuario_id } });
+    const nroHoras = (await Horario.findAll({
+      attributes: [
+        [
+          sequelize.literal(
+            "SUM(FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60))"
+          ),
+          "min_trabajados",
+        ],
+      ],
+      where: { usuario_id },
+    })) as any;
+
+    console.log(nroHoras);
 
     if (!item) {
       return {
@@ -136,7 +148,11 @@ export const _getUsuario = async (usuario_id: string) => {
     }
 
     return {
-      item: { ...item.dataValues, nroIncidencias: countIncidencias },
+      item: {
+        ...item.dataValues,
+        nroIncidencias: countIncidencias,
+        nroHoras: nroHoras[0],
+      },
       success: true,
       status: 200,
     };
@@ -354,37 +370,32 @@ export const _horasTrabajadas = async (usuario_id: number) => {
   }
 };
 
-
 //Sql puro
 
-export const _deleteAsistencia = async (
-  horario_id: number,
-) => {
+export const _deleteAsistencia = async (horario_id: number) => {
   try {
-
     await sequelize.query(`
       CALL SP_DeleteHorario(${horario_id})`);
 
     return {
       message: "Eliminacion exitosa",
       success: true,
-      status: 200
+      status: 200,
     };
   } catch (error) {
     console.error("Error al eliminar la asistencia:", error);
     return {
       message: "Error al eliminar la asistencia",
       success: false,
-      status: 500
+      status: 500,
     };
   }
 };
 
 export const _generarReporte = async (usuario_id: number) => {
   try {
-    
-    const PDFDocument = require("pdfkit-table")
-    const fs = require("fs")
+    const PDFDocument = require("pdfkit-table");
+    const fs = require("fs");
 
     // const data = await sequelize.query(`
     //   CALL SP_ReporteUsuario(${usuario_id})`);
@@ -392,37 +403,35 @@ export const _generarReporte = async (usuario_id: number) => {
     const tabla = {
       title: "Datos del Trabajador",
       headers: ["Nombre", "Teléfono", "DNI", "Tienda"],
-      rows: [
-        ["PEPE PEREZ PICA PAPAS", "12345678", "76361013", "Tienda 1"],
-      ],
+      rows: [["PEPE PEREZ PICA PAPAS", "12345678", "76361013", "Tienda 1"]],
     };
 
-    const doc = new PDFDocument(
-      {
-        bufferPages:true,
-        title:"Reporte Usuario",
-        permissions:{
-          printing:"highResolution"
-        }
-      }
-    );
-    
-    doc.pipe(fs.createWriteStream(`reporte1.pdf`))
-    
-    doc.image("src/Img/logo.png", 10, 10, { fit: [100, 100], align: "center", valign: "center" });
+    const doc = new PDFDocument({
+      bufferPages: true,
+      title: "Reporte Usuario",
+      permissions: {
+        printing: "highResolution",
+      },
+    });
 
-    doc.text("KALIFFO SAC",250,50)
-    doc.text("REPORTE DE TRABAJADOR",210,70)
+    doc.pipe(fs.createWriteStream(`reporte1.pdf`));
 
-    await doc.table(tabla,{
+    doc.image("src/Img/logo.png", 10, 10, {
+      fit: [100, 100],
+      align: "center",
+      valign: "center",
+    });
+
+    doc.text("KALIFFO SAC", 250, 50);
+    doc.text("REPORTE DE TRABAJADOR", 210, 70);
+
+    await doc.table(tabla, {
       width: 450,
       x: 50,
       y: 120,
-      
-      
-    })
+    });
 
-    doc.end()
+    doc.end();
 
     return {
       message: "Reporte generado exitosamente",
@@ -431,7 +440,7 @@ export const _generarReporte = async (usuario_id: number) => {
     };
   } catch (error) {
     return {
-      message:error,
+      message: error,
       success: false,
       status: 500,
     };

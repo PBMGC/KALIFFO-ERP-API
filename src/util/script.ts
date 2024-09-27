@@ -46,6 +46,7 @@ const usuarios: UsuarioInterface[] = [
     dni: "73214567",
     telefono: "987654321",
     contraseña: "juan1234",
+    sueldo: 300,
     tienda_id: 1,
     rol: 1,
   },
@@ -53,10 +54,11 @@ const usuarios: UsuarioInterface[] = [
     nombre: "María",
     ap_paterno: "López",
     ap_materno: "Hernández",
-    fecha_nacimiento: "1992-07-02",
+    fecha_nacimiento: "19*92-07-02",
     dni: "65478932",
     telefono: "912345678",
     contraseña: "maria2021",
+    sueldo: 200,
     rol: 2,
   },
   {
@@ -67,6 +69,7 @@ const usuarios: UsuarioInterface[] = [
     dni: "87654321",
     telefono: "976543210",
     contraseña: "carlos78",
+    sueldo: 150,
     rol: 2,
   },
   {
@@ -74,10 +77,10 @@ const usuarios: UsuarioInterface[] = [
     ap_paterno: "García",
     ap_materno: "Mendoza",
     fecha_nacimiento: "1995-05-15",
-
     dni: "78945612",
     telefono: "934567890",
     contraseña: "lucia95",
+    sueldo: 80,
     rol: 2,
   },
 ];
@@ -639,13 +642,17 @@ const incidencias: IncidenciaInterface[] = [
 ];
 
 const createTienda = async () => {
-  for (const tienda of tiendas) {
-    const tiendaExistente = await Tienda.findOne({
-      where: { tienda: tienda.tienda },
-    });
-    if (!tiendaExistente) {
-      await _createTienda(tienda);
+  try {
+    for (const tienda of tiendas) {
+      const tiendaExistente = await Tienda.findOne({
+        where: { tienda: tienda.tienda },
+      });
+      if (!tiendaExistente) {
+        await _createTienda(tienda);
+      }
     }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -672,7 +679,6 @@ const createHorario = async () => {
       ('09:00:00', '14:00:00', '2024-08-18', 1),
       ('09:00:00', '12:00:00', '2024-08-14', 1);
     `);
-
   }
 };
 const createColores = async () => {

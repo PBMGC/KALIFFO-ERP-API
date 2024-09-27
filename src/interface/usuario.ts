@@ -7,6 +7,7 @@ export interface Usuario {
   telefono: string;
   dni: string;
   contraseña: string;
+  sueldo: number;
 
   rol: number;
   tienda_id?: number;

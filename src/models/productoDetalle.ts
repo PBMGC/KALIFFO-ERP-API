@@ -19,7 +19,7 @@ export const ProductoDetalle = sequelize.define<ProductoDetalleModel>(
     codigo: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique:true
+      unique: true,
     },
     talla: {
       type: DataTypes.STRING,
@@ -34,16 +34,16 @@ export const ProductoDetalle = sequelize.define<ProductoDetalleModel>(
       allowNull: false,
     },
   },
-  { 
-    freezeTableName: true, 
+  {
+    freezeTableName: true,
     timestamps: false,
-    indexes:[
+    indexes: [
       {
-        name:"I_codigo",
-        fields:["codigo"]
-      }
-    ]
-   }
+        name: "I_codigo",
+        fields: ["codigo"],
+      },
+    ],
+  }
 );
 
 ProductoDetalle.belongsTo(Producto, {

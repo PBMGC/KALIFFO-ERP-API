@@ -6,7 +6,7 @@ import {
   _getProductos,
   _loseProductos,
   _updateProducto,
-  _getColoresProducto
+  _getColoresProducto,
 } from "../service/producto";
 import { handleHttp } from "../util/error.handler";
 
@@ -99,8 +99,8 @@ export const loseProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const getColoresProducto = async(req:Request,res:Response) =>{
-  const {producto_id} = req.params;
+export const getColoresProducto = async (req: Request, res: Response) => {
+  const { producto_id } = req.params;
 
   try {
     const response = await _getColoresProducto(Number(producto_id));
@@ -108,5 +108,4 @@ export const getColoresProducto = async(req:Request,res:Response) =>{
   } catch (error) {
     handleHttp(res, "error ", 500);
   }
-
-}
+};
