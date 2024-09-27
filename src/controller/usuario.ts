@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import { Usuario } from "../interface/usuario";
 import {
   _createUsuario,
+  _deleteAsistencia,
   _deleteUsuario,
+  _generarReporte,
   _getUsuario,
   _getUsuarios,
   _horaEntrada,
@@ -176,4 +178,29 @@ export const horasTrabajadas = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteAsistencia = async (req: Request, res: Response) => {
+  const { horario_id } = req.params;
+
+  try {
+    const response = await _deleteAsistencia(
+      Number(horario_id),
+    )
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_deleteAsistencia", 500);
+  }
+};
+
+export const generateReporte = async (req:Request,res:Response) =>{
+  const { usuario_id } = req.params;
+
+  try {
+    const response = await _generarReporte(Number(usuario_id))
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_generarReporte", 500);
+  }
+}
+
 //horario correo coun de horario de incidencia
+

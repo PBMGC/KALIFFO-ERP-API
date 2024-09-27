@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Incidencia } from "../interface/incidencia";
-import { _createIncidencia, _deleteIncidencia, _getIncidencia, _updateIncidencia } from "../service/incidencia";
+import { _createIncidencia, _deleteIncidencia, _getIncidencia, _getIncidencias, _updateIncidencia } from "../service/incidencia";
 import { handleHttp } from "../util/error.handler";
 
 export const createIncidencia = async (req: Request, res: Response) => {
