@@ -1,8 +1,11 @@
 import sequelize from "../db/connection";
 
-
 //CREADORES
-const crearProcedimiento = async (nombre: string, query: string, parametros: string = '') => {
+const crearProcedimiento = async (
+  nombre: string,
+  query: string,
+  parametros: string = ""
+) => {
   try {
     await sequelize.query(`
       CREATE PROCEDURE ${nombre}(${parametros})
@@ -23,7 +26,6 @@ const eliminarProcedimiento = async (nombre: string) => {
   }
 };
 
-
 //consulta
 const queryColoresProductos = `
   SELECT c.color_id, c.nombre 
@@ -34,7 +36,11 @@ const queryColoresProductos = `
 
 export const initProcedureColoresProductos = async () => {
   await eliminarProcedimiento("SP_ColoresProductos");
-  await crearProcedimiento("SP_ColoresProductos", queryColoresProductos,"IN id_p INT");
+  await crearProcedimiento(
+    "SP_ColoresProductos",
+    queryColoresProductos,
+    "IN id_p INT"
+  );
 };
 
 const queryUpdateIncidencias = `
@@ -61,11 +67,71 @@ const queryDeleteIncidencia = `
 
 export const initProcedureDeleteIncidencia = async () => {
   await eliminarProcedimiento("SP_DeleteIncidencia");
-  await crearProcedimiento("SP_DeleteIncidencia", queryDeleteIncidencia, "IN i_id INT");
+  await crearProcedimiento(
+    "SP_DeleteIncidencia",
+    queryDeleteIncidencia,
+    "IN i_id INT"
+  );
 };
+
+const queryDeleteHorario = `
+  DELETE FROM horario WHERE horario_id = h_id;
+`;
+
+export const initProcedureDeleteHorario = async () => {
+  await eliminarProcedimiento("SP_DeleteHorario");
+  await crearProcedimiento(
+    "SP_DeleteHorario",
+    queryDeleteHorario,
+    "IN h_id INT"
+  );
+};
+
+const queryGetReporteUsuario = `
+  SELECT 
+    u.usuario_id, 
+    u.nombre, 
+    u.ap_paterno, 
+    u.ap_materno, 
+    u.telefono, 
+    u.dni, 
+    t.tienda, 
+    h.horarios,
+    i.incidencias,
+    pg.pagos
+FROM 
+    usuario u 
+LEFT JOIN 
+    tienda t ON u.tienda_id = t.tienda_id 
+LEFT JOIN 
+    (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", hora_entrada, ', ', hora_salida, ")") ORDER BY fecha DESC SEPARATOR ', ') AS horarios 
+     FROM horario 
+     GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id 
+LEFT JOIN 
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ")") ORDER BY tipo SEPARATOR "; ") AS incidencias 
+     FROM incidencia 
+     GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id 
+LEFT JOIN 
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos 
+     FROM pago 
+     GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id 
+WHERE 
+    u.usuario_id = u_id
+ORDER BY 
+    u.usuario_id;
+
+`;
+
+export const initProcedureGetReporteUsuario = async () =>{
+  await eliminarProcedimiento("SP_ReporteUsuario")
+  await crearProcedimiento("SP_ReporteUsuario",queryGetReporteUsuario,"IN u_id INT")
+}
+
 
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
   await initProcedureUpdateIncidencia();
-  await initProcedureDeleteIncidencia()
+  await initProcedureDeleteIncidencia();
+  await initProcedureDeleteHorario();
+  await initProcedureGetReporteUsuario();
 };

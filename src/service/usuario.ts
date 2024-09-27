@@ -8,7 +8,9 @@ import { Op } from "sequelize";
 import { Tienda } from "../models/tienda";
 import sequelize from "../db/connection";
 import { Incidencia } from "../models/incidencia";
+
 dotenv.config();
+
 
 export const _createUsuario = async (usuario: UsuarioInterface) => {
   try {
@@ -346,6 +348,71 @@ export const _horasTrabajadas = async (usuario_id: number) => {
   } catch (error) {
     return {
       message: "error _horasTrabajadas",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+
+//Sql puro
+
+export const _deleteAsistencia = async (
+  horario_id: number,
+) => {
+  try {
+
+    await sequelize.query(`
+      CALL SP_DeleteHorario(${horario_id})`);
+
+    return {
+      message: "Eliminacion exitosa",
+      success: true,
+      status: 200
+    };
+  } catch (error) {
+    console.error("Error al eliminar la asistencia:", error);
+    return {
+      message: "Error al eliminar la asistencia",
+      success: false,
+      status: 500
+    };
+  }
+};
+
+export const _generarReporte = async (usuario_id: number) => {
+  try {
+    
+    const PDFDocument = require("pdfkit")
+    const fs = require("fs")
+
+    // const data = await sequelize.query(`
+    //   CALL SP_ReporteUsuario(${usuario_id})`);
+
+    const doc = new PDFDocument(
+      {
+        bufferPages:true,
+        title:"Reporte Usuario",
+        permissions:{
+          printing:"highResolution"
+        }
+      }
+    );
+    
+    doc.pipe(fs.createWriteStream(`reporte${usuario_id}.pdf`))
+    
+    doc.image("src/Img/logo.png", 430, 15, { fit: [100, 100], align: "center", valign: "center" });
+
+    doc.end()
+
+    return {
+      message: "Reporte generado exitosamente",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message:error,
       success: false,
       status: 500,
     };

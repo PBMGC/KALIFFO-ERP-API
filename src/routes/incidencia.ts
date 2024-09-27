@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createIncidencia, deleteIncidencia, getIncidencia, updateIncidencia } from "../controller/incidencia";
+import { createIncidencia, deleteIncidencia, getIncidencia, updateIncidencia,getIncidencias } from "../controller/incidencia";
 import { Incidencia } from "../models/incidencia";
 
 

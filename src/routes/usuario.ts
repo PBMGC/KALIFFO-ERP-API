@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createUsuario,
   deleteUsuario,
+  generateReporte,
   getUsuario,
   getUsuarios,
   loginUsuario,
@@ -20,5 +21,7 @@ router.post("/login", ValidateLogin, loginUsuario);
 router.put("/update/:usuario_id", updateUsuario);
 
 router.delete("/delete/:usuario_id", deleteUsuario);
+
+router.get("/reporte/:usuario_id",generateReporte)
 
 export { router };
