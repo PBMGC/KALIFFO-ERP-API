@@ -1,15 +1,21 @@
 import { Router } from "express";
-import { createIncidencia, deleteIncidencia, getIncidencia, updateIncidencia,getIncidencias } from "../controller/incidencia";
-import { Incidencia } from "../models/incidencia";
-
+import {
+  createIncidencia,
+  deleteIncidencia,
+  getIncidencia,
+  getIncidencias,
+  updateIncidencia,
+} from "../controller/incidencia";
 
 const router = Router();
 
 router.get("", getIncidencias);
-router.get("/:usuario_id", getIncidencia);
+router.get("/:incidencia_id", getIncidencia);
+
+router.delete("/delete/:incidencia_id", deleteIncidencia);
+
+router.put("/update/:incidencia_id", updateIncidencia);
 
 router.post("/create", createIncidencia);
-router.put("/update/:incidencia_id",updateIncidencia)
-router.delete("/delete/:incidencia_id",deleteIncidencia)
 
 export { router };

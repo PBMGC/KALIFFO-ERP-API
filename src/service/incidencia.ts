@@ -1,4 +1,4 @@
-import sequelize from "../db/connection";
+
 import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
 
 import { Incidencia } from "../models/incidencia";
@@ -22,9 +22,15 @@ export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
   }
 };
 
-export const _getIncidencias = async () => {
+export const _getIncidencias = async (usuario_id?: number) => {
   try {
-    const items = await Incidencia.findAll();
+    const filtros: any = {};
+
+    if (usuario_id) {
+      filtros.where = { usuario_id };
+    }
+
+    const items = await Incidencia.findAll(filtros);
     return {
       items,
       success: true,
@@ -39,14 +45,14 @@ export const _getIncidencias = async () => {
   }
 };
 
-export const _getIncidencia = async (usuario_id: string) => {
+export const _getIncidencia = async (incidencia_id: number) => {
   try {
-    const items = await Incidencia.findAll({
-      where: { usuario_id: usuario_id },
+    const item = await Incidencia.findAll({
+      where: { incidencia_id },
     });
 
     return {
-      items,
+      item,
       success: true,
       status: 201,
     };
@@ -59,53 +65,59 @@ export const _getIncidencia = async (usuario_id: string) => {
   }
 };
 
-//SQL PURO
-export const _updateIncidencia = async (
-  incidencia_id: number,
-  updateIncidencia: IncidenciaInterface
-) => {
+export const _deleteIncidencia = async (incidencia_id: number) => {
   try {
-    const { tipo, descripcion, fecha_creacion } = updateIncidencia;
+    const result = await Incidencia.destroy({
+      where: { incidencia_id },
+    });
 
-    await sequelize.query(`
-      CALL SP_UpdateIncidencia(
-        ${incidencia_id},
-        ${tipo !== undefined ? `${tipo}` : null},
-        ${descripcion !== undefined ? `"${descripcion}"` : null},
-        ${fecha_creacion !== undefined ? `"${fecha_creacion}"` : null}
-      )
-    `);
+    if (result === 0) {
+      return {
+        msg: "no se encontro incidencia",
+        success: false,
+        status: 404,
+      };
+    }
 
     return {
-      message: "Actualización exitosa",
+      msg: "incidencia eliminada",
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al actualizar la incidencia:", error);
     return {
-      message: "Error al actualizar la incidencia",
+      msg: "error _deleteIncidencia",
       success: false,
       status: 500,
     };
   }
 };
 
-//Sql puro
-export const _deleteIncidencia = async (incidencia_id: number) => {
+export const _updateIncidencia = async (
+  incidencia_id: number,
+  updatedIncidencia: Partial<IncidenciaInterface>
+) => {
   try {
-    await sequelize.query(`
-      CALL SP_DeleteIncidencia(${incidencia_id})`);
+    const [updatedRows] = await Incidencia.update(updatedIncidencia, {
+      where: { incidencia_id },
+    });
+
+    if (updatedRows === 0) {
+      return {
+        msg: "Incidencia no encontrada o no actualizada",
+        success: false,
+        status: 404,
+      };
+    }
 
     return {
-      message: "Eliminacion exitosa",
+      msg: "Incidencia actualizada correctamente",
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al eliminar la incidencia:", error);
     return {
-      message: "Error al eliminar la incidencia",
+      msg: "error _updateIncidencia",
       success: false,
       status: 500,
     };
