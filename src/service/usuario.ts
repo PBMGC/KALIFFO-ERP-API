@@ -383,11 +383,19 @@ export const _deleteAsistencia = async (
 export const _generarReporte = async (usuario_id: number) => {
   try {
     
-    const PDFDocument = require("pdfkit")
+    const PDFDocument = require("pdfkit-table")
     const fs = require("fs")
 
     // const data = await sequelize.query(`
     //   CALL SP_ReporteUsuario(${usuario_id})`);
+
+    const tabla = {
+      title: "Datos del Trabajador",
+      headers: ["Nombre", "Teléfono", "DNI", "Tienda"],
+      rows: [
+        ["PEPE PEREZ PICA PAPAS", "12345678", "76361013", "Tienda 1"],
+      ],
+    };
 
     const doc = new PDFDocument(
       {
@@ -399,9 +407,20 @@ export const _generarReporte = async (usuario_id: number) => {
       }
     );
     
-    doc.pipe(fs.createWriteStream(`reporte${usuario_id}.pdf`))
+    doc.pipe(fs.createWriteStream(`reporte1.pdf`))
     
-    doc.image("src/Img/logo.png", 430, 15, { fit: [100, 100], align: "center", valign: "center" });
+    doc.image("src/Img/logo.png", 10, 10, { fit: [100, 100], align: "center", valign: "center" });
+
+    doc.text("KALIFFO SAC",250,50)
+    doc.text("REPORTE DE TRABAJADOR",210,70)
+
+    await doc.table(tabla,{
+      width: 450,
+      x: 50,
+      y: 120,
+      
+      
+    })
 
     doc.end()
 
