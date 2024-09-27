@@ -79,39 +79,35 @@ export const _updateIncidencia = async (
     return {
       message: "Actualización exitosa",
       success: true,
-      status: 200
+      status: 200,
     };
   } catch (error) {
     console.error("Error al actualizar la incidencia:", error);
     return {
       message: "Error al actualizar la incidencia",
       success: false,
-      status: 500
+      status: 500,
     };
   }
 };
 
 //Sql puro
-
-export const _deleteIncidencia = async (
-  incidencia_id: number,
-) => {
+export const _deleteIncidencia = async (incidencia_id: number) => {
   try {
-
     await sequelize.query(`
       CALL SP_DeleteIncidencia(${incidencia_id})`);
 
     return {
       message: "Eliminacion exitosa",
       success: true,
-      status: 200
+      status: 200,
     };
   } catch (error) {
     console.error("Error al eliminar la incidencia:", error);
     return {
       message: "Error al eliminar la incidencia",
       success: false,
-      status: 500
+      status: 500,
     };
   }
 };
