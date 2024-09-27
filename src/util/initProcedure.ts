@@ -127,6 +127,14 @@ export const initProcedureGetReporteUsuario = async () =>{
   await crearProcedimiento("SP_ReporteUsuario",queryGetReporteUsuario,"IN u_id INT")
 }
 
+const queryDeletePago = `
+  DELETE FROM pago WHERE pago_id = p_id;
+`;
+
+export const initProcedureDeletePago = async () =>{
+  await eliminarProcedimiento("SP_DeletePago")
+  await crearProcedimiento("SP_DeletePago",queryDeletePago,"IN p_id INT")
+}
 
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
@@ -134,4 +142,5 @@ export const initProcedure = async () => {
   await initProcedureDeleteIncidencia();
   await initProcedureDeleteHorario();
   await initProcedureGetReporteUsuario();
+  await initProcedureDeletePago();
 };
