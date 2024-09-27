@@ -1,21 +1,10 @@
 import express from "express";
 import cors from "cors";
 import { router } from "../routes";
-
-import { Tienda } from "./tienda";
-import { Usuario } from "./usuario";
-import { Horario } from "./horario";
 import cookieParser from "cookie-parser";
-import { Incidencia } from "./incidencia";
 import { scriptInicio } from "../util/script";
-import { Producto } from "./producto";
-import { ProductoDetalle } from "./productoDetalle";
-import { ProductoTienda } from "./productoTienda";
-import { Color } from "./color";
-import { Pago } from "./pago";
-import { Factura } from "./factura";
-import { DetalleFactura } from "./detalleFactura";
 import { initProcedure } from "../util/initProcedure";
+import { initBD } from "../util/initBD";
 
 class Serve {
   app: express.Application;
@@ -48,21 +37,9 @@ class Serve {
 
   async db() {
     try {
-      await Tienda.sync();
-      await Usuario.sync();
-      await Horario.sync();
-      await Incidencia.sync();
-      await Producto.sync();
-      await Color.sync();
-
-      await ProductoDetalle.sync();
-      await ProductoTienda.sync();
-      await Pago.sync();
-      await Factura.sync();
-      await DetalleFactura.sync();
-
-      scriptInicio();
-      initProcedure();
+      await initBD();
+      await scriptInicio();
+      await initProcedure();
     } catch (error) {
       console.log(error);
     }

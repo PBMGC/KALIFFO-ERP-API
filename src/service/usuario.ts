@@ -125,6 +125,19 @@ export const _getUsuario = async (usuario_id: string) => {
     });
 
     const countIncidencias = await Incidencia.count({ where: { usuario_id } });
+    const nroHoras = (await Horario.findAll({
+      attributes: [
+        [
+          sequelize.literal(
+            "SUM(FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60))"
+          ),
+          "min_trabajados",
+        ],
+      ],
+      where: { usuario_id },
+    })) as any;
+
+    console.log(nroHoras);
 
     if (!item) {
       return {
@@ -135,7 +148,11 @@ export const _getUsuario = async (usuario_id: string) => {
     }
 
     return {
-      item: { ...item.dataValues, nroIncidencias: countIncidencias },
+      item: {
+        ...item.dataValues,
+        nroIncidencias: countIncidencias,
+        nroHoras: nroHoras[0],
+      },
       success: true,
       status: 200,
     };

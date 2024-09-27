@@ -1,4 +1,3 @@
-
 import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
 
 import { Incidencia } from "../models/incidencia";

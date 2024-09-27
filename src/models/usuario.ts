@@ -51,6 +51,10 @@ export const Usuario = sequelize.define<UsuarioModel>(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    sueldo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     tienda_id: {
       type: DataTypes.INTEGER,
       allowNull: true,

@@ -24,6 +24,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     dni,
     telefono,
     contraseña,
+    sueldo,
     tienda_id,
     rol,
   } = req.body;
@@ -36,6 +37,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     dni,
     telefono,
     contraseña,
+    sueldo,
     tienda_id,
     rol,
   };
@@ -50,7 +52,7 @@ export const createUsuario = async (req: Request, res: Response) => {
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const rol = req.query.rol;
-  const inicio = req.query.inicio; 
+  const inicio = req.query.inicio;
   const final = req.query.final;
   const nombre = req.query.nombre as string;
   const tienda_id = req.query.tienda_id;
@@ -182,25 +184,22 @@ export const deleteAsistencia = async (req: Request, res: Response) => {
   const { horario_id } = req.params;
 
   try {
-    const response = await _deleteAsistencia(
-      Number(horario_id),
-    )
+    const response = await _deleteAsistencia(Number(horario_id));
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_deleteAsistencia", 500);
   }
 };
 
-export const generateReporte = async (req:Request,res:Response) =>{
+export const generateReporte = async (req: Request, res: Response) => {
   const { usuario_id } = req.params;
 
   try {
-    const response = await _generarReporte(Number(usuario_id))
+    const response = await _generarReporte(Number(usuario_id));
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_generarReporte", 500);
   }
-}
+};
 
 //horario correo coun de horario de incidencia
-

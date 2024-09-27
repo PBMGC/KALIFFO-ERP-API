@@ -33,12 +33,12 @@ export const Horario = sequelize.define<HorarioModel>(
   {
     freezeTableName: true,
     timestamps: false,
-    indexes:[
+    indexes: [
       {
-        name:"I_usuarioID", 
-        fields:["usuario_id"]
-      }
-    ]
+        name: "I_usuarioID",
+        fields: ["usuario_id"],
+      },
+    ],
   }
 );
 

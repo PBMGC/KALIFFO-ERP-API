@@ -15,26 +15,26 @@ export const Color = sequelize.define<ColorModel>(
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique:true
+      unique: true,
     },
     codigo: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique:true
+      unique: true,
     },
   },
   {
     freezeTableName: true,
     timestamps: false,
-    indexes:[
+    indexes: [
       {
-        name:"I_nombre",
-        fields:["nombre"]
+        name: "I_nombre",
+        fields: ["nombre"],
       },
       {
-        name:"I_codigo",
-        fields:["codigo"]
-      }
-    ]
+        name: "I_codigo",
+        fields: ["codigo"],
+      },
+    ],
   }
 );
