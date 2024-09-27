@@ -332,9 +332,9 @@ export const _horasTrabajadas = async (usuario_id: number) => {
         "usuario_id",
         [
           sequelize.literal(
-            'TIME_FORMAT(TIMEDIFF(hora_salida, hora_entrada), "%H:%i:%s")'
+            "FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60)"
           ),
-          "horas_trabajadas",
+          "min_trabajados",
         ],
       ],
       where: { usuario_id },
