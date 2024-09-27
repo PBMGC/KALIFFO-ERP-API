@@ -397,14 +397,50 @@ export const _generarReporte = async (usuario_id: number) => {
     const PDFDocument = require("pdfkit-table");
     const fs = require("fs");
 
-    // const data = await sequelize.query(`
-    //   CALL SP_ReporteUsuario(${usuario_id})`);
+    const data: any = await sequelize.query(
+      `CALL SP_ReporteUsuario(${usuario_id})`
+    );
 
-    const tabla = {
-      title: "Datos del Trabajador",
-      headers: ["Nombre", "Teléfono", "DNI", "Tienda"],
-      rows: [["PEPE PEREZ PICA PAPAS", "12345678", "76361013", "Tienda 1"]],
-    };
+    const horariodata: any = data[0].horarios
+    .split('), (')
+    .map((item:string) => {
+      const [hora_entrada, hora_salida] = item
+        .replace(/\(|\)/g, "") 
+        .trim()
+        .split(", "); 
+      return {
+        hora_entrada: hora_entrada,
+        hora_salida: hora_salida 
+      };
+    });
+
+    const pagosData = data[0].pagos
+    .split('), (')
+    .map((item:string)=>{
+      const [pago_total,pago_faltante] = item
+      .replace(/\(|\)/g, "") 
+      .trim()
+      .split(", "); 
+      return {
+        pago_total:pago_total,
+        pago_faltante:pago_faltante
+      }
+    })
+
+    console.log(pagosData)
+
+    const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
+    const incidenciasData = data[0].incidencias.split("; ").map((item: any) => {
+      const [id, descripcion, fecha] = item
+        .replace(/\(|\)/g, "")
+        .trim()
+        .split(", ");
+      return {
+        tipo: incidenciaTIPO[Number(id)],
+        descripcion: descripcion,
+        fecha: fecha,
+      };
+    });
 
     const doc = new PDFDocument({
       bufferPages: true,
@@ -421,14 +457,285 @@ export const _generarReporte = async (usuario_id: number) => {
       align: "center",
       valign: "center",
     });
-
     doc.text("KALIFFO SAC", 250, 50);
     doc.text("REPORTE DE TRABAJADOR", 210, 70);
 
-    await doc.table(tabla, {
+    const tablaDatosTrabajador = {
+      title: `Datos de ${data[0].nombre} ${data[0].ap_paterno} ${data[0].ap_materno}`,
+      headers: [
+        {
+          label: "Nombre",
+          property: "nombre",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Teléfono",
+          property: "telefono",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "DNI",
+          property: "dni",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Tienda",
+          property: "tienda",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas: [
+        {
+          nombre:
+            data[0].nombre +
+            " " +
+            data[0].ap_paterno +
+            " " +
+            data[0].ap_materno,
+          telefono: data[0].telefono,
+          dni: data[0].dni,
+          tienda: data[0].tienda,
+        },
+      ],
+    };
+
+    await doc.table(tablaDatosTrabajador, {
       width: 450,
       x: 50,
       y: 120,
+      prepareRow: (
+        row: string[],
+        indexColumn: number,
+        indexRow: number,
+        rectRow: { x: number; y: number; width: number; height: number },
+        rectCell: { x: number; y: number; width: number; height: number }
+      ) => {
+        const { x, y, width, height } = rectCell;
+
+        if (indexColumn === 0) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y)
+            .lineTo(x, y + height)
+            .stroke();
+        }
+
+        doc
+          .lineWidth(0.5)
+          .moveTo(x + width, y)
+          .lineTo(x + width, y + height)
+          .stroke();
+
+        if (indexRow === tablaDatosTrabajador.datas.length - 1) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y + height)
+            .lineTo(x + width, y + height)
+            .stroke();
+        }
+      },
+    });
+
+    const tablaDatosHorario = {
+      title: "Asistencia del Trabajador",
+      headers: [
+        {
+          label: "Hora de Entrada",
+          property: "horadeentrada",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Hora de Salida",
+          property: "horasalida",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Horas Trabajadas",
+          property: "horatrabajadas",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas: horariodata.map((horario: any) => {
+        return {
+          horadeentrada: horario.hora_entrada,
+          horasalida: horario.hora_salida,
+          horatrabajadas: "8",
+        };
+      }),
+    };
+
+    await doc.table(tablaDatosHorario, {
+      width: 450,
+      x: 50,
+      y: 200,
+      prepareRow: (
+        row: string[],
+        indexColumn: number,
+        indexRow: number,
+        rectRow: { x: number; y: number; width: number; height: number },
+        rectCell: { x: number; y: number; width: number; height: number }
+      ) => {
+        const { x, y, width, height } = rectCell;
+
+        if (indexColumn === 0) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y)
+            .lineTo(x, y + height)
+            .stroke();
+        }
+
+        doc
+          .lineWidth(0.5)
+          .moveTo(x + width, y)
+          .lineTo(x + width, y + height)
+          .stroke();
+
+        if (indexRow === tablaDatosHorario.datas.length - 1) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y + height)
+            .lineTo(x + width, y + height)
+            .stroke();
+        }
+      },
+    });
+
+    const tablaDatosPago = {
+      title: "Planilla de pagos del Trabajador",
+      headers: [
+        {
+          label: "Fecha de pago",
+          property: "fecha",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Monto Pagado",
+          property: "montoP",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Monto Faltante",
+          property: "montoF",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas: [{ fecha: "12/14/23", montoP: "1300", montoF: "0" }],
+    };
+
+    await doc.table(tablaDatosPago, {
+      width: 450,
+      x: 50,
+      y: 280,
+      prepareRow: (
+        row: string[],
+        indexColumn: number,
+        indexRow: number,
+        rectRow: { x: number; y: number; width: number; height: number },
+        rectCell: { x: number; y: number; width: number; height: number }
+      ) => {
+        const { x, y, width, height } = rectCell;
+
+        if (indexColumn === 0) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y)
+            .lineTo(x, y + height)
+            .stroke();
+        }
+
+        doc
+          .lineWidth(0.5)
+          .moveTo(x + width, y)
+          .lineTo(x + width, y + height)
+          .stroke();
+
+        if (indexRow === tablaDatosPago.datas.length - 1) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y + height)
+            .lineTo(x + width, y + height)
+            .stroke();
+        }
+      },
+    });
+
+    const tablaDatosIncidencias = {
+      title: "Incidencias del Trabajador",
+      headers: [
+        {
+          label: "Tipo",
+          property: "tipo",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Fecha",
+          property: "fecha",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Descripcion",
+          property: "descripcion",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas: incidenciasData.map((incidencia:any)=>{
+        return{
+          tipo:incidencia.tipo,
+          fecha:incidencia.fecha,
+          descripcion:incidencia.descripcion
+        }
+      }),
+    };
+
+    await doc.table(tablaDatosIncidencias, {
+      width: 450,
+      x: 50,
+      y: 350,
+      prepareRow: (
+        row: string[],
+        indexColumn: number,
+        indexRow: number,
+        rectRow: { x: number; y: number; width: number; height: number },
+        rectCell: { x: number; y: number; width: number; height: number }
+      ) => {
+        const { x, y, width, height } = rectCell;
+
+        if (indexColumn === 0) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y)
+            .lineTo(x, y + height)
+            .stroke();
+        }
+
+        doc
+          .lineWidth(0.5)
+          .moveTo(x + width, y)
+          .lineTo(x + width, y + height)
+          .stroke();
+
+        if (indexRow === tablaDatosIncidencias.datas.length - 1) {
+          doc
+            .lineWidth(0.5)
+            .moveTo(x, y + height)
+            .lineTo(x + width, y + height)
+            .stroke();
+        }
+      },
     });
 
     doc.end();
