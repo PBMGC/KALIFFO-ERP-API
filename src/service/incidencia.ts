@@ -44,10 +44,10 @@ export const _getIncidencias = async (usuario_id?: number) => {
   }
 };
 
-export const _getIncidencia = async (incidencia_id: number) => {
+export const _getIncidencia = async (usuario_id: number) => {
   try {
     const item = await Incidencia.findAll({
-      where: { incidencia_id },
+      where: { usuario_id },
     });
 
     return {

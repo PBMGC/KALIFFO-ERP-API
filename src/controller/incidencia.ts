@@ -40,10 +40,10 @@ export const getIncidencias = async (req: Request, res: Response) => {
 };
 
 export const getIncidencia = async (req: Request, res: Response) => {
-  const { incidencia_id } = req.params;
+  const { usuario_id } = req.params;
 
   try {
-    const response = await _getIncidencia(Number(incidencia_id));
+    const response = await _getIncidencia(Number(usuario_id));
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getIncidencia", 500);

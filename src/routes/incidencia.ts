@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("", getIncidencias);
-router.get("/:incidencia_id", getIncidencia);
+router.get("/:usuario_id", getIncidencia);
 
 router.delete("/delete/:incidencia_id", deleteIncidencia);
 
