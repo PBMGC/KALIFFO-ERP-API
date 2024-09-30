@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.get("", getIncidencias);
+router.get("", getIncidencias); 
 router.get("/:usuario_id", getIncidencia);
 
 router.delete("/delete/:incidencia_id", deleteIncidencia);
