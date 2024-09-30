@@ -195,8 +195,7 @@ export const generateReporte = async (req: Request, res: Response) => {
   const { usuario_id } = req.params;
 
   try {
-    const response = await _generarReporte(Number(usuario_id));
-    res.status(response.status).json(response);
+    const response = await _generarReporte(res,Number(usuario_id));
   } catch (error) {
     handleHttp(res, "error_generarReporte", 500);
   }

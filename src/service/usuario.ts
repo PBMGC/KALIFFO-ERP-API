@@ -392,10 +392,12 @@ export const _deleteAsistencia = async (horario_id: number) => {
   }
 };
 
-export const _generarReporte = async (usuario_id: number) => {
+export const _generarReporte = async (res:any,usuario_id: number) => {
   try {
     const PDFDocument = require("pdfkit-table");
-    const fs = require("fs");
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="reporte.pdf"');
 
     const data: any = await sequelize.query(
       `CALL SP_ReporteUsuario(${usuario_id})`
@@ -417,17 +419,16 @@ export const _generarReporte = async (usuario_id: number) => {
     const pagosData = data[0].pagos
     .split('), (')
     .map((item:string)=>{
-      const [pago_total,pago_faltante] = item
+      const [pago_total,pago_faltante,pago_fecha] = item
       .replace(/\(|\)/g, "") 
       .trim()
       .split(", "); 
       return {
         pago_total:pago_total,
-        pago_faltante:pago_faltante
+        pago_faltante:pago_faltante,
+        pago_fecha:pago_fecha
       }
     })
-
-    console.log(pagosData)
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
     const incidenciasData = data[0].incidencias.split("; ").map((item: any) => {
@@ -448,17 +449,19 @@ export const _generarReporte = async (usuario_id: number) => {
       permissions: {
         printing: "highResolution",
       },
+      size: 'A4', 
+      layout: 'portrait',
     });
 
-    doc.pipe(fs.createWriteStream(`reporte1.pdf`));
+    doc.pipe(res)
 
-    doc.image("src/Img/logo.png", 10, 10, {
+    doc.image("src/Img/logo.png", 60, 10, {
       fit: [100, 100],
       align: "center",
       valign: "center",
     });
-    doc.text("KALIFFO SAC", 250, 50);
-    doc.text("REPORTE DE TRABAJADOR", 210, 70);
+    doc.fontSize(20).text("KALIFFO SAC", 250, 50);
+    doc.font("Helvetica-Bold").fontSize(18).text("REPORTE DE TRABAJADOR", 190, 75);
 
     const tablaDatosTrabajador = {
       title: `Datos de ${data[0].nombre} ${data[0].ap_paterno} ${data[0].ap_materno}`,
@@ -503,42 +506,7 @@ export const _generarReporte = async (usuario_id: number) => {
       ],
     };
 
-    await doc.table(tablaDatosTrabajador, {
-      width: 450,
-      x: 50,
-      y: 120,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosTrabajador.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
+    
 
     const tablaDatosHorario = {
       title: "Asistencia del Trabajador",
@@ -571,42 +539,6 @@ export const _generarReporte = async (usuario_id: number) => {
       }),
     };
 
-    await doc.table(tablaDatosHorario, {
-      width: 450,
-      x: 50,
-      y: 200,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosHorario.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
 
     const tablaDatosPago = {
       title: "Planilla de pagos del Trabajador",
@@ -630,45 +562,15 @@ export const _generarReporte = async (usuario_id: number) => {
           align: "center",
         },
       ],
-      datas: [{ fecha: "12/14/23", montoP: "1300", montoF: "0" }],
+      datas: pagosData.map((pago:any)=>{
+        return{
+          fecha:pago.pago_fecha,
+          montoP:pago.pago_total,
+          montoF:pago.pago_faltante,
+        }
+      })
     };
 
-    await doc.table(tablaDatosPago, {
-      width: 450,
-      x: 50,
-      y: 280,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosPago.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
 
     const tablaDatosIncidencias = {
       title: "Incidencias del Trabajador",
@@ -701,50 +603,65 @@ export const _generarReporte = async (usuario_id: number) => {
       }),
     };
 
-    await doc.table(tablaDatosIncidencias, {
-      width: 450,
-      x: 50,
-      y: 350,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
 
-        if (indexColumn === 0) {
+    const nuevaTabla = async (tablaData:any,posY:number)=>{
+      const tablaAltura = await doc.table(tablaData,{
+        width:450,
+        x:70,
+        y:posY,
+        prepareRow: (
+          row: string[],
+          indexColumn: number,
+          indexRow: number,
+          rectRow: { x: number; y: number; width: number; height: number },
+          rectCell: { x: number; y: number; width: number; height: number }
+        ) => {
+          const { x, y, width, height } = rectCell;
+  
+          if (indexColumn === 0) {
+            doc
+              .lineWidth(0.5)
+              .moveTo(x, y)
+              .lineTo(x, y + height)
+              .stroke();
+          }
+  
           doc
             .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosIncidencias.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
+            .moveTo(x + width, y)
             .lineTo(x + width, y + height)
             .stroke();
-        }
-      },
-    });
+  
+          if (indexRow === tablaDatosIncidencias.datas.length - 1) {
+            doc
+              .lineWidth(0.5)
+              .moveTo(x, y + height)
+              .lineTo(x + width, y + height)
+              .stroke();
+          }
+        },
+      })
+    
+      if(tablaAltura + posY >doc.page.height - doc.page.margins.bottom){
+        doc.addPage()
+      }
 
+      return posY+tablaAltura
+
+    }
+
+    let posY=120;
+
+    posY=await nuevaTabla(tablaDatosTrabajador,posY)
+
+    posY=await nuevaTabla(tablaDatosHorario,posY)
+
+    posY=await nuevaTabla(tablaDatosPago,posY)
+
+    posY=await nuevaTabla(tablaDatosIncidencias,posY)
+    
+    
     doc.end();
-
-    return {
-      message: "Reporte generado exitosamente",
-      success: true,
-      status: 200,
-    };
   } catch (error) {
     return {
       message: error,

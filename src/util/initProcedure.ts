@@ -112,7 +112,7 @@ LEFT JOIN
      FROM incidencia 
      GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id 
 LEFT JOIN 
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos 
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ", ", fecha,")") ORDER BY montoPagado SEPARATOR ", ") AS pagos 
      FROM pago 
      GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id 
 WHERE 
