@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-import { DecodedToken } from "../interface/decodeToken";
-
 dotenv.config();
 
 export const validateToken = (
@@ -25,7 +23,7 @@ export const validateToken = (
     const decodeToken = jwt.verify(
       tokenCookie,
       process.env.SECRET_KEY || "contraseña"
-    ) as DecodedToken;
+    ) as any;
 
     req.decodeToken = decodeToken;
 

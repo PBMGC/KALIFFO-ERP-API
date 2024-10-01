@@ -1,19 +1,16 @@
-import { Usuario as UsuarioInterface } from "../interface/usuario";
-import { Horario } from "../models/horario";
-import { Usuario } from "../models/usuario";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Op } from "sequelize";
-import { Tienda } from "../models/tienda";
-import sequelize from "../db/connection";
-import { Incidencia } from "../models/incidencia";
+import { query } from "../util/query";
 
 dotenv.config();
 
-export const _createUsuario = async (usuario: UsuarioInterface) => {
+export const _createUsuario = async (usuario: any) => {
   try {
-    if (await Usuario.findOne({ where: { dni: usuario.dni } })) {
+    const checkDniQuery = `SELECT * FROM usuario WHERE dni = ?`;
+    const dniResult = (await query(checkDniQuery, [usuario.dni])) as any;
+
+    if (dniResult.length > 0) {
       return {
         message: "Este DNI ya está en uso",
         success: false,
@@ -22,9 +19,12 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
     }
 
     if (usuario.tienda_id) {
-      if (
-        !(await Tienda.findOne({ where: { tienda_id: usuario.tienda_id } }))
-      ) {
+      const checkTiendaQuery = `SELECT * FROM tienda WHERE tienda_id = ?`;
+      const tiendaResult = (await query(checkTiendaQuery, [
+        usuario.tienda_id,
+      ])) as any;
+
+      if (tiendaResult.length === 0) {
         return {
           message: "Esta tienda no existe",
           success: false,
@@ -36,18 +36,40 @@ export const _createUsuario = async (usuario: UsuarioInterface) => {
     const hashPassword = await bcrypt.hash(usuario.contraseña, 8);
     usuario.contraseña = hashPassword;
 
-    const newUsuario = await Usuario.create(usuario);
+    const createUserQuery = `
+      INSERT INTO usuario (nombre, ap_paterno, ap_materno, fecha_nacimiento, telefono, dni, contraseña, sueldo, tienda_id, rol) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = await query(createUserQuery, [
+      usuario.nombre,
+      usuario.ap_paterno,
+      usuario.ap_materno,
+      usuario.fecha_nacimiento,
+      usuario.telefono,
+      usuario.dni,
+      usuario.contraseña,
+      usuario.sueldo,
+      usuario.tienda_id || null,
+      usuario.rol,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return {
+        message: "No se pudo crear el usuario",
+        success: false,
+        status: 500,
+      };
+    }
 
     return {
       message: "Usuario creado exitosamente",
-      data: newUsuario,
       success: true,
       status: 201,
     };
   } catch (error) {
     console.error("Error al crear el usuario:", error);
     return {
-      message: "error _createUsuario",
+      message: "Error al crear el usuario",
       success: false,
       status: 500,
     };
@@ -63,44 +85,56 @@ export const _getUsuarios = async (
   antiTienda_id?: number
 ) => {
   try {
-    const filtros: any = {
-      include: {
-        model: Tienda,
-        attributes: ["tienda_id", "tienda"],
-      },
-      where: {},
+    let consulta = `
+      SELECT u.usuario_id, u.nombre, u.ap_paterno, u.rol, u.tienda_id, t.tienda 
+      FROM usuario u
+      LEFT JOIN tienda t ON u.tienda_id = t.tienda_id
+      WHERE 1=1
+    `;
 
-      offset: inicio || 0,
-      limit: final ? final - (inicio || 0) : undefined,
-    };
+    const parametros: any[] = [];
 
     if (nombre) {
-      filtros.where.nombre = { [Op.like]: `%${nombre}%` };
+      consulta += ` AND u.nombre LIKE ?`;
+      parametros.push(`%${nombre}%`);
     }
 
     if (rol) {
-      filtros.where.rol = rol;
+      consulta += ` AND u.rol = ?`;
+      parametros.push(rol);
     }
 
     if (tienda_id) {
-      filtros.where.tienda_id = tienda_id;
+      consulta += ` AND u.tienda_id = ?`;
+      parametros.push(tienda_id);
     }
 
     if (antiTienda_id) {
-      filtros.where.tienda_id = { [Op.ne]: antiTienda_id };
+      consulta += ` AND u.tienda_id != ?`;
+      parametros.push(antiTienda_id);
     }
 
-    const items = await Usuario.findAll(filtros);
+    // Agregar paginación si se especifica
+    if (inicio !== undefined && final !== undefined) {
+      consulta += ` LIMIT ?, ?`;
+      parametros.push(inicio, final - inicio);
+    } else if (inicio !== undefined) {
+      consulta += ` LIMIT ?, 10`; // Si solo se pasa el inicio, devolver 10 registros por defecto
+      parametros.push(inicio);
+    }
 
-    const transformedItems = items.map((item: any) => {
-      const tienda = item.tienda;
+    // Ejecutar la consulta
+    const usuarios = (await query(consulta, parametros)) as any;
+    console.log(usuarios);
+
+    // Transformar los datos para quitar la contraseña u otros campos
+    const transformedItems = usuarios.map((usuario: any) => {
       const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
-        item.toJSON();
-
+        usuario;
       return {
         ...userWithoutPassword,
-        tienda_id: tienda ? tienda.tienda_id : null,
-        tienda: tienda ? tienda.tienda : null,
+        tienda_id: usuario.tienda_id,
+        tienda: usuario.tienda,
       };
     });
 
@@ -110,324 +144,385 @@ export const _getUsuarios = async (
       status: 200,
     };
   } catch (error) {
+    console.error("Error al obtener usuarios:", error);
     return {
-      message: "error _getUsuarios",
+      message: "Error al obtener usuarios",
       success: false,
       status: 500,
     };
   }
 };
 
-export const _getUsuario = async (usuario_id: string) => {
-  try {
-    const item = await Usuario.findOne({
-      where: { usuario_id: usuario_id },
-    });
+// export const _getUsuarios = async (
+//   inicio?: number,
+//   final?: number,
+//   nombre?: string,
+//   rol?: number,
+//   tienda_id?: number,
+//   antiTienda_id?: number
+// ) => {
+//   try {
+//     const filtros: any = {
+//       include: {
+//         model: Tienda,
+//         attributes: ["tienda_id", "tienda"],
+//       },
+//       where: {},
 
-    const countIncidencias = await Incidencia.count({ where: { usuario_id } });
-    const nroHoras = (await Horario.findAll({
-      attributes: [
-        [
-          sequelize.literal(
-            "SUM(FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60))"
-          ),
-          "min_trabajados",
-        ],
-      ],
-      where: { usuario_id },
-    })) as any;
+//       offset: inicio || 0,
+//       limit: final ? final - (inicio || 0) : undefined,
+//     };
 
-    console.log(nroHoras);
+//     if (nombre) {
+//       filtros.where.nombre = { [Op.like]: `%${nombre}%` };
+//     }
 
-    if (!item) {
-      return {
-        message: "Usuario no encontrado",
-        success: false,
-        status: 404,
-      };
-    }
+//     if (rol) {
+//       filtros.where.rol = rol;
+//     }
 
-    return {
-      item: {
-        ...item.dataValues,
-        nroIncidencias: countIncidencias,
-        nroHoras: nroHoras[0],
-      },
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _getUsuario",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     if (tienda_id) {
+//       filtros.where.tienda_id = tienda_id;
+//     }
 
-export const _deleteUsuario = async (usuario_id: string) => {
-  try {
-    const usuario = await Usuario.findOne({
-      where: { usuario_id: usuario_id },
-    });
+//     if (antiTienda_id) {
+//       filtros.where.tienda_id = { [Op.ne]: antiTienda_id };
+//     }
 
-    if (!usuario) {
-      return {
-        message: "Usuario no encontrado",
-        success: false,
-        status: 404,
-      };
-    }
+//     const items = await Usuario.findAll(filtros);
 
-    await usuario.destroy();
+//     const transformedItems = items.map((item: any) => {
+//       const tienda = item.tienda;
+//       const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
+//         item.toJSON();
 
-    return {
-      message: "Usuario eliminado exitosamente",
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _deleteUsuario",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//       return {
+//         ...userWithoutPassword,
+//         tienda_id: tienda ? tienda.tienda_id : null,
+//         tienda: tienda ? tienda.tienda : null,
+//       };
+//     });
 
-export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
-  try {
-    const updateUsuario = await Usuario.findOne({
-      where: { usuario_id: usuario.usuario_id },
-    });
+//     return {
+//       items: transformedItems,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _getUsuarios",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
-    if (!updateUsuario) {
-      return {
-        message: "Usuario no encontrado",
-        success: false,
-        status: 404,
-      };
-    }
+// export const _getUsuario = async (usuario_id: string) => {
+//   try {
+//     const item = await Usuario.findOne({
+//       where: { usuario_id: usuario_id },
+//     });
 
-    await updateUsuario.update(usuario);
+//     const countIncidencias = await Incidencia.count({ where: { usuario_id } });
+//     const nroHoras = (await Horario.findAll({
+//       attributes: [
+//         [
+//           sequelize.literal(
+//             "SUM(FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60))"
+//           ),
+//           "min_trabajados",
+//         ],
+//       ],
+//       where: { usuario_id },
+//     })) as any;
 
-    return {
-      message: updateUsuario,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _updateUsuario",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     console.log(nroHoras);
 
-export const _login = async (dni: string, contraseña: string) => {
-  try {
-    const usuario = await Usuario.findOne({
-      where: { dni: dni },
-    });
+//     if (!item) {
+//       return {
+//         message: "Usuario no encontrado",
+//         success: false,
+//         status: 404,
+//       };
+//     }
 
-    if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
-      return {
-        message: "DNI o contraseña incorrectos",
-        success: false,
-        status: 400,
-      };
-    }
+//     return {
+//       item: {
+//         ...item.dataValues,
+//         nroIncidencias: countIncidencias,
+//         nroHoras: nroHoras[0],
+//       },
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _getUsuario",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
-    const token = jwt.sign(
-      {
-        usuario_id: usuario.usuario_id,
-        nombre: usuario.nombre,
-        dni: usuario.dni,
-      },
-      process.env.SECRET_KEY || "default_secret_key"
-    );
+// export const _deleteUsuario = async (usuario_id: string) => {
+//   try {
+//     const usuario = await Usuario.findOne({
+//       where: { usuario_id: usuario_id },
+//     });
 
-    return {
-      message: `Bienvenido ${usuario.nombre}`,
-      token,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _login",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     if (!usuario) {
+//       return {
+//         message: "Usuario no encontrado",
+//         success: false,
+//         status: 404,
+//       };
+//     }
 
-export const _horaEntrada = async (usuario_id: number) => {
-  try {
-    const now = new Date();
-    const fecha = now.toLocaleDateString("en-CA");
-    const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
+//     await usuario.destroy();
 
-    const asistenciaExistente = await Horario.findOne({
-      where: { fecha: fecha, usuario_id: usuario_id, hora_salida: null },
-    });
+//     return {
+//       message: "Usuario eliminado exitosamente",
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _deleteUsuario",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
-    if (asistenciaExistente) {
-      return {
-        message: "Asistencia ya registrada para hoy",
-        success: false,
-        status: 400,
-      };
-    }
+// export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
+//   try {
+//     const updateUsuario = await Usuario.findOne({
+//       where: { usuario_id: usuario.usuario_id },
+//     });
 
-    const newHorario = await Horario.create({
-      hora_entrada: horaEntrada,
-      hora_salida: null,
-      fecha: fecha,
-      usuario_id,
-    });
+//     if (!updateUsuario) {
+//       return {
+//         message: "Usuario no encontrado",
+//         success: false,
+//         status: 404,
+//       };
+//     }
 
-    return {
-      message: newHorario,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _horaEntrada",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     await updateUsuario.update(usuario);
 
-export const _horaSalida = async (usuario_id: number) => {
-  try {
-    const now = new Date();
-    const fecha = now.toLocaleDateString("en-CA");
-    const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
+//     return {
+//       message: updateUsuario,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _updateUsuario",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
-    const asistencia = await Horario.findOne({
-      where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
-    });
+// export const _login = async (dni: string, contraseña: string) => {
+//   try {
+//     const usuario = await Usuario.findOne({
+//       where: { dni: dni },
+//     });
 
-    if (!asistencia) {
-      return {
-        message: "Primero debes registrar la hora de entrada",
-        success: false,
-        status: 400,
-      };
-    }
+//     if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
+//       return {
+//         message: "DNI o contraseña incorrectos",
+//         success: false,
+//         status: 400,
+//       };
+//     }
 
-    asistencia.hora_salida = horaSalida;
-    await asistencia.save();
+//     const token = jwt.sign(
+//       {
+//         usuario_id: usuario.usuario_id,
+//         nombre: usuario.nombre,
+//         dni: usuario.dni,
+//       },
+//       process.env.SECRET_KEY || "default_secret_key"
+//     );
 
-    return {
-      message: asistencia,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _ horaSalida",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     return {
+//       message: `Bienvenido ${usuario.nombre}`,
+//       token,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _login",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
-export const _horasTrabajadas = async (usuario_id: number) => {
-  try {
-    const items = await Horario.findAll({
-      attributes: [
-        "horario_id",
-        "hora_entrada",
-        "hora_salida",
-        "fecha",
-        "usuario_id",
-        [
-          sequelize.literal(
-            "FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60)"
-          ),
-          "min_trabajados",
-        ],
-      ],
-      where: { usuario_id },
-    });
+// export const _horaEntrada = async (usuario_id: number) => {
+//   try {
+//     const now = new Date();
+//     const fecha = now.toLocaleDateString("en-CA");
+//     const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
 
-    return {
-      items,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: "error _horasTrabajadas",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     const asistenciaExistente = await Horario.findOne({
+//       where: { fecha: fecha, usuario_id: usuario_id, hora_salida: null },
+//     });
 
-//Sql puro
+//     if (asistenciaExistente) {
+//       return {
+//         message: "Asistencia ya registrada para hoy",
+//         success: false,
+//         status: 400,
+//       };
+//     }
 
-export const _deleteAsistencia = async (horario_id: number) => {
-  try {
-    await sequelize.query(`
-      CALL SP_DeleteHorario(${horario_id})`);
+//     const newHorario = await Horario.create({
+//       hora_entrada: horaEntrada,
+//       hora_salida: null,
+//       fecha: fecha,
+//       usuario_id,
+//     });
 
-    return {
-      message: "Eliminacion exitosa",
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    console.error("Error al eliminar la asistencia:", error);
-    return {
-      message: "Error al eliminar la asistencia",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     return {
+//       message: newHorario,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _horaEntrada",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// export const _horaSalida = async (usuario_id: number) => {
+//   try {
+//     const now = new Date();
+//     const fecha = now.toLocaleDateString("en-CA");
+//     const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
+
+//     const asistencia = await Horario.findOne({
+//       where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
+//     });
+
+//     if (!asistencia) {
+//       return {
+//         message: "Primero debes registrar la hora de entrada",
+//         success: false,
+//         status: 400,
+//       };
+//     }
+
+//     asistencia.hora_salida = horaSalida;
+//     await asistencia.save();
+
+//     return {
+//       message: asistencia,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _ horaSalida",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// export const _horasTrabajadas = async (usuario_id: number) => {
+//   try {
+//     const items = await Horario.findAll({
+//       attributes: [
+//         "horario_id",
+//         "hora_entrada",
+//         "hora_salida",
+//         "fecha",
+//         "usuario_id",
+//         [
+//           sequelize.literal(
+//             "FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60)"
+//           ),
+//           "min_trabajados",
+//         ],
+//       ],
+//       where: { usuario_id },
+//     });
+
+//     return {
+//       items,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _horasTrabajadas",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// //Sql puro
+
+// export const _deleteAsistencia = async (horario_id: number) => {
+//   try {
+//     await sequelize.query(`
+//       CALL SP_DeleteHorario(${horario_id})`);
+
+//     return {
+//       message: "Eliminacion exitosa",
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     console.error("Error al eliminar la asistencia:", error);
+//     return {
+//       message: "Error al eliminar la asistencia",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
 export const _generarReporte = async (usuario_id: number) => {
   try {
     const PDFDocument = require("pdfkit-table");
     const fs = require("fs");
 
-    const data: any = await sequelize.query(
-      `CALL SP_ReporteUsuario(${usuario_id})`
-    );
+    const data: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
 
     const horariodata: any = data[0].horarios
-    .split('), (')
-    .map((item:string) => {
-      const [hora_entrada, hora_salida] = item
-        .replace(/\(|\)/g, "") 
+      .split("), (")
+      .map((item: string) => {
+        const [hora_entrada, hora_salida] = item
+          .replace(/\(|\)/g, "")
+          .trim()
+          .split(", ");
+        return {
+          hora_entrada: hora_entrada,
+          hora_salida: hora_salida,
+        };
+      });
+
+    const pagosData = data[0].pagos.split("), (").map((item: string) => {
+      const [pago_total, pago_faltante] = item
+        .replace(/\(|\)/g, "")
         .trim()
-        .split(", "); 
+        .split(", ");
       return {
-        hora_entrada: hora_entrada,
-        hora_salida: hora_salida 
+        pago_total: pago_total,
+        pago_faltante: pago_faltante,
       };
     });
 
-    const pagosData = data[0].pagos
-    .split('), (')
-    .map((item:string)=>{
-      const [pago_total,pago_faltante] = item
-      .replace(/\(|\)/g, "") 
-      .trim()
-      .split(", "); 
-      return {
-        pago_total:pago_total,
-        pago_faltante:pago_faltante
-      }
-    })
-
-    console.log(pagosData)
+    console.log(pagosData);
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
     const incidenciasData = data[0].incidencias.split("; ").map((item: any) => {
@@ -692,12 +787,12 @@ export const _generarReporte = async (usuario_id: number) => {
           align: "center",
         },
       ],
-      datas: incidenciasData.map((incidencia:any)=>{
-        return{
-          tipo:incidencia.tipo,
-          fecha:incidencia.fecha,
-          descripcion:incidencia.descripcion
-        }
+      datas: incidenciasData.map((incidencia: any) => {
+        return {
+          tipo: incidencia.tipo,
+          fecha: incidencia.fecha,
+          descripcion: incidencia.descripcion,
+        };
       }),
     };
 

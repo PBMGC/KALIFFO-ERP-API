@@ -1,107 +1,176 @@
-import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
+import connection from "../db/connection";
+import { query } from "../util/query";
 
-import { Incidencia } from "../models/incidencia";
+export const _createIncidencia = async (incidencia: any) => {
+  const { descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
+  incidencia.fecha_creacion = new Date();
 
-export const _createIncidencia = async (incidencia: IncidenciaInterface) => {
+  const query = `
+    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion)
+    VALUES (?, ?, ?)`;
+
+  let conn;
+
   try {
-    incidencia.fecha_creacion = new Date();
-    const newIncidencia = await Incidencia.create(incidencia);
+    conn = await connection();
 
+    if (!conn) {
+      throw new Error("No se pudo establecer la conexión a la base de datos.");
+    }
+
+    const [result] = await conn.execute(query, [
+      descripcion,
+      usuario_id,
+      incidencia.fecha_creacion,
+    ]);
     return {
-      message: newIncidencia,
+      message: result,
       success: true,
       status: 201,
     };
   } catch (error) {
+    console.error("Error al crear incidencia:", error);
     return {
       msg: "error _createIncidencia",
-      succes: false,
+      success: false,
       status: 500,
     };
+  } finally {
+    if (conn) {
+      await conn.end();
+    }
   }
 };
 
 export const _getIncidencias = async (usuario_id?: number) => {
+  const consulta = usuario_id
+    ? `SELECT * FROM incidencia WHERE usuario_id = ?`
+    : `SELECT * FROM incidencia`;
+
   try {
-    const filtros: any = {};
-
-    if (usuario_id) {
-      filtros.where = { usuario_id };
-    }
-
-    const items = await Incidencia.findAll(filtros);
-    return {
-      items,
-      success: true,
-      status: 201,
-    };
-  } catch (error) {
-    return {
-      msg: "error _getIncidencias",
-      succes: false,
-      status: 500,
-    };
-  }
-};
-
-export const _getIncidencia = async (incidencia_id: number) => {
-  try {
-    const item = await Incidencia.findAll({
-      where: { incidencia_id },
-    });
+    const result = await query(consulta);
 
     return {
-      item,
-      success: true,
-      status: 201,
-    };
-  } catch (error) {
-    return {
-      msg: "error _getIncidencia",
-      succes: false,
-      status: 500,
-    };
-  }
-};
-
-export const _deleteIncidencia = async (incidencia_id: number) => {
-  try {
-    const result = await Incidencia.destroy({
-      where: { incidencia_id },
-    });
-
-    if (result === 0) {
-      return {
-        msg: "no se encontro incidencia",
-        success: false,
-        status: 404,
-      };
-    }
-
-    return {
-      msg: "incidencia eliminada",
+      items: result,
       success: true,
       status: 200,
     };
   } catch (error) {
+    console.error("Error al obtener incidencias:", error);
     return {
-      msg: "error _deleteIncidencia",
+      msg: "error _getIncidencias",
       success: false,
       status: 500,
     };
   }
 };
 
+export const _getIncidencia = async (incidencia_id: number) => {
+  const query = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
+
+  let conn;
+
+  try {
+    conn = await connection();
+
+    if (!conn) {
+      throw new Error("No se pudo establecer la conexión a la base de datos.");
+    }
+
+    const [item] = (await conn.execute(query, [incidencia_id])) as any;
+
+    if (item.length === 0) {
+      return {
+        msg: "Incidencia no encontrada",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      item: item[0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error al obtener la incidencia:", error);
+    return {
+      msg: "error _getIncidencia",
+      success: false,
+      status: 500,
+    };
+  } finally {
+    if (conn) {
+      await conn.end();
+    }
+  }
+};
+
+export const _deleteIncidencia = async (incidencia_id: number) => {
+  const query = `DELETE FROM incidencia WHERE incidencia_id = ?`;
+
+  let conn;
+
+  try {
+    conn = await connection();
+
+    if (!conn) {
+      throw new Error("No se pudo establecer la conexión a la base de datos.");
+    }
+
+    const result = (await conn.execute(query, [incidencia_id])) as any;
+
+    if (result[0].affectedRows === 0) {
+      return {
+        msg: "No se encontró la incidencia",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      msg: "Incidencia eliminada",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error al eliminar la incidencia:", error);
+    return {
+      msg: "error _deleteIncidencia",
+      success: false,
+      status: 500,
+    };
+  } finally {
+    if (conn) {
+      await conn.end();
+    }
+  }
+};
+
 export const _updateIncidencia = async (
   incidencia_id: number,
-  updatedIncidencia: Partial<IncidenciaInterface>
+  updatedIncidencia: any
 ) => {
-  try {
-    const [updatedRows] = await Incidencia.update(updatedIncidencia, {
-      where: { incidencia_id },
-    });
+  const { descripcion, usuario_id } = updatedIncidencia;
+  const query = `
+    UPDATE incidencia SET descripcion = ?, usuario_id = ? WHERE incidencia_id = ?`;
 
-    if (updatedRows === 0) {
+  let conn;
+
+  try {
+    conn = await connection();
+
+    if (!conn) {
+      throw new Error("No se pudo establecer la conexión a la base de datos.");
+    }
+
+    const [result] = (await conn.execute(query, [
+      descripcion,
+      usuario_id,
+      incidencia_id,
+    ])) as any;
+
+    if (result.affectedRows === 0) {
       return {
         msg: "Incidencia no encontrada o no actualizada",
         success: false,
@@ -115,10 +184,15 @@ export const _updateIncidencia = async (
       status: 200,
     };
   } catch (error) {
+    console.error("Error al actualizar la incidencia:", error);
     return {
       msg: "error _updateIncidencia",
       success: false,
       status: 500,
     };
+  } finally {
+    if (conn) {
+      await conn.end();
+    }
   }
 };

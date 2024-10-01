@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import { router } from "../routes";
 import cookieParser from "cookie-parser";
-import { scriptInicio } from "../util/script";
-import { initProcedure } from "../util/initProcedure";
+import { initCronJobs } from "../job/correo";
 import { initBD } from "../util/initBD";
+import { scriptInicio } from "../util/script";
 
 class Serve {
   app: express.Application;
@@ -16,7 +16,10 @@ class Serve {
 
     this.midddlewares();
     this.route();
-    this.db().then(() => this.listen());
+    this.db().then(() => {
+      this.initCron();
+      this.listen();
+    });
   }
 
   listen() {
@@ -35,11 +38,14 @@ class Serve {
     this.app.use(router);
   }
 
+  initCron() {
+    initCronJobs();
+  }
+
   async db() {
     try {
       await initBD();
       await scriptInicio();
-      await initProcedure();
     } catch (error) {
       console.log(error);
     }

@@ -1,37 +1,46 @@
-import { Color as ColorInterface } from "../interface/color";
-import { Color } from "../models/color";
+import { query } from "../util/query";
 
-export const _createColor = async (color: ColorInterface) => {
-  try {
-    const newColor = await Color.create(color);
+export const _createColor = async (color: any) => {
+  const { nombre, codigo } = color;
 
+  const queryText = `
+    INSERT INTO color (nombre, codigo) 
+    VALUES (?, ?)`;
+
+  const result = await query(queryText, [nombre, codigo]);
+
+  if (!result.success) {
+    console.error("Error al crear el color:", result.error);
     return {
-      message: newColor,
-      success: true,
-      status: 201,
-    };
-  } catch (error) {
-    return {
-      message: error,
+      message: "Error al crear el color. Intente nuevamente más tarde.",
       success: false,
-      status: 400,
+      status: result.status || 500,
     };
   }
+
+  return {
+    message: "Color creado con éxito.",
+    success: true,
+    status: 201,
+  };
 };
 
 export const _getColores = async () => {
-  try {
-    const items = await Color.findAll();
+  const queryText = `SELECT * FROM color`;
+
+  const result = await query(queryText);
+
+  if (!result.success) {
     return {
-      items,
-      success: true,
-      status: 200,
-    };
-  } catch (error) {
-    return {
-      message: error,
+      message: result.error,
       success: false,
-      status: 500,
+      status: result.status || 500,
     };
   }
+
+  return {
+    items: result.data,
+    success: true,
+    status: 200,
+  };
 };
