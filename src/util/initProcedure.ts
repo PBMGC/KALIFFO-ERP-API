@@ -44,12 +44,12 @@ export const initProcedureColoresProductos = async () => {
 };
 
 const queryUpdateIncidencias = `
-   UPDATE incidencia
-   SET
-     tipo = IFNULL(p_tipo, tipo),
-     descripcion = IFNULL(p_descripcion, descripcion),
-     fecha_creacion = IFNULL(p_fecha, fecha_creacion)
-   WHERE incidencia_id = i_id;
+UPDATE incidencia
+    SET 
+        tipo = IF(p_tipo IS NOT NULL AND p_tipo != '', p_tipo, tipo), 
+        descripcion = IF(p_descripcion IS NOT NULL AND p_descripcion != '', p_descripcion, descripcion), 
+        fecha_creacion = IF(p_fecha IS NOT NULL, p_fecha, fecha_creacion)
+    WHERE incidencia_id = i_id;
 `;
 
 export const initProcedureUpdateIncidencia = async () => {
@@ -136,11 +136,105 @@ export const initProcedureDeletePago = async () =>{
   await crearProcedimiento("SP_DeletePago",queryDeletePago,"IN p_id INT")
 }
 
+const queryGetUsuarios = `
+SELECT 
+    usuario.usuario_id,
+    CONCAT(usuario.nombre, " ", usuario.ap_paterno, " ", usuario.ap_materno) AS nombre_completo,
+    usuario.dni,
+    usuario.telefono,
+    usuario.tienda_id,
+    IFNULL((SELECT COUNT(*) 
+             FROM incidencia 
+             WHERE incidencia.usuario_id = usuario.usuario_id), 0) AS total_incidencias,
+    IFNULL(FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(horario.hora_salida, horario.hora_entrada)) / 3600)), 0) AS total_horas_trabajadas
+FROM 
+    usuario 
+LEFT JOIN 
+    horario ON usuario.usuario_id = horario.usuario_id
+WHERE 
+    usuario.rol = u_rol
+GROUP BY 
+    usuario.usuario_id;
+`
+
+export const initProcedureGetUsuarios= async () =>{
+  await eliminarProcedimiento("SP_GetUsuarios")
+  await crearProcedimiento("SP_GetUsuarios",queryGetUsuarios,"IN u_rol INT")
+}
+
+const queryGetUsuario = `
+SELECT 
+    usuario.usuario_id,
+    usuario.nombre, 
+    usuario.ap_paterno,
+    usuario.ap_materno,
+    usuario.dni,
+    usuario.telefono,
+    usuario.tienda_id,
+    usuario.sueldo,
+    IFNULL((SELECT COUNT(*) 
+             FROM incidencia 
+             WHERE incidencia.usuario_id = usuario.usuario_id), 0) AS total_incidencias,
+    IFNULL(FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(horario.hora_salida, horario.hora_entrada)) / 3600)), 0) AS total_horas_trabajadas
+FROM 
+    usuario 
+LEFT JOIN 
+    horario ON usuario.usuario_id = horario.usuario_id
+WHERE 
+    usuario.usuario_id=u_id
+GROUP BY 
+    usuario.usuario_id;
+
+`
+
+export const initProcedureGetUsuario= async () =>{
+  await eliminarProcedimiento("SP_GetUsuario")
+  await crearProcedimiento("SP_GetUsuario",queryGetUsuario,"IN u_id INT")
+}
+
+const queryUpdateUsuario = `
+  UPDATE usuario 
+  SET
+    nombre = IF(p_nombre IS NOT NULL AND p_nombre != '',p_nombre,nombre),
+    ap_paterno = IF(p_ap_paterno IS NOT NULL AND p_ap_paterno != '',p_ap_paterno,ap_paterno),
+    ap_materno = IF(p_ap_materno IS NOT NULL AND p_ap_materno != '',p_ap_materno,ap_materno),
+    fecha_nacimiento = IF(p_fecha_nacimiento IS NOT NULL AND p_fecha_nacimiento != '',p_fecha_nacimiento,fecha_nacimiento),
+    telefono = IF(p_telefono IS NOT NULL AND p_telefono != '',p_telefono,telefono),
+    dni= IF(p_dni IS NOT NULL AND p_dni != '',p_dni,dni),
+    sueldo= IF(p_sueldo IS NOT NULL AND p_sueldo != '',p_sueldo,sueldo),
+    tienda_id=IF(p_tienda_id IS NOT NULL AND p_tienda_id != '',p_tienda_id,tienda_id),
+    rol=IF(p_rol IS NOT NULL AND p_rol != '',p_rol,rol)
+    WHERE usuario_id = u_id;
+`;
+
+export const initiProcedureUpdateUsuario = async () =>{
+  await eliminarProcedimiento("SP_UpdateUsuario");
+  await crearProcedimiento("SP_UpdateUsuario",queryUpdateUsuario,
+    "u_id INT,p_nombre varchar(30),p_ap_paterno varchar(30),p_ap_materno varchar(30),p_fecha_nacimiento DATE,p_telefono varchar(10),p_dni varchar(10),p_sueldo INT,p_tienda_id INT,p_rol INT"
+  )
+}
+
+const queryDeleteUsuario =`
+  Delete from usuario where usuario_id = u_id;
+`
+
+export const initiProcedureDeleteUsuario = async()=>{
+  await eliminarProcedimiento("SP_DeleteUsuario")
+  await crearProcedimiento("SP_DeleteUsuario",queryDeleteUsuario,
+    "u_id INT"
+  )
+}
+
+
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
   await initProcedureUpdateIncidencia();
   await initProcedureDeleteIncidencia();
   await initProcedureDeleteHorario();
+  await initProcedureGetUsuarios();
+  await initProcedureGetUsuario();
+  await initiProcedureUpdateUsuario();
+  await initiProcedureDeleteUsuario();
   await initProcedureGetReporteUsuario();
   await initProcedureDeletePago();
 };
