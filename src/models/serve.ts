@@ -6,6 +6,7 @@ import { initCronJobs } from "../job/correo";
 import { initBD } from "../util/initBD";
 import { scriptInicio } from "../util/script";
 import { initProcedure } from "../util/initProcedure";
+import morgan from "morgan";
 
 class Serve {
   app: express.Application;
@@ -33,6 +34,7 @@ class Serve {
     this.app.use(express.json());
     this.app.use(cors());
     this.app.use(cookieParser());
+    this.app.use(morgan("dev"));
   }
 
   route() {
@@ -47,7 +49,7 @@ class Serve {
     try {
       await initBD();
       await scriptInicio();
-      initProcedure()
+      await initProcedure();
     } catch (error) {
       console.log(error);
     }

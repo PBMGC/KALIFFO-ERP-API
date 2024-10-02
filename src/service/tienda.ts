@@ -1,12 +1,3 @@
-// import { Model } from "sequelize";
-// import sequelize from "../db/connection";
-// import { Tienda as TiendaInterface } from "../interface/tienda";
-// import { ProductoDetalle } from "../models/productoDetalle";
-// import { ProductoTienda } from "../models/productoTienda";
-// import { Tienda } from "../models/tienda";
-// import { Producto } from "../models/producto";
-// import { Usuario } from "../models/usuario";
-
 import { query } from "../util/query";
 
 export const _createTienda = async (tienda: any) => {
@@ -40,13 +31,12 @@ export const _createTienda = async (tienda: any) => {
 
 export const _getTiendas = async () => {
   try {
-    
     const response = (await query(`CALL SP_GetTiendas()`)) as any;
 
     const tiendasData = response.data[0].map((tienda: any) => {
-      return{
-        ...tienda
-      }
+      return {
+        ...tienda,
+      };
     });
 
     return {
@@ -65,12 +55,12 @@ export const _getTiendas = async () => {
 
 export const _getTienda = async (tienda_id: number) => {
   try {
-    const response = (await query(`CALL SP_GetTienda(?)`,[tienda_id])) as any;
+    const response = (await query(`CALL SP_GetTienda(?)`, [tienda_id])) as any;
 
     const tiendaData = response.data[0].map((tienda: any) => {
-      return{
-        ...tienda
-      }
+      return {
+        ...tienda,
+      };
     });
 
     return {

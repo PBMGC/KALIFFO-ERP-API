@@ -1,29 +1,9 @@
-// import sequelize from "../db/connection";
-// import { Color as ColorInterface } from "../interface/color";
-// import { Incidencia as IncidenciaInterface } from "../interface/incidencia";
-// import { Pago as PagoInterface } from "../interface/pago";
-// import { Producto as ProductoInterface } from "../interface/producto";
-// import { Tienda as TiendaInterface } from "../interface/tienda";
-// import { Color } from "../models/color";
-// import { Horario } from "../models/horario";
-// import { Incidencia } from "../models/incidencia";
-// import { Pago } from "../models/pago";
-// import { Producto } from "../models/producto";
-// import { Tienda } from "../models/tienda";
-// import { Usuario } from "../models/usuario";
-// import { _createColor } from "../service/color";
-// import { _createIncidencia } from "../service/incidencia";
-// import { _createPago } from "../service/pago";
-// import { _createProducto } from "../service/producto";
-// import { _createTienda } from "../service/tienda";
-// import { _createUsuario } from "../service/usuario";
-
-import { log } from "console";
+import { query } from "./query";
 import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
-import { query } from "./query";
-import { _createProducto, _createProductoDetalle, _createProductoTalla } from "../service/producto";
+import { _createPago } from "../service/pago";
 import { _createColor } from "../service/color";
+import { _createProducto } from "../service/producto";
 
 const tiendas: any = [
   {
@@ -120,132 +100,146 @@ const colores: any = [
   { nombre: "Azul Cobalto", codigo: "0047AB" },
   { nombre: "Verde Lima", codigo: "32CD32" },
   { nombre: "Marfil", codigo: "FFFFF0" },
-  { nombre: "Fucsia", codigo: "FF00FF" },
   { nombre: "Verde Menta", codigo: "98FF98" },
 ];
 
-const productos:any =[
+const pagos: any = [
   {
-    nombre:"Premium",stockTotal:0,precioBase:12,descuento:12
+    montoPagado: 100.0,
+    montoFaltante: 80.0,
+    fecha: "2024-01-15",
+    estado: 1,
+    usuario_id: 1,
   },
   {
-    nombre:"Drill",stockTotal:0,precioBase:11,descuento:12
+    montoPagado: 120.0,
+    montoFaltante: 60.0,
+    fecha: "2024-02-15",
+    estado: 1,
+    usuario_id: 1,
   },
   {
-    nombre:"Strech",stockTotal:0,precioBase:11,descuento:12
-  }
-]
+    montoPagado: 110.0,
+    montoFaltante: 70.0,
+    fecha: "2024-03-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 150.0,
+    montoFaltante: 50.0,
+    fecha: "2024-04-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 130.0,
+    montoFaltante: 30.0,
+    fecha: "2024-05-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 140.0,
+    montoFaltante: 20.0,
+    fecha: "2024-06-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 160.0,
+    montoFaltante: 10.0,
+    fecha: "2024-07-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 170.0,
+    montoFaltante: 0.0,
+    fecha: "2024-08-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 150.0,
+    montoFaltante: 5.0,
+    fecha: "2024-09-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 180.0,
+    montoFaltante: 15.0,
+    fecha: "2024-10-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 190.0,
+    montoFaltante: 25.0,
+    fecha: "2024-11-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+  {
+    montoPagado: 200.0,
+    montoFaltante: 30.0,
+    fecha: "2024-12-15",
+    estado: 1,
+    usuario_id: 1,
+  },
+];
 
-const productodetalle:any=[
+const productos: any = [
   {
-    producto_id:1,color_id:1,tienda_id:1,stock:0
+    nombre: "Jeans Skinny Azul",
+    stockTotal: 120,
+    precioBase: 49.99,
+    descuento: 10,
   },
   {
-    producto_id:1,color_id:2,tienda_id:1,stock:0
+    nombre: "Jeans Recto Negro",
+    stockTotal: 80,
+    precioBase: 59.99,
+    descuento: 15,
   },
   {
-    producto_id:1,color_id:3,tienda_id:1,stock:0
-  }
-]
-
-const productoTalla:any=[
-  {
-    productoDetalle_id:46,talla:"28",codigo:"PP28J"
+    nombre: "Jeans Slim Fit Gris",
+    stockTotal: 100,
+    precioBase: 54.99,
+    descuento: 5,
   },
   {
-    productoDetalle_id:47,talla:"30",codigo:"PP30J"
+    nombre: "Jeans Boyfriend Azul Claro",
+    stockTotal: 60,
+    precioBase: 44.99,
+    descuento: 20,
   },
   {
-    productoDetalle_id:48,talla:"31",codigo:"PP31J"
-  }
-]
-
-// const pagos: PagoInterface[] = [
-//   {
-//     montoPagado: 100.0,
-//     montoFaltante: 80.0,
-//     fecha: new Date("2024-01-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 120.0,
-//     montoFaltante: 60.0,
-//     fecha: new Date("2024-02-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 110.0,
-//     montoFaltante: 70.0,
-//     fecha: new Date("2024-03-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 150.0,
-//     montoFaltante: 50.0,
-//     fecha: new Date("2024-04-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 130.0,
-//     montoFaltante: 30.0,
-//     fecha: new Date("2024-05-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 140.0,
-//     montoFaltante: 20.0,
-//     fecha: new Date("2024-06-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 160.0,
-//     montoFaltante: 10.0,
-//     fecha: new Date("2024-07-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 170.0,
-//     montoFaltante: 0.0,
-//     fecha: new Date("2024-08-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 150.0,
-//     montoFaltante: 5.0,
-//     fecha: new Date("2024-09-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 180.0,
-//     montoFaltante: 15.0,
-//     fecha: new Date("2024-10-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 190.0,
-//     montoFaltante: 25.0,
-//     fecha: new Date("2024-11-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-//   {
-//     montoPagado: 200.0,
-//     montoFaltante: 30.0,
-//     fecha: new Date("2024-12-15"),
-//     estado: 1,
-//     usuario_id: 1,
-//   },
-// ];
+    nombre: "Jeans Mom Fit Celeste",
+    stockTotal: 90,
+    precioBase: 39.99,
+    descuento: 12,
+  },
+  {
+    nombre: "Jeans Bootcut Azul Oscuro",
+    stockTotal: 70,
+    precioBase: 64.99,
+    descuento: 18,
+  },
+  {
+    nombre: "Jeans Wide Leg Beige",
+    stockTotal: 50,
+    precioBase: 69.99,
+    descuento: 8,
+  },
+  {
+    nombre: "Jeans High-Waist Gris Oscuro",
+    stockTotal: 75,
+    precioBase: 49.99,
+    descuento: 10,
+  },
+];
 
 // const incidencias: IncidenciaInterface[] = [
 //   {
@@ -339,59 +333,62 @@ const createUsuario = async () => {
     }
 
     // createHorario();
-    // createPago();
+    await createPago();
     // createIncidencias();
   } catch (error) {
     console.log("Error en createUsuario:", error);
   }
 };
 
-const createProducto = async () =>{
-  try {
-    for(const producto of productos){
-      const result = await query("SELECT * FROM producto WHERE nombre = ?", [
+const createPago = async () => {
+  for (const pago of pagos) {
+    try {
+      const formattedDate = new Date(pago.fecha).toISOString().split("T")[0];
+
+      const result = await query("SELECT * FROM pago WHERE fecha = ?", [
+        formattedDate,
+      ]);
+
+      if (result.data.length === 0) {
+        await _createPago(pago);
+      }
+    } catch (error) {
+      console.log("Error al crear pagos:", error);
+    }
+  }
+};
+
+const createProducto = async () => {
+  for (const producto of productos) {
+    try {
+      const result = await query("select * from producto where nombre = ?", [
         producto.nombre,
       ]);
-      if(result.data.length===0){
-        await _createProducto(producto)
-      }
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
 
-const createProductoDetalle = async () =>{
-  try {
-    for(const producto of productodetalle){
-      const result = await query("SELECT * FROM productoDetalle WHERE tienda_id = ? AND producto_id = ? AND color_id = ? ", [
-        producto.tienda_id,
-        producto.producto_id,
-        producto.color_id
-      ]);
-      if(result.data.length===0){
-        await _createProductoDetalle(producto)
+      if (result.data.length === 0) {
+        await _createProducto(producto);
       }
+    } catch (error) {
+      console.log("Error al crear producto:", error);
     }
-  } catch (error) {
-    console.log(error)
   }
-}
+};
 
-const createProductoTalla = async () =>{
-  try {
-    for(const producto of productoTalla){
-      const result = await query("SELECT * FROM productoTalla WHERE codigo = ?", [
-        producto.codigo
+const createColores = async () => {
+  for (const color of colores) {
+    try {
+      const result = await query(`select * from color where nombre = ?`, [
+        color.nombre,
       ]);
-      if(result.data.length===0){
-        await _createProductoTalla(producto)
+
+      if (result.data.length === 0) {
+        await _createColor(color);
       }
+    } catch (error) {
+      console.log("error al crear colores");
     }
-  } catch (error) {
-    console.log(error)
   }
-}
+};
 
 // const createHorario = async () => {
 //   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
@@ -402,51 +399,6 @@ const createProductoTalla = async () =>{
 //       ('09:00:00', '14:00:00', '2024-08-18', 1),
 //       ('09:00:00', '12:00:00', '2024-08-14', 1);
 //     `);
-//   }
-// };
-  const createColores = async () => {
-    try {
-      for (const color of colores) {
-        const result = await query("SELECT * FROM color WHERE codigo = ?", [
-          color.codigo,
-        ]);
-  
-        if(result.data.length===0){
-          await _createColor(color)
-        }
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  };
-
-// const createProducto = async () => {
-//   for (const producto of productos) {
-//     const productoExistente = await Producto.findOne({
-//       where: { nombre: producto.nombre },
-//     });
-//     if (!productoExistente) {
-//       const newProducto: ProductoInterface = {
-//         nombre: producto.nombre,
-//         precio: producto.precio,
-//         descuento: producto.descuento,
-//         stockGeneral: 0,
-//       };
-
-//       await _createProducto(newProducto, producto.detalles);
-//     }
-//   }
-// };
-
-// const createPago = async () => {
-//   for (const pago of pagos) {
-//     const pagoExistente = await Pago.findOne({
-//       where: { fecha: pago.fecha },
-//     });
-
-//     if (!pagoExistente) {
-//       await _createPago(pago);
-//     }
 //   }
 // };
 
@@ -463,12 +415,8 @@ const createProductoTalla = async () =>{
 // };
 
 export const scriptInicio = async () => {
-  createTienda();
-  createUsuario();
-  createColores();
-  createProducto();
-  createProductoDetalle();
-  createProductoTalla();
-  // createColores();
-  // createProducto();
+  await createTienda();
+  await createUsuario();
+  await createColores();
+  await createProducto();
 };

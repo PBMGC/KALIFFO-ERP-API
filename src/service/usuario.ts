@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { query } from "../util/query";
 
@@ -7,7 +6,6 @@ dotenv.config();
 
 export const _createUsuario = async (usuario: any) => {
   try {
-
     if (usuario.tienda_id) {
       const checkTiendaQuery = `SELECT * FROM tienda WHERE tienda_id = ?`;
       const tiendaResult = (await query(checkTiendaQuery, [
@@ -74,22 +72,20 @@ export const _getUsuarios = async (
   antiTienda_id?: number
 ) => {
   try {
-
-    const usuarios = (await query(`CALL SP_GetUsuarios(?,?,?)`,[
+    const usuarios = (await query(`CALL SP_GetUsuarios(?,?,?)`, [
       rol || null,
       tienda_id || null,
-      antiTienda_id || null
+      antiTienda_id || null,
     ])) as any;
 
-
     const usuariosData = usuarios.data[0].map((usuario: any) => {
-      return{
-        ...usuario
-      }
+      return {
+        ...usuario,
+      };
     });
 
     return {
-      items:usuariosData,
+      items: usuariosData,
       success: true,
       status: 200,
     };
@@ -105,19 +101,19 @@ export const _getUsuarios = async (
 
 export const _getUsuario = async (usuario_id: string) => {
   try {
-    const usuario= (await query(`CALL SP_GetUsuario(?)`,[usuario_id])) as any;
-    
+    const usuario = (await query(`CALL SP_GetUsuario(?)`, [usuario_id])) as any;
+
     const usuariosData = usuario.data[0].map((usuarioD: any) => {
-      return{
-        ...usuarioD
-      }
+      return {
+        ...usuarioD,
+      };
     });
 
     return {
-      items:usuariosData,
-      success:true,
-      status:200
-    }
+      items: usuariosData,
+      success: true,
+      status: 200,
+    };
   } catch (error) {
     console.error("Error al obtener usuario:", error);
     return {
@@ -125,13 +121,12 @@ export const _getUsuario = async (usuario_id: string) => {
       success: false,
       status: 500,
     };
-  } 
+  }
 };
 
 export const _deleteUsuario = async (usuario_id: string) => {
   try {
-    
-    await query(`Delete from usuario where usuario_id= ${usuario_id}`)
+    await query(`Delete from usuario where usuario_id= ${usuario_id}`);
 
     return {
       message: "Usuario eliminado exitosamente",
@@ -147,21 +142,20 @@ export const _deleteUsuario = async (usuario_id: string) => {
   }
 };
 
-export const _updateUsuario = async (usuario:any) => {
+export const _updateUsuario = async (usuario: any) => {
   try {
-    
-    await query(`CALL SP_UpdateUsuario(?,?,?,?,?,?,?,?,?,?)`,[
+    (await query(`CALL SP_UpdateUsuario(?,?,?,?,?,?,?,?,?,?)`, [
       usuario.usuario_id,
-      usuario.nombre||null,
-      usuario.ap_paterno||null,
-      usuario.ap_materno||null,
-      usuario.fecha_nacimiento||null,
-      usuario.telefono||null,
-      usuario.dni||null,
-      usuario.sueldo||null,
-      usuario.tienda_id||null,
-      usuario.rol||null
-    ]) as any;
+      usuario.nombre || null,
+      usuario.ap_paterno || null,
+      usuario.ap_materno || null,
+      usuario.fecha_nacimiento || null,
+      usuario.telefono || null,
+      usuario.dni || null,
+      usuario.sueldo || null,
+      usuario.tienda_id || null,
+      usuario.rol || null,
+    ])) as any;
 
     return {
       message: "ACTUALIZADO CON EXITO",
@@ -344,12 +338,12 @@ export const _deleteAsistencia = async (horario_id: number) => {
   }
 };
 
-export const _generarReporte = async (res:any,usuario_id: number) => {
+export const _generarReporte = async (res: any, usuario_id: number) => {
   try {
     const PDFDocument = require("pdfkit-table");
-    
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename="reporte.pdf"');
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="reporte.pdf"');
 
     const data: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
 
@@ -365,8 +359,7 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
           hora_salida: hora_salida,
         };
       });
-    
-      
+
     const pagosData = data[0].pagos.split("), (").map((item: string) => {
       const [pago_total, pago_faltante] = item
         .replace(/\(|\)/g, "")
@@ -397,11 +390,11 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
       permissions: {
         printing: "highResolution",
       },
-      size: 'A4', 
-      layout: 'portrait',
+      size: "A4",
+      layout: "portrait",
     });
 
-    doc.pipe(res)
+    doc.pipe(res);
 
     doc.image("src/Img/logo.png", 60, 10, {
       fit: [100, 100],
@@ -409,7 +402,10 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
       valign: "center",
     });
     doc.fontSize(20).text("KALIFFO SAC", 250, 50);
-    doc.font("Helvetica-Bold").fontSize(18).text("REPORTE DE TRABAJADOR", 190, 75);
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(18)
+      .text("REPORTE DE TRABAJADOR", 190, 75);
 
     const tablaDatosTrabajador = {
       title: `Datos de ${data[0].nombre} ${data[0].ap_paterno} ${data[0].ap_materno}`,
@@ -454,8 +450,6 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
       ],
     };
 
-    
-
     const tablaDatosHorario = {
       title: "Asistencia del Trabajador",
       headers: [
@@ -487,7 +481,6 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
       }),
     };
 
-
     const tablaDatosPago = {
       title: "Planilla de pagos del Trabajador",
       headers: [
@@ -510,15 +503,14 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
           align: "center",
         },
       ],
-      datas: pagosData.map((pago:any)=>{
-        return{
-          fecha:pago.pago_fecha,
-          montoP:pago.pago_total,
-          montoF:pago.pago_faltante,
-        }
-      })
+      datas: pagosData.map((pago: any) => {
+        return {
+          fecha: pago.pago_fecha,
+          montoP: pago.pago_total,
+          montoF: pago.pago_faltante,
+        };
+      }),
     };
-
 
     const tablaDatosIncidencias = {
       title: "Incidencias del Trabajador",
@@ -551,12 +543,11 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
       }),
     };
 
-
-    const nuevaTabla = async (tablaData:any,posY:number)=>{
-      const tablaAltura = await doc.table(tablaData,{
-        width:450,
-        x:70,
-        y:posY,
+    const nuevaTabla = async (tablaData: any, posY: number) => {
+      const tablaAltura = await doc.table(tablaData, {
+        width: 450,
+        x: 70,
+        y: posY,
         prepareRow: (
           row: string[],
           indexColumn: number,
@@ -565,7 +556,7 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
           rectCell: { x: number; y: number; width: number; height: number }
         ) => {
           const { x, y, width, height } = rectCell;
-  
+
           if (indexColumn === 0) {
             doc
               .lineWidth(0.5)
@@ -573,13 +564,13 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
               .lineTo(x, y + height)
               .stroke();
           }
-  
+
           doc
             .lineWidth(0.5)
             .moveTo(x + width, y)
             .lineTo(x + width, y + height)
             .stroke();
-  
+
           if (indexRow === tablaDatosIncidencias.datas.length - 1) {
             doc
               .lineWidth(0.5)
@@ -588,27 +579,25 @@ export const _generarReporte = async (res:any,usuario_id: number) => {
               .stroke();
           }
         },
-      })
-    
-      if(tablaAltura + posY >doc.page.height - doc.page.margins.bottom){
-        doc.addPage()
+      });
+
+      if (tablaAltura + posY > doc.page.height - doc.page.margins.bottom) {
+        doc.addPage();
       }
 
-      return posY+tablaAltura
+      return posY + tablaAltura;
+    };
 
-    }
+    let posY = 120;
 
-    let posY=120;
+    posY = await nuevaTabla(tablaDatosTrabajador, posY);
 
-    posY=await nuevaTabla(tablaDatosTrabajador,posY)
+    posY = await nuevaTabla(tablaDatosHorario, posY);
 
-    posY=await nuevaTabla(tablaDatosHorario,posY)
+    posY = await nuevaTabla(tablaDatosPago, posY);
 
-    posY=await nuevaTabla(tablaDatosPago,posY)
+    posY = await nuevaTabla(tablaDatosIncidencias, posY);
 
-    posY=await nuevaTabla(tablaDatosIncidencias,posY)
-    
-    
     doc.end();
   } catch (error) {
     return {
