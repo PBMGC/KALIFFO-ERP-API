@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { _createTienda, _getTienda, _getTiendas } from "../service/tienda";
-import { Tienda } from "../interface/tienda";
+
 import { handleHttp } from "../util/error.handler";
+import { _createTienda, _getTienda, _getTiendas } from "../service/tienda";
 
 export const createTienda = async (req: Request, res: Response) => {
   const { tienda, direccion, telefono } = req.body;
 
-  const newTienda: Tienda = {
+  const newTienda: any = {
     tienda,
     direccion,
     telefono,
@@ -34,10 +34,10 @@ export const getTienda = async (req: Request, res: Response) => {
 
   try {
     const response = await _getTienda(Number(tienda_id));
-    res.status(response.status).json(response.item);
+    res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getTienda", 500);
   }
 };
 
-export const getProductosTienda = async (req: Request, res: Response) => {};
+// export const getProductosTienda = async (req: Request, res: Response) => {};

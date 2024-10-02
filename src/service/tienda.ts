@@ -1,24 +1,37 @@
-import { Model } from "sequelize";
-import sequelize from "../db/connection";
-import { Tienda as TiendaInterface } from "../interface/tienda";
-import { ProductoDetalle } from "../models/productoDetalle";
-import { ProductoTienda } from "../models/productoTienda";
-import { Tienda } from "../models/tienda";
-import { Producto } from "../models/producto";
-import { Usuario } from "../models/usuario";
+// import { Model } from "sequelize";
+// import sequelize from "../db/connection";
+// import { Tienda as TiendaInterface } from "../interface/tienda";
+// import { ProductoDetalle } from "../models/productoDetalle";
+// import { ProductoTienda } from "../models/productoTienda";
+// import { Tienda } from "../models/tienda";
+// import { Producto } from "../models/producto";
+// import { Usuario } from "../models/usuario";
 
-export const _createTienda = async (tienda: TiendaInterface) => {
+import { query } from "../util/query";
+
+export const _createTienda = async (tienda: any) => {
+  const consulta = `
+    INSERT INTO tienda (tienda, direccion, telefono)
+    VALUES (?, ?, ?)
+  `;
+
   try {
-    const newTienda = await Tienda.create(tienda);
+    const result = await query(consulta, [
+      tienda.tienda,
+      tienda.direccion,
+      tienda.telefono,
+    ]);
 
     return {
-      message: newTienda,
+      message: "Tienda creada exitosamente.",
+      data: result,
       success: true,
       status: 201,
     };
   } catch (error) {
+    console.error("Error al crear la tienda:", error);
     return {
-      message: "error _createTienda",
+      message: "Error al crear la tienda. Intente nuevamente más tarde.",
       success: false,
       status: 500,
     };
@@ -27,17 +40,17 @@ export const _createTienda = async (tienda: TiendaInterface) => {
 
 export const _getTiendas = async () => {
   try {
-    const stockPorTienda = await ProductoTienda.findAll({
-      attributes: [
-        "tienda_id",
-        [sequelize.fn("SUM", sequelize.col("stock")), "stock"],
-      ],
-      include: { model: Tienda },
-      group: ["tienda_id"],
+    
+    const response = (await query(`CALL SP_GetTiendas()`)) as any;
+
+    const tiendasData = response.data[0].map((tienda: any) => {
+      return{
+        ...tienda
+      }
     });
 
     return {
-      items: stockPorTienda,
+      items: tiendasData,
       success: true,
       status: 200,
     };
@@ -52,14 +65,16 @@ export const _getTiendas = async () => {
 
 export const _getTienda = async (tienda_id: number) => {
   try {
-    const item = await Tienda.findOne({ where: { tienda_id } });
-    const nroUsuarios = await Usuario.count({ where: { tienda_id } });
-    const stockTotal = await ProductoTienda.sum("stock", {
-      where: { tienda_id },
+    const response = (await query(`CALL SP_GetTienda(?)`,[tienda_id])) as any;
+
+    const tiendaData = response.data[0].map((tienda: any) => {
+      return{
+        ...tienda
+      }
     });
 
     return {
-      item: { ...item?.dataValues, nroUsuarios, stockTotal },
+      items: tiendaData,
       success: true,
       status: 200,
     };

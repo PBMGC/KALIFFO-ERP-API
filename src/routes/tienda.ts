@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTienda, getTienda, getTiendas } from "../controller/tienda";
+import { createTienda, getTienda, getTiendas, } from "../controller/tienda";
 import { ValidateCreateTienda } from "../validation/tienda";
 
 const router = Router();

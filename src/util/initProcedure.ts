@@ -1,18 +1,19 @@
-import sequelize from "../db/connection";
+import { executeDDL } from "./query";
 
-//CREADORES
+// CREADORES
 const crearProcedimiento = async (
   nombre: string,
-  query: string,
+  queryCodigo: string,
   parametros: string = ""
 ) => {
   try {
-    await sequelize.query(`
+    const sql = `
       CREATE PROCEDURE ${nombre}(${parametros})
       BEGIN
-        ${query}
+        ${queryCodigo}
       END;
-    `);
+    `;
+    await executeDDL(sql); // Usar executeDDL para crear el procedimiento
   } catch (error) {
     console.error(`Error al crear el procedimiento ${nombre}:`, error);
   }
@@ -20,7 +21,8 @@ const crearProcedimiento = async (
 
 const eliminarProcedimiento = async (nombre: string) => {
   try {
-    await sequelize.query(`DROP PROCEDURE IF EXISTS ${nombre};`);
+    const sql = `DROP PROCEDURE IF EXISTS ${nombre};`;
+    await executeDDL(sql); // Usar executeDDL para eliminar el procedimiento
   } catch (error) {
     console.error(`Error al eliminar el procedimiento ${nombre}:`, error);
   }
@@ -28,9 +30,9 @@ const eliminarProcedimiento = async (nombre: string) => {
 
 //consulta
 const queryColoresProductos = `
-  SELECT c.color_id, c.nombre 
-  FROM color c 
-  INNER JOIN productodetalle p ON c.color_id = p.color_id 
+  SELECT c.color_id, c.nombre
+  FROM color c
+  INNER JOIN productodetalle p ON c.color_id = p.color_id
   WHERE p.producto_id = id_p;
 `;
 
@@ -51,6 +53,7 @@ UPDATE incidencia
         fecha_creacion = IF(p_fecha IS NOT NULL, p_fecha, fecha_creacion)
     WHERE incidencia_id = i_id;
 `;
+
 
 export const initProcedureUpdateIncidencia = async () => {
   await eliminarProcedimiento("SP_UpdateIncidencia");
@@ -88,36 +91,36 @@ export const initProcedureDeleteHorario = async () => {
 };
 
 const queryGetReporteUsuario = `
-  SELECT 
-    u.usuario_id, 
-    u.nombre, 
-    u.ap_paterno, 
-    u.ap_materno, 
-    u.telefono, 
-    u.dni, 
-    t.tienda, 
+  SELECT
+    u.usuario_id,
+    u.nombre,
+    u.ap_paterno,
+    u.ap_materno,
+    u.telefono,
+    u.dni,
+    t.tienda,
     h.horarios,
     i.incidencias,
     pg.pagos
-FROM 
-    usuario u 
-LEFT JOIN 
-    tienda t ON u.tienda_id = t.tienda_id 
-LEFT JOIN 
-    (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", hora_entrada, ', ', hora_salida, ")") ORDER BY fecha DESC SEPARATOR ', ') AS horarios 
-     FROM horario 
-     GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id 
-LEFT JOIN 
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion,", ",fecha_creacion,")") ORDER BY tipo SEPARATOR "; ") AS incidencias 
-     FROM incidencia 
-     GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id 
-LEFT JOIN 
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ", ", fecha,")") ORDER BY montoPagado SEPARATOR ", ") AS pagos 
-     FROM pago 
-     GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id 
-WHERE 
+FROM
+    usuario u
+LEFT JOIN
+    tienda t ON u.tienda_id = t.tienda_id
+LEFT JOIN
+    (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", hora_entrada, ', ', hora_salida, ")") ORDER BY fecha DESC SEPARATOR ', ') AS horarios
+     FROM horario
+     GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id
+LEFT JOIN
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion,", ",fecha_creacion,")") ORDER BY tipo SEPARATOR "; ") AS incidencias
+     FROM incidencia
+     GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id
+LEFT JOIN
+    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
+     FROM pago
+     GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id
+WHERE
     u.usuario_id = u_id
-ORDER BY 
+ORDER BY
     u.usuario_id;
 
 `;
@@ -135,32 +138,61 @@ export const initProcedureDeletePago = async () =>{
   await eliminarProcedimiento("SP_DeletePago")
   await crearProcedimiento("SP_DeletePago",queryDeletePago,"IN p_id INT")
 }
-
 const queryGetUsuarios = `
-SELECT 
-    usuario.usuario_id,
-    CONCAT(usuario.nombre, " ", usuario.ap_paterno, " ", usuario.ap_materno) AS nombre_completo,
-    usuario.dni,
-    usuario.telefono,
-    usuario.tienda_id,
-    IFNULL((SELECT COUNT(*) 
-             FROM incidencia 
-             WHERE incidencia.usuario_id = usuario.usuario_id), 0) AS total_incidencias,
-    IFNULL(FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(horario.hora_salida, horario.hora_entrada)) / 3600)), 0) AS total_horas_trabajadas
-FROM 
-    usuario 
-LEFT JOIN 
-    horario ON usuario.usuario_id = horario.usuario_id
-WHERE 
-    usuario.rol = u_rol
-GROUP BY 
-    usuario.usuario_id;
-`
+    SET @consulta = '
+        SELECT 
+            usuario.usuario_id,
+            usuario.nombre, 
+            usuario.ap_paterno,
+            usuario.ap_materno,
+            usuario.dni,
+            usuario.telefono,
+            usuario.tienda_id,
+            tienda.tienda,
+            usuario.sueldo,
+            IFNULL((SELECT COUNT(*) 
+                    FROM incidencia 
+                    WHERE incidencia.usuario_id = usuario.usuario_id), 0) AS total_incidencias,
+            IFNULL(FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(horario.hora_salida, horario.hora_entrada)) / 3600)), 0) AS total_horas_trabajadas
+        FROM 
+            usuario 
+        LEFT JOIN 
+            horario ON usuario.usuario_id = horario.usuario_id
+        LEFT JOIN 
+            tienda ON tienda.tienda_id = usuario.tienda_id
+        WHERE 
+            1=1
+    ';
 
-export const initProcedureGetUsuarios= async () =>{
-  await eliminarProcedimiento("SP_GetUsuarios")
-  await crearProcedimiento("SP_GetUsuarios",queryGetUsuarios,"IN u_rol INT")
-}
+    IF p_rol IS NOT NULL AND p_rol != '' THEN 
+        SET @consulta = CONCAT(@consulta, ' AND usuario.rol = ', p_rol);
+    END IF;
+
+    IF p_tienda_id IS NOT NULL AND p_tienda_id != '' THEN 
+        SET @consulta = CONCAT(@consulta, ' AND usuario.tienda_id = ', p_tienda_id);
+    END IF;
+
+    IF p_antiTienda_id IS NOT NULL AND p_antiTienda_id != '' THEN
+        SET @consulta = CONCAT(@consulta, ' AND usuario.tienda_id != ', p_antiTienda_id);
+    END IF;
+
+    SET @consulta = CONCAT(@consulta, ' GROUP BY usuario.usuario_id;');
+      
+    PREPARE stmt FROM @consulta;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+`;
+
+export const initProcedureGetUsuarios = async () => {
+    await eliminarProcedimiento("SP_GetUsuarios");
+
+    await crearProcedimiento("SP_GetUsuarios", queryGetUsuarios, `
+        IN p_rol INT, 
+        IN p_tienda_id INT, 
+        IN p_antiTienda_id INT
+    `);
+};
+
 
 const queryGetUsuario = `
 SELECT 
@@ -214,16 +246,50 @@ export const initiProcedureUpdateUsuario = async () =>{
   )
 }
 
-const queryDeleteUsuario =`
-  Delete from usuario where usuario_id = u_id;
-`
+const queryGetTiendas =`
+SELECT 
+  tienda.tienda,
+  tienda.direccion,
+  tienda.telefono,
+  SUM(productodetalle.stock) AS total_stock,
+  COUNT(DISTINCT usuario.tienda_id) AS total_usuarios
+FROM 
+  tienda
+LEFT JOIN 
+  productodetalle ON productodetalle.tienda_id = tienda.tienda_id
+LEFT JOIN 
+  usuario ON usuario.tienda_id = tienda.tienda_id
+GROUP BY 
+  tienda.tienda, tienda.direccion, tienda.telefono;
+`;
 
-export const initiProcedureDeleteUsuario = async()=>{
-  await eliminarProcedimiento("SP_DeleteUsuario")
-  await crearProcedimiento("SP_DeleteUsuario",queryDeleteUsuario,
-    "u_id INT"
+export const initiProcedureGetTiendas = async () =>{
+  await eliminarProcedimiento("SP_GetTiendas");
+  await crearProcedimiento("SP_GetTiendas",queryGetTiendas,
   )
 }
+
+const queryGetTienda =`
+SELECT 
+  tienda.tienda,
+  tienda.direccion,
+  tienda.telefono,
+  SUM(productodetalle.stock) AS total_stock,
+  COUNT(DISTINCT usuario.tienda_id) AS total_usuarios
+FROM 
+  tienda
+LEFT JOIN 
+  productodetalle ON productodetalle.tienda_id = tienda.tienda_id
+LEFT JOIN 
+  usuario ON usuario.tienda_id = tienda.tienda_id
+WHERE tienda.tienda_id = t_id;
+`;
+
+export const initiProcedureGetTienda = async () =>{
+  await eliminarProcedimiento("SP_GetTienda");
+  await crearProcedimiento("SP_GetTienda",queryGetTienda,"IN t_id INT")
+}
+
 
 
 export const initProcedure = async () => {
@@ -232,9 +298,10 @@ export const initProcedure = async () => {
   await initProcedureDeleteIncidencia();
   await initProcedureDeleteHorario();
   await initProcedureGetUsuarios();
-  await initProcedureGetUsuario();
+  await initProcedureGetUsuario(); 
   await initiProcedureUpdateUsuario();
-  await initiProcedureDeleteUsuario();
   await initProcedureGetReporteUsuario();
+  await initiProcedureGetTiendas();
+  await initiProcedureGetTienda();
   await initProcedureDeletePago();
 };

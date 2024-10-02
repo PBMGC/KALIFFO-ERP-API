@@ -1,5 +1,4 @@
 import { body, check } from "express-validator";
-import { Tienda } from "../models/tienda";
 import { NextFunction, Request, Response } from "express";
 import { validateResult } from "../util/validation";
 
@@ -68,20 +67,20 @@ export const ValidateCreateProducto: any = [
     .isArray()
     .withMessage("El campo 'detalles[tiendas]' debe ser un array"),
 
-  body("detalles.*.tiendas.*.tienda_id")
-    .exists()
-    .withMessage("El campo 'detalles[tiendas][tienda_id]' es obligatorio")
-    .isInt()
-    .withMessage(
-      "El campo 'detalles[tiendas][tienda_id]' debe ser un número entero."
-    )
-    .custom(async (value) => {
-      const tienda = await Tienda.findOne({ where: { tienda_id: value } });
-      if (!tienda) {
-        throw new Error(`La tienda_id ${value} no existe.`);
-      }
-      return true;
-    }),
+  // body("detalles.*.tiendas.*.tienda_id")
+  //   .exists()
+  //   .withMessage("El campo 'detalles[tiendas][tienda_id]' es obligatorio")
+  //   .isInt()
+  //   .withMessage(
+  //     "El campo 'detalles[tiendas][tienda_id]' debe ser un número entero."
+  //   )
+  //   .custom(async (value) => {
+  //     const tienda = await Tienda.findOne({ where: { tienda_id: value } });
+  //     if (!tienda) {
+  //       throw new Error(`La tienda_id ${value} no existe.`);
+  //     }
+  //     return true;
+  //   }),
 
   body("detalles.*.tiendas.*.stock")
     .exists()
