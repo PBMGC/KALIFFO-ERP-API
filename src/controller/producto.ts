@@ -6,6 +6,7 @@ import {
   _deleteProducto,
   _getProducto,
   _getProductos,
+  _getProductosTienda,
   _updateProducto,
 } from "../service/producto";
 import { handleHttp } from "../util/error.handler";
@@ -57,6 +58,17 @@ export const getProducto = async (req: Request, res: Response) => {
   try {
     const response = await _getProducto(Number(producto_id));
     res.status(response.status).json(response.item);
+  } catch (error) {
+    handleHttp(res, "error_getProducto", 500);
+  }
+};
+
+export const getProductosTienda = async (req: Request, res: Response) => {
+  const { tienda_id } = req.params;
+
+  try {
+    const response = await _getProductosTienda(Number(tienda_id));
+    res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getProducto", 500);
   }

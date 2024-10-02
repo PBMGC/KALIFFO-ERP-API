@@ -110,10 +110,10 @@ export const _getUsuario = async (usuario_id: string) => {
     });
 
     return {
-      items: usuariosData,
-      success: true,
-      status: 200,
-    };
+      items:usuariosData[0],
+      success:true,
+      status:200
+    }
   } catch (error) {
     console.error("Error al obtener usuario:", error);
     return {

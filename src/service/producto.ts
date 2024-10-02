@@ -125,6 +125,23 @@ export const _getProducto = async (producto_id: number) => {
   };
 };
 
+export const _getProductosTienda = async (tienda_id: number) => {
+
+  const result = await query(`CALL SP_GetProductosTienda(?)`, [tienda_id]);
+
+  const TiendaProductosData = result.data[0].map((producto: any) => {
+    return {
+      ...producto,
+    };
+  });
+  
+  return {
+    items: TiendaProductosData,
+    success: true,
+    status: 200,
+  };
+};
+
 export const _updateProducto = async (producto: any) => {
   const { producto_id, nombre, stockTotal, precioBase, descuento } = producto;
 
