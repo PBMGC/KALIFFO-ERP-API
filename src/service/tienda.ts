@@ -64,7 +64,7 @@ export const _getTienda = async (tienda_id: number) => {
     });
 
     return {
-      items: tiendaData,
+      items: tiendaData[0],
       success: true,
       status: 200,
     };

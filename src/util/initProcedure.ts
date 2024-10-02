@@ -248,6 +248,7 @@ export const initiProcedureUpdateUsuario = async () =>{
 
 const queryGetTiendas =`
 SELECT 
+  tienda.tienda_id,
   tienda.tienda,
   tienda.direccion,
   tienda.telefono,
@@ -291,6 +292,21 @@ export const initiProcedureGetTienda = async () =>{
 }
 
 
+const queryGetProductoTienda =`
+SELECT producto.producto_id, producto.nombre,SUM(productodetalle.stock) as stock,producto.precioBase,producto.descuento
+FROM producto
+INNER JOIN productodetalle
+on producto.producto_id = productodetalle.producto_id
+WHERE productodetalle.tienda_id=t_id
+GROUP BY producto.producto_id;
+`;
+
+export const initiProcedureGetProductoTienda = async () =>{
+  await eliminarProcedimiento("SP_GetProductosTienda");
+  await crearProcedimiento("SP_GetProductosTienda",queryGetProductoTienda,"IN t_id INT")
+}
+
+
 
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
@@ -304,4 +320,5 @@ export const initProcedure = async () => {
   await initiProcedureGetTiendas();
   await initiProcedureGetTienda();
   await initProcedureDeletePago();
+  await initiProcedureGetProductoTienda();
 };
