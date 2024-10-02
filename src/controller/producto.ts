@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 // import { Producto } from "../interface/producto";
 import {
   _createProducto,
+  _createProductoDetalle,
   _deleteProducto,
   _getProducto,
   _getProductos,
@@ -22,6 +23,22 @@ export const createProducto = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createProducto", 500);
+  }
+};
+
+export const createProductoDetalle = async (req: Request, res: Response) => {
+  const { producto_id, color_id, tienda_id, stock } = req.body;
+
+  try {
+    const response = await _createProductoDetalle({
+      producto_id,
+      color_id,
+      tienda_id,
+      stock,
+    });
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_createProductoDetalle", 500);
   }
 };
 
