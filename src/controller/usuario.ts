@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { _createUsuario, _getUsuarios } from "../service/usuario";
+import { _createUsuario, _deleteUsuario, _generarReporte, _getUsuario, _getUsuarios, _updateUsuario } from "../service/usuario";
 import { handleHttp } from "../util/error.handler";
 // import { Usuario } from "../interface/usuario";
 // import {
@@ -64,7 +64,6 @@ export const getUsuarios = async (req: Request, res: Response) => {
     const response = await _getUsuarios(
       Number(inicio),
       Number(final),
-      nombre,
       Number(rol),
       Number(tienda_id),
       Number(antiTienda_id)
@@ -75,60 +74,62 @@ export const getUsuarios = async (req: Request, res: Response) => {
   }
 };
 
-// export const getUsuario = async (req: Request, res: Response) => {
-//   const { usuario_id } = req.params;
+export const getUsuario = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
 
-//   try {
-//     const response = await _getUsuario(usuario_id);
-//     res.status(response.status).json(response.item ? response.item : response);
-//   } catch (error) {
-//     handleHttp(res, "error_getUsuario", 500);
-//   }
-// };
+  try {
+    const response = await _getUsuario(usuario_id);
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error_getUsuario", 500);
+  }
+};
 
-// export const deleteUsuario = async (req: Request, res: Response) => {
-//   const { usuario_id } = req.params;
+export const deleteUsuario = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
 
-//   try {
-//     const response = await _deleteUsuario(usuario_id);
-//     res.status(response.status).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_deleteUsuario", 500);
-//   }
-// };
+  try {
+    const response = await _deleteUsuario(usuario_id);
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_deleteUsuario", 500);
+  }
+};
 
-// export const updateUsuario = async (req: Request, res: Response) => {
-//   const { usuario_id } = req.params;
-//   const {
-//     nombre,
-//     ap_paterno,
-//     ap_materno,
-//     fecha_nacimiento,
-//     dni,
-//     telefono,
-//     tienda_id,
-//     rol,
-//   } = req.body;
+export const updateUsuario = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
+  const {
+    nombre,
+    ap_paterno,
+    ap_materno,
+    fecha_nacimiento,
+    dni,
+    sueldo,
+    telefono,
+    tienda_id,
+    rol,
+  } = req.body;
 
-//   const updateUsuario: Partial<Usuario> = {
-//     usuario_id: Number(usuario_id),
-//     nombre,
-//     ap_paterno,
-//     ap_materno,
-//     fecha_nacimiento,
-//     dni,
-//     telefono,
-//     tienda_id,
-//     rol,
-//   };
+  const updateUsuario:any= {
+    usuario_id: Number(usuario_id),
+    nombre,
+    ap_paterno,
+    ap_materno,
+    fecha_nacimiento,
+    dni,
+    sueldo,
+    telefono,
+    tienda_id,
+    rol,
+  };
 
-//   try {
-//     const response = await _updateUsuario(updateUsuario);
-//     res.status(response.status).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_updateUsuario", 500);
-//   }
-// };
+  try {
+    const response = await _updateUsuario(updateUsuario);
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_updateUsuario", 500);
+  }
+};
 
 // export const loginUsuario = async (req: Request, res: Response) => {
 //   const { dni, contraseña } = req.body;
@@ -193,15 +194,14 @@ export const getUsuarios = async (req: Request, res: Response) => {
 //   }
 // };
 
-// export const generateReporte = async (req: Request, res: Response) => {
-//   const { usuario_id } = req.params;
+export const generateReporte = async (req: Request, res: Response) => {
+  const { usuario_id } = req.params;
 
-//   try {
-//     const response = await _generarReporte(Number(usuario_id));
-//     res.status(response.status).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_generarReporte", 500);
-//   }
-// };
+  try {
+    const response = await _generarReporte(res,Number(usuario_id));
+  } catch (error) {
+    handleHttp(res, "error_generarReporte", 500);
+  }
+};
 
 // //horario correo coun de horario de incidencia

@@ -7,45 +7,103 @@
 // import { Op, literal } from "sequelize";
 // import { Tienda } from "../models/tienda";
 
-// export const _createProducto = async (
-//   producto: ProductoInterface,
-//   detalles: any
-// ) => {
-//   try {
-//     const newProducto = await Producto.create(producto);
+import { query } from "../util/query";
 
-//     for (const detalle of detalles) {
-//       const newDetalle = await ProductoDetalle.create({
-//         codigo: detalle.codigo,
-//         talla: detalle.talla,
-//         color_id: detalle.color_id,
-//         producto_id: newProducto.producto_id || 0,
-//       });
+export const _createProducto = async (
+  producto:any
+) => {
+    const consulta =`
+        INSERT INTO producto(nombre,stockTotal,precioBase,descuento)
+        VALUES (?,?,?,?)
+    `
+  try {
+    
+    const result = await query(consulta,[
+        producto.nombre,
+        producto.stockTotal,
+        producto.precioBase,
+        producto.descuento
+    ])
 
-//       for (const tienda of detalle.tiendas) {
-//         await ProductoTienda.create({
-//           stock: tienda.stock,
-//           productoDetalle_id: newDetalle.productoDetalle_id || 0,
-//           tienda_id: tienda.tienda_id,
-//         });
-//         newProducto.stockGeneral += Number(tienda.stock);
-//       }
-//     }
-//     await newProducto.save();
+    return{
+        mesage:"Producto Creado exitosamente",
+        data:result,
+        success:true,
+        status:201
+    }
 
-//     return {
-//       message: newProducto,
-//       success: true,
-//       status: 201,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _createProducto",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
+  } catch (error) {
+    return {
+      message: "error _createProducto",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _createProductoDetalle = async (
+    productodetalle:any
+  ) => {
+      const consulta =`
+          INSERT INTO productoDetalle(producto_id,color_id,tienda_id,stock)
+          VALUES (?,?,?,?)
+      `
+    try {
+      
+      const result = await query(consulta,[
+        productodetalle.producto_id,
+        productodetalle.color_id,
+        productodetalle.tienda_id,
+        productodetalle.stock
+      ])
+  
+      return{
+          mesage:"Producto Detalle Creado exitosamente",
+          data:result,
+          success:true,
+          status:201
+      }
+  
+    } catch (error) {
+      return {
+        message: "error _createProductoDetalle",
+        success: false,
+        status: 500,
+      };
+    }
+  };
+
+  export const _createProductoTalla = async (
+    productodetalle:any
+  ) => {
+      const consulta =`
+          INSERT INTO productoTalla(productoDetalle_id,talla,codigo)
+          VALUES (?,?,?)
+      `
+    try {
+      
+      const result = await query(consulta,[
+        productodetalle.productoDetalle_id,
+        productodetalle.talla,
+        productodetalle.codigo
+      ])
+  
+      return{
+          mesage:"Producto Detalle Talla Creado exitosamente",
+          data:result,
+          success:true,
+          status:201
+      }
+  
+    } catch (error) {
+      return {
+        message: "error _createProductoDetalle",
+        success: false,
+        status: 500,
+      };
+    }
+  };
+
 
 // export const _getProductos = async (
 //   offset?: number,

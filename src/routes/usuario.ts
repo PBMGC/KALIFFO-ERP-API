@@ -9,21 +9,21 @@ import { Router } from "express";
 //   updateUsuario,
 // } from "../controller/usuario";
 import { ValidateCreateUsuario, ValidateLogin } from "../validation/usuario";
-import { createUsuario, getUsuarios } from "../controller/usuario";
+import { createUsuario, deleteUsuario, generateReporte, getUsuario, getUsuarios, updateUsuario } from "../controller/usuario";
 
 const router = Router();
 
 router.get("/", getUsuarios);
-// router.get("/:usuario_id", getUsuario);
+router.get("/:usuario_id", getUsuario);
 
 router.post("/create", ValidateCreateUsuario, createUsuario);
 
 // router.post("/login", ValidateLogin, loginUsuario);
 
-// router.put("/update/:usuario_id", updateUsuario);
+router.put("/update/:usuario_id", updateUsuario);
 
-// router.delete("/delete/:usuario_id", deleteUsuario);
+router.delete("/delete/:usuario_id", deleteUsuario);
 
-// router.get("/reporte/:usuario_id",generateReporte)
+router.get("/reporte/:usuario_id",generateReporte)
 
 export { router };

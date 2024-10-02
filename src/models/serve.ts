@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { initCronJobs } from "../job/correo";
 import { initBD } from "../util/initBD";
 import { scriptInicio } from "../util/script";
+import { initProcedure } from "../util/initProcedure";
 
 class Serve {
   app: express.Application;
@@ -46,6 +47,7 @@ class Serve {
     try {
       await initBD();
       await scriptInicio();
+      initProcedure()
     } catch (error) {
       console.log(error);
     }

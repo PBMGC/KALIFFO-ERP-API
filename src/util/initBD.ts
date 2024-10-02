@@ -95,7 +95,6 @@ const productoTalla = `
     productoDetalle_id INT,
     talla VARCHAR(20),
     codigo VARCHAR(20),
-    PRIMARY KEY (productoDetalle_id, talla),
     FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id),
     INDEX (codigo)
   );`;

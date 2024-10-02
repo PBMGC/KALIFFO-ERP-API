@@ -38,51 +38,53 @@ export const _createTienda = async (tienda: any) => {
   }
 };
 
-// export const _getTiendas = async () => {
-//   try {
-//     const stockPorTienda = await ProductoTienda.findAll({
-//       attributes: [
-//         "tienda_id",
-//         [sequelize.fn("SUM", sequelize.col("stock")), "stock"],
-//       ],
-//       include: { model: Tienda },
-//       group: ["tienda_id"],
-//     });
+export const _getTiendas = async () => {
+  try {
+    
+    const response = (await query(`CALL SP_GetTiendas()`)) as any;
 
-//     return {
-//       items: stockPorTienda,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _getTiendas",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
+    const tiendasData = response.data[0].map((tienda: any) => {
+      return{
+        ...tienda
+      }
+    });
 
-// export const _getTienda = async (tienda_id: number) => {
-//   try {
-//     const item = await Tienda.findOne({ where: { tienda_id } });
-//     const nroUsuarios = await Usuario.count({ where: { tienda_id } });
-//     const stockTotal = await ProductoTienda.sum("stock", {
-//       where: { tienda_id },
-//     });
+    return {
+      items: tiendasData,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message: "error _getTiendas",
+      success: false,
+      status: 500,
+    };
+  }
+};
 
-//     return {
-//       item: { ...item?.dataValues, nroUsuarios, stockTotal },
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     console.log(error);
+export const _getTienda = async (tienda_id: number) => {
+  try {
+    const response = (await query(`CALL SP_GetTienda(?)`,[tienda_id])) as any;
 
-//     return {
-//       msg: "error _getTienda",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
+    const tiendaData = response.data[0].map((tienda: any) => {
+      return{
+        ...tienda
+      }
+    });
+
+    return {
+      items: tiendaData,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      msg: "error _getTienda",
+      success: false,
+      status: 500,
+    };
+  }
+};

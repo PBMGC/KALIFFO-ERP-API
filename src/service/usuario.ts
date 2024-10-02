@@ -7,16 +7,6 @@ dotenv.config();
 
 export const _createUsuario = async (usuario: any) => {
   try {
-    const checkDniQuery = `SELECT * FROM usuario WHERE dni = ?`;
-    const dniResult = (await query(checkDniQuery, [usuario.dni])) as any;
-
-    if (dniResult.length > 0) {
-      return {
-        message: "Este DNI ya está en uso",
-        success: false,
-        status: 400,
-      };
-    }
 
     if (usuario.tienda_id) {
       const checkTiendaQuery = `SELECT * FROM tienda WHERE tienda_id = ?`;
@@ -79,67 +69,27 @@ export const _createUsuario = async (usuario: any) => {
 export const _getUsuarios = async (
   inicio?: number,
   final?: number,
-  nombre?: string,
   rol?: number,
   tienda_id?: number,
   antiTienda_id?: number
 ) => {
   try {
-    let consulta = `
-      SELECT u.usuario_id, u.nombre, u.ap_paterno, u.rol, u.tienda_id, t.tienda 
-      FROM usuario u
-      LEFT JOIN tienda t ON u.tienda_id = t.tienda_id
-      WHERE 1=1
-    `;
 
-    const parametros: any[] = [];
+    const usuarios = (await query(`CALL SP_GetUsuarios(?,?,?)`,[
+      rol || null,
+      tienda_id || null,
+      antiTienda_id || null
+    ])) as any;
 
-    if (nombre) {
-      consulta += ` AND u.nombre LIKE ?`;
-      parametros.push(`%${nombre}%`);
-    }
 
-    if (rol) {
-      consulta += ` AND u.rol = ?`;
-      parametros.push(rol);
-    }
-
-    if (tienda_id) {
-      consulta += ` AND u.tienda_id = ?`;
-      parametros.push(tienda_id);
-    }
-
-    if (antiTienda_id) {
-      consulta += ` AND u.tienda_id != ?`;
-      parametros.push(antiTienda_id);
-    }
-
-    // Agregar paginación si se especifica
-    if (inicio !== undefined && final !== undefined) {
-      consulta += ` LIMIT ?, ?`;
-      parametros.push(inicio, final - inicio);
-    } else if (inicio !== undefined) {
-      consulta += ` LIMIT ?, 10`; // Si solo se pasa el inicio, devolver 10 registros por defecto
-      parametros.push(inicio);
-    }
-
-    // Ejecutar la consulta
-    const usuarios = (await query(consulta, parametros)) as any;
-    console.log(usuarios);
-
-    // Transformar los datos para quitar la contraseña u otros campos
-    const transformedItems = usuarios.map((usuario: any) => {
-      const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
-        usuario;
-      return {
-        ...userWithoutPassword,
-        tienda_id: usuario.tienda_id,
-        tienda: usuario.tienda,
-      };
+    const usuariosData = usuarios.data[0].map((usuario: any) => {
+      return{
+        ...usuario
+      }
     });
 
     return {
-      items: transformedItems,
+      items:usuariosData,
       success: true,
       status: 200,
     };
@@ -153,176 +103,79 @@ export const _getUsuarios = async (
   }
 };
 
-// export const _getUsuarios = async (
-//   inicio?: number,
-//   final?: number,
-//   nombre?: string,
-//   rol?: number,
-//   tienda_id?: number,
-//   antiTienda_id?: number
-// ) => {
-//   try {
-//     const filtros: any = {
-//       include: {
-//         model: Tienda,
-//         attributes: ["tienda_id", "tienda"],
-//       },
-//       where: {},
+export const _getUsuario = async (usuario_id: string) => {
+  try {
+    const usuario= (await query(`CALL SP_GetUsuario(?)`,[usuario_id])) as any;
+    
+    const usuariosData = usuario.data[0].map((usuarioD: any) => {
+      return{
+        ...usuarioD
+      }
+    });
 
-//       offset: inicio || 0,
-//       limit: final ? final - (inicio || 0) : undefined,
-//     };
+    return {
+      items:usuariosData,
+      success:true,
+      status:200
+    }
+  } catch (error) {
+    console.error("Error al obtener usuario:", error);
+    return {
+      message: "Error al obtener usuario",
+      success: false,
+      status: 500,
+    };
+  } 
+};
 
-//     if (nombre) {
-//       filtros.where.nombre = { [Op.like]: `%${nombre}%` };
-//     }
+export const _deleteUsuario = async (usuario_id: string) => {
+  try {
+    
+    await query(`Delete from usuario where usuario_id= ${usuario_id}`)
 
-//     if (rol) {
-//       filtros.where.rol = rol;
-//     }
+    return {
+      message: "Usuario eliminado exitosamente",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message: "error _deleteUsuario",
+      success: false,
+      status: 500,
+    };
+  }
+};
 
-//     if (tienda_id) {
-//       filtros.where.tienda_id = tienda_id;
-//     }
+export const _updateUsuario = async (usuario:any) => {
+  try {
+    
+    await query(`CALL SP_UpdateUsuario(?,?,?,?,?,?,?,?,?,?)`,[
+      usuario.usuario_id,
+      usuario.nombre||null,
+      usuario.ap_paterno||null,
+      usuario.ap_materno||null,
+      usuario.fecha_nacimiento||null,
+      usuario.telefono||null,
+      usuario.dni||null,
+      usuario.sueldo||null,
+      usuario.tienda_id||null,
+      usuario.rol||null
+    ]) as any;
 
-//     if (antiTienda_id) {
-//       filtros.where.tienda_id = { [Op.ne]: antiTienda_id };
-//     }
-
-//     const items = await Usuario.findAll(filtros);
-
-//     const transformedItems = items.map((item: any) => {
-//       const tienda = item.tienda;
-//       const { contraseña, createdAt, updatedAt, ...userWithoutPassword } =
-//         item.toJSON();
-
-//       return {
-//         ...userWithoutPassword,
-//         tienda_id: tienda ? tienda.tienda_id : null,
-//         tienda: tienda ? tienda.tienda : null,
-//       };
-//     });
-
-//     return {
-//       items: transformedItems,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _getUsuarios",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _getUsuario = async (usuario_id: string) => {
-//   try {
-//     const item = await Usuario.findOne({
-//       where: { usuario_id: usuario_id },
-//     });
-
-//     const countIncidencias = await Incidencia.count({ where: { usuario_id } });
-//     const nroHoras = (await Horario.findAll({
-//       attributes: [
-//         [
-//           sequelize.literal(
-//             "SUM(FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60))"
-//           ),
-//           "min_trabajados",
-//         ],
-//       ],
-//       where: { usuario_id },
-//     })) as any;
-
-//     console.log(nroHoras);
-
-//     if (!item) {
-//       return {
-//         message: "Usuario no encontrado",
-//         success: false,
-//         status: 404,
-//       };
-//     }
-
-//     return {
-//       item: {
-//         ...item.dataValues,
-//         nroIncidencias: countIncidencias,
-//         nroHoras: nroHoras[0],
-//       },
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _getUsuario",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _deleteUsuario = async (usuario_id: string) => {
-//   try {
-//     const usuario = await Usuario.findOne({
-//       where: { usuario_id: usuario_id },
-//     });
-
-//     if (!usuario) {
-//       return {
-//         message: "Usuario no encontrado",
-//         success: false,
-//         status: 404,
-//       };
-//     }
-
-//     await usuario.destroy();
-
-//     return {
-//       message: "Usuario eliminado exitosamente",
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _deleteUsuario",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _updateUsuario = async (usuario: Partial<UsuarioInterface>) => {
-//   try {
-//     const updateUsuario = await Usuario.findOne({
-//       where: { usuario_id: usuario.usuario_id },
-//     });
-
-//     if (!updateUsuario) {
-//       return {
-//         message: "Usuario no encontrado",
-//         success: false,
-//         status: 404,
-//       };
-//     }
-
-//     await updateUsuario.update(usuario);
-
-//     return {
-//       message: updateUsuario,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _updateUsuario",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
+    return {
+      message: "ACTUALIZADO CON EXITO",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      message: "error _updateUsuario",
+      success: false,
+      status: 500,
+    };
+  }
+};
 
 // export const _login = async (dni: string, contraseña: string) => {
 //   try {
@@ -471,30 +324,32 @@ export const _getUsuarios = async (
 
 // //Sql puro
 
-// export const _deleteAsistencia = async (horario_id: number) => {
-//   try {
-//     await sequelize.query(`
-//       CALL SP_DeleteHorario(${horario_id})`);
+export const _deleteAsistencia = async (horario_id: number) => {
+  try {
+    await query(`
+      CALL SP_DeleteHorario(${horario_id})`);
 
-//     return {
-//       message: "Eliminacion exitosa",
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     console.error("Error al eliminar la asistencia:", error);
-//     return {
-//       message: "Error al eliminar la asistencia",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
+    return {
+      message: "Eliminacion exitosa",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error al eliminar la asistencia:", error);
+    return {
+      message: "Error al eliminar la asistencia",
+      success: false,
+      status: 500,
+    };
+  }
+};
 
-export const _generarReporte = async (usuario_id: number) => {
+export const _generarReporte = async (res:any,usuario_id: number) => {
   try {
     const PDFDocument = require("pdfkit-table");
-    const fs = require("fs");
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="reporte.pdf"');
 
     const data: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
 
@@ -510,7 +365,8 @@ export const _generarReporte = async (usuario_id: number) => {
           hora_salida: hora_salida,
         };
       });
-
+    
+      
     const pagosData = data[0].pagos.split("), (").map((item: string) => {
       const [pago_total, pago_faltante] = item
         .replace(/\(|\)/g, "")
@@ -521,8 +377,6 @@ export const _generarReporte = async (usuario_id: number) => {
         pago_faltante: pago_faltante,
       };
     });
-
-    console.log(pagosData);
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
     const incidenciasData = data[0].incidencias.split("; ").map((item: any) => {
@@ -543,17 +397,19 @@ export const _generarReporte = async (usuario_id: number) => {
       permissions: {
         printing: "highResolution",
       },
+      size: 'A4', 
+      layout: 'portrait',
     });
 
-    doc.pipe(fs.createWriteStream(`reporte1.pdf`));
+    doc.pipe(res)
 
-    doc.image("src/Img/logo.png", 10, 10, {
+    doc.image("src/Img/logo.png", 60, 10, {
       fit: [100, 100],
       align: "center",
       valign: "center",
     });
-    doc.text("KALIFFO SAC", 250, 50);
-    doc.text("REPORTE DE TRABAJADOR", 210, 70);
+    doc.fontSize(20).text("KALIFFO SAC", 250, 50);
+    doc.font("Helvetica-Bold").fontSize(18).text("REPORTE DE TRABAJADOR", 190, 75);
 
     const tablaDatosTrabajador = {
       title: `Datos de ${data[0].nombre} ${data[0].ap_paterno} ${data[0].ap_materno}`,
@@ -598,42 +454,7 @@ export const _generarReporte = async (usuario_id: number) => {
       ],
     };
 
-    await doc.table(tablaDatosTrabajador, {
-      width: 450,
-      x: 50,
-      y: 120,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosTrabajador.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
+    
 
     const tablaDatosHorario = {
       title: "Asistencia del Trabajador",
@@ -666,42 +487,6 @@ export const _generarReporte = async (usuario_id: number) => {
       }),
     };
 
-    await doc.table(tablaDatosHorario, {
-      width: 450,
-      x: 50,
-      y: 200,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosHorario.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
 
     const tablaDatosPago = {
       title: "Planilla de pagos del Trabajador",
@@ -725,45 +510,15 @@ export const _generarReporte = async (usuario_id: number) => {
           align: "center",
         },
       ],
-      datas: [{ fecha: "12/14/23", montoP: "1300", montoF: "0" }],
+      datas: pagosData.map((pago:any)=>{
+        return{
+          fecha:pago.pago_fecha,
+          montoP:pago.pago_total,
+          montoF:pago.pago_faltante,
+        }
+      })
     };
 
-    await doc.table(tablaDatosPago, {
-      width: 450,
-      x: 50,
-      y: 280,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
-
-        if (indexColumn === 0) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosPago.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
-            .lineTo(x + width, y + height)
-            .stroke();
-        }
-      },
-    });
 
     const tablaDatosIncidencias = {
       title: "Incidencias del Trabajador",
@@ -796,50 +551,65 @@ export const _generarReporte = async (usuario_id: number) => {
       }),
     };
 
-    await doc.table(tablaDatosIncidencias, {
-      width: 450,
-      x: 50,
-      y: 350,
-      prepareRow: (
-        row: string[],
-        indexColumn: number,
-        indexRow: number,
-        rectRow: { x: number; y: number; width: number; height: number },
-        rectCell: { x: number; y: number; width: number; height: number }
-      ) => {
-        const { x, y, width, height } = rectCell;
 
-        if (indexColumn === 0) {
+    const nuevaTabla = async (tablaData:any,posY:number)=>{
+      const tablaAltura = await doc.table(tablaData,{
+        width:450,
+        x:70,
+        y:posY,
+        prepareRow: (
+          row: string[],
+          indexColumn: number,
+          indexRow: number,
+          rectRow: { x: number; y: number; width: number; height: number },
+          rectCell: { x: number; y: number; width: number; height: number }
+        ) => {
+          const { x, y, width, height } = rectCell;
+  
+          if (indexColumn === 0) {
+            doc
+              .lineWidth(0.5)
+              .moveTo(x, y)
+              .lineTo(x, y + height)
+              .stroke();
+          }
+  
           doc
             .lineWidth(0.5)
-            .moveTo(x, y)
-            .lineTo(x, y + height)
-            .stroke();
-        }
-
-        doc
-          .lineWidth(0.5)
-          .moveTo(x + width, y)
-          .lineTo(x + width, y + height)
-          .stroke();
-
-        if (indexRow === tablaDatosIncidencias.datas.length - 1) {
-          doc
-            .lineWidth(0.5)
-            .moveTo(x, y + height)
+            .moveTo(x + width, y)
             .lineTo(x + width, y + height)
             .stroke();
-        }
-      },
-    });
+  
+          if (indexRow === tablaDatosIncidencias.datas.length - 1) {
+            doc
+              .lineWidth(0.5)
+              .moveTo(x, y + height)
+              .lineTo(x + width, y + height)
+              .stroke();
+          }
+        },
+      })
+    
+      if(tablaAltura + posY >doc.page.height - doc.page.margins.bottom){
+        doc.addPage()
+      }
 
+      return posY+tablaAltura
+
+    }
+
+    let posY=120;
+
+    posY=await nuevaTabla(tablaDatosTrabajador,posY)
+
+    posY=await nuevaTabla(tablaDatosHorario,posY)
+
+    posY=await nuevaTabla(tablaDatosPago,posY)
+
+    posY=await nuevaTabla(tablaDatosIncidencias,posY)
+    
+    
     doc.end();
-
-    return {
-      message: "Reporte generado exitosamente",
-      success: true,
-      status: 200,
-    };
   } catch (error) {
     return {
       message: error,

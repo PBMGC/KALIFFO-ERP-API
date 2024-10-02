@@ -22,6 +22,8 @@ import { log } from "console";
 import { _createTienda } from "../service/tienda";
 import { _createUsuario } from "../service/usuario";
 import { query } from "./query";
+import { _createProducto, _createProductoDetalle, _createProductoTalla } from "../service/producto";
+import { _createColor } from "../service/color";
 
 const tiendas: any = [
   {
@@ -121,6 +123,42 @@ const colores: any = [
   { nombre: "Fucsia", codigo: "FF00FF" },
   { nombre: "Verde Menta", codigo: "98FF98" },
 ];
+
+const productos:any =[
+  {
+    nombre:"Premium",stockTotal:0,precioBase:12,descuento:12
+  },
+  {
+    nombre:"Drill",stockTotal:0,precioBase:11,descuento:12
+  },
+  {
+    nombre:"Strech",stockTotal:0,precioBase:11,descuento:12
+  }
+]
+
+const productodetalle:any=[
+  {
+    producto_id:1,color_id:1,tienda_id:1,stock:0
+  },
+  {
+    producto_id:1,color_id:2,tienda_id:1,stock:0
+  },
+  {
+    producto_id:1,color_id:3,tienda_id:1,stock:0
+  }
+]
+
+const productoTalla:any=[
+  {
+    productoDetalle_id:46,talla:"28",codigo:"PP28J"
+  },
+  {
+    productoDetalle_id:47,talla:"30",codigo:"PP30J"
+  },
+  {
+    productoDetalle_id:48,talla:"31",codigo:"PP31J"
+  }
+]
 
 // const pagos: PagoInterface[] = [
 //   {
@@ -308,6 +346,53 @@ const createUsuario = async () => {
   }
 };
 
+const createProducto = async () =>{
+  try {
+    for(const producto of productos){
+      const result = await query("SELECT * FROM producto WHERE nombre = ?", [
+        producto.nombre,
+      ]);
+      if(result.data.length===0){
+        await _createProducto(producto)
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const createProductoDetalle = async () =>{
+  try {
+    for(const producto of productodetalle){
+      const result = await query("SELECT * FROM productoDetalle WHERE tienda_id = ? AND producto_id = ? AND color_id = ? ", [
+        producto.tienda_id,
+        producto.producto_id,
+        producto.color_id
+      ]);
+      if(result.data.length===0){
+        await _createProductoDetalle(producto)
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const createProductoTalla = async () =>{
+  try {
+    for(const producto of productoTalla){
+      const result = await query("SELECT * FROM productoTalla WHERE codigo = ?", [
+        producto.codigo
+      ]);
+      if(result.data.length===0){
+        await _createProductoTalla(producto)
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // const createHorario = async () => {
 //   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
 //     await sequelize.query(`
@@ -319,21 +404,21 @@ const createUsuario = async () => {
 //     `);
 //   }
 // };
-// const createColores = async () => {
-//   for (const color of colores) {
-//     const colorExistente = await Color.findOne({
-//       where: { nombre: color.nombre },
-//     });
-
-//     const newColor = {
-//       nombre: color.nombre,
-//       codigo: color.codigo,
-//     };
-//     if (!colorExistente) {
-//       await _createColor(newColor);
-//     }
-//   }
-// };
+  const createColores = async () => {
+    try {
+      for (const color of colores) {
+        const result = await query("SELECT * FROM color WHERE codigo = ?", [
+          color.codigo,
+        ]);
+  
+        if(result.data.length===0){
+          await _createColor(color)
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
 // const createProducto = async () => {
 //   for (const producto of productos) {
@@ -380,6 +465,10 @@ const createUsuario = async () => {
 export const scriptInicio = async () => {
   createTienda();
   createUsuario();
+  createColores();
+  createProducto();
+  createProductoDetalle();
+  createProductoTalla();
   // createColores();
   // createProducto();
 };
