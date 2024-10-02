@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS color (
 
 const productoDetalle = `
   CREATE TABLE IF NOT EXISTS productoDetalle (
-    productoDetalle_id INT AUTO_INCREMENT PRIMARY KEY,  -- Agrega un ID único para cada detalle del producto.
+    productoDetalle_id INT AUTO_INCREMENT PRIMARY KEY, 
     producto_id INT NOT NULL,
     color_id INT NOT NULL,
     tienda_id INT NOT NULL,
@@ -157,17 +157,17 @@ export const initBD = async () => {
 
   if (conn) {
     try {
-      const [resultTienda] = await conn.execute(tienda);
-      const [resultUsuario] = await conn.execute(usuario);
-      const [resultHorario] = await conn.execute(horario);
-      const [resultIncidencia] = await conn.execute(incidencia);
-      const [resultProducto] = await conn.execute(producto);
-      const [resultColor] = await conn.execute(color);
-      const [resultProductoDetalle] = await conn.execute(productoDetalle);
-      const [resultProductoTalla] = await conn.execute(productoTalla);
-      const [resultPago] = await conn.execute(pago);
-      const [resultVenta] = await conn.execute(venta);
-      const [resultDetalleVenta] = await conn.execute(detalleVenta);
+      await conn.execute(tienda);
+      await conn.execute(usuario);
+      await conn.execute(horario);
+      await conn.execute(incidencia);
+      await conn.execute(producto);
+      await conn.execute(color);
+      await conn.execute(productoDetalle);
+      await conn.execute(productoTalla);
+      await conn.execute(pago);
+      await conn.execute(venta);
+      await conn.execute(detalleVenta);
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {

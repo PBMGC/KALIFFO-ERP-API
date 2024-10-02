@@ -4,9 +4,9 @@ import { router } from "../routes";
 import cookieParser from "cookie-parser";
 import { initCronJobs } from "../job/correo";
 import { initBD } from "../util/initBD";
-import { scriptInicio } from "../util/script";
 import { initProcedure } from "../util/initProcedure";
 import morgan from "morgan";
+import { initSeeders } from "../seeders/initSeeders";
 
 class Serve {
   app: express.Application;
@@ -48,7 +48,7 @@ class Serve {
   async db() {
     try {
       await initBD();
-      await scriptInicio();
+      await initSeeders();
       await initProcedure();
     } catch (error) {
       console.log(error);
