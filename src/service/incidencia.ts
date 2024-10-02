@@ -2,12 +2,12 @@ import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-  const { descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
+  const { tipo,descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
   incidencia.fecha_creacion = new Date();
 
   const query = `
-    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion)
-    VALUES (?, ?, ?)`;
+    INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
+    VALUES (?,?, ?, ?)`;
 
   let conn;
 
@@ -19,12 +19,13 @@ export const _createIncidencia = async (incidencia: any) => {
     }
 
     const [result] = await conn.execute(query, [
+      tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
     ]);
     return {
-      message: result,
+      message:"EXITO AL AÑADIR",
       success: true,
       status: 201,
     };
@@ -48,10 +49,12 @@ export const _getIncidencias = async (usuario_id?: number) => {
     : `SELECT * FROM incidencia`;
 
   try {
-    const result = await query(consulta);
+    const result = await query(consulta,[usuario_id]) as any;
+
+    console.log(result.data)
 
     return {
-      items: result,
+      items: result.data,
       success: true,
       status: 200,
     };
@@ -151,24 +154,16 @@ export const _updateIncidencia = async (
   incidencia_id: number,
   updatedIncidencia: any
 ) => {
-  const { descripcion, usuario_id } = updatedIncidencia;
-  const query = `
-    UPDATE incidencia SET descripcion = ?, usuario_id = ? WHERE incidencia_id = ?`;
-
-  let conn;
+  const { tipo ,descripcion } = updatedIncidencia;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [result] = (await conn.execute(query, [
-      descripcion,
-      usuario_id,
+    const result = await query(`CALL SP_UpdateIncidencia(?,?,?,?)`,[
       incidencia_id,
-    ])) as any;
+      tipo||null,
+      descripcion||null,
+      null,
+    ])
 
     if (result.affectedRows === 0) {
       return {
@@ -190,9 +185,5 @@ export const _updateIncidencia = async (
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
