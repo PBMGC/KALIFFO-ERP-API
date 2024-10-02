@@ -114,7 +114,7 @@ export const _getUsuario = async (usuario_id: string) => {
     });
 
     return {
-      items:usuariosData,
+      items:usuariosData[0],
       success:true,
       status:200
     }
