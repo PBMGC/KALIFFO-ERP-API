@@ -21,12 +21,16 @@ CREATE TRIGGER `TR_DELproductodetalle` AFTER DELETE ON `productoDetalle`
     WHERE producto.idproducto = OLD.producto_id;
 END
 
-CREATE TRIGGER `TR_UPDProductoDetalle` BEFORE UPDATE ON `productoDetalle`
- FOR EACH ROW BEGIN
+
+CREATE TRIGGER `TR_INS_productodetalle` 
+AFTER UPDATE ON `productodetalle`
+FOR EACH ROW 
+BEGIN
+    -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
     UPDATE producto 
-    SET stocktotal = stocktotal + (NEW.stock - OLD.stock) 
-    WHERE producto.idproducto = NEW.producto_id; 
-END
+    SET producto.stockTotal = producto.stockTotal - OLD.stock + NEW.stock
+    WHERE producto.producto_id = NEW.producto_id;
+END$$
 
 CREATE TRIGGER `TR_INSproductoTalla` BEFORE INSERT ON `productoTalla`
  FOR EACH ROW BEGIN

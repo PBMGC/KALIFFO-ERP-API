@@ -2,29 +2,25 @@ import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-  const { descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
+  const { tipo,descripcion, usuario_id } = incidencia; 
   incidencia.fecha_creacion = new Date();
 
-  const query = `
-    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion)
-    VALUES (?, ?, ?)`;
+  const queryS = `
+    INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
+    VALUES (?,?, ?, ?)`;
 
-  let conn;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [result] = await conn.execute(query, [
+    const [result] = await query(queryS, [
+      tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
-    ]);
+    ]) as any;
+
     return {
-      message: result,
+      message:"EXITO AL AÑADIR",
       success: true,
       status: 201,
     };
@@ -35,10 +31,6 @@ export const _createIncidencia = async (incidencia: any) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
@@ -48,10 +40,10 @@ export const _getIncidencias = async (usuario_id?: number) => {
     : `SELECT * FROM incidencia`;
 
   try {
-    const result = await query(consulta);
+    const result = await query(consulta,[usuario_id]) as any;
 
     return {
-      items: result,
+      items: result.data,
       success: true,
       status: 200,
     };
@@ -66,18 +58,11 @@ export const _getIncidencias = async (usuario_id?: number) => {
 };
 
 export const _getIncidencia = async (incidencia_id: number) => {
-  const query = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
-
-  let conn;
+  const queryS = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [item] = (await conn.execute(query, [incidencia_id])) as any;
+    const [item] = await query(queryS,[incidencia_id]) as any;
 
     if (item.length === 0) {
       return {
@@ -99,26 +84,15 @@ export const _getIncidencia = async (incidencia_id: number) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
 export const _deleteIncidencia = async (incidencia_id: number) => {
-  const query = `DELETE FROM incidencia WHERE incidencia_id = ?`;
-
-  let conn;
+  const queryS = `DELETE FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-    conn = await connection();
-
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const result = (await conn.execute(query, [incidencia_id])) as any;
+  
+    const result = await query(queryS,[incidencia_id]) as any;
 
     if (result[0].affectedRows === 0) {
       return {
@@ -140,10 +114,6 @@ export const _deleteIncidencia = async (incidencia_id: number) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
@@ -151,24 +121,16 @@ export const _updateIncidencia = async (
   incidencia_id: number,
   updatedIncidencia: any
 ) => {
-  const { descripcion, usuario_id } = updatedIncidencia;
-  const query = `
-    UPDATE incidencia SET descripcion = ?, usuario_id = ? WHERE incidencia_id = ?`;
-
-  let conn;
+  const { tipo ,descripcion } = updatedIncidencia;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [result] = (await conn.execute(query, [
-      descripcion,
-      usuario_id,
+    const result = await query(`CALL SP_UpdateIncidencia(?,?,?,?)`,[
       incidencia_id,
-    ])) as any;
+      tipo||null,
+      descripcion||null,
+      null,
+    ])
 
     if (result.affectedRows === 0) {
       return {
@@ -190,9 +152,5 @@ export const _updateIncidencia = async (
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
