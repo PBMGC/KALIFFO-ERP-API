@@ -2,28 +2,23 @@ import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-  const { tipo,descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
+  const { tipo,descripcion, usuario_id } = incidencia; 
   incidencia.fecha_creacion = new Date();
 
-  const query = `
+  const queryS = `
     INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
     VALUES (?,?, ?, ?)`;
 
-  let conn;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [result] = await conn.execute(query, [
+    const [result] = await query(queryS, [
       tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
-    ]);
+    ]) as any;
+
     return {
       message:"EXITO AL AÑADIR",
       success: true,
@@ -36,10 +31,6 @@ export const _createIncidencia = async (incidencia: any) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
@@ -50,8 +41,6 @@ export const _getIncidencias = async (usuario_id?: number) => {
 
   try {
     const result = await query(consulta,[usuario_id]) as any;
-
-    console.log(result.data)
 
     return {
       items: result.data,
@@ -69,18 +58,11 @@ export const _getIncidencias = async (usuario_id?: number) => {
 };
 
 export const _getIncidencia = async (incidencia_id: number) => {
-  const query = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
-
-  let conn;
+  const queryS = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-    conn = await connection();
 
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const [item] = (await conn.execute(query, [incidencia_id])) as any;
+    const [item] = await query(queryS,[incidencia_id]) as any;
 
     if (item.length === 0) {
       return {
@@ -102,26 +84,15 @@ export const _getIncidencia = async (incidencia_id: number) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
 export const _deleteIncidencia = async (incidencia_id: number) => {
-  const query = `DELETE FROM incidencia WHERE incidencia_id = ?`;
-
-  let conn;
+  const queryS = `DELETE FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-    conn = await connection();
-
-    if (!conn) {
-      throw new Error("No se pudo establecer la conexión a la base de datos.");
-    }
-
-    const result = (await conn.execute(query, [incidencia_id])) as any;
+  
+    const result = await query(queryS,[incidencia_id]) as any;
 
     if (result[0].affectedRows === 0) {
       return {
@@ -143,10 +114,6 @@ export const _deleteIncidencia = async (incidencia_id: number) => {
       success: false,
       status: 500,
     };
-  } finally {
-    if (conn) {
-      await conn.end();
-    }
   }
 };
 
