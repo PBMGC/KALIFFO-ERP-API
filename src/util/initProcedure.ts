@@ -307,6 +307,22 @@ export const initiProcedureGetProductoTienda = async () =>{
 }
 
 
+const queryGetLoseProductosTienda =`
+SELECT producto.nombre, producto.producto_id 
+FROM producto
+INNER JOIN productodetalle pd1 ON producto.producto_id = pd1.producto_id
+LEFT JOIN productodetalle pd2 ON producto.producto_id = pd2.producto_id AND pd2.tienda_id = t_id
+WHERE pd1.tienda_id != t_id
+AND pd2.producto_id IS NULL
+GROUP BY producto.producto_id;
+`;
+
+export const initiProcedureGetLoseProductosTienda = async () =>{
+  await eliminarProcedimiento("SP_GetLoseProductosTienda");
+  await crearProcedimiento("SP_GetLoseProductosTienda",queryGetLoseProductosTienda,"IN t_id INT")
+}
+
+
 
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
@@ -321,4 +337,5 @@ export const initProcedure = async () => {
   await initiProcedureGetTienda();
   await initProcedureDeletePago();
   await initiProcedureGetProductoTienda();
+  await initiProcedureGetLoseProductosTienda();
 };
