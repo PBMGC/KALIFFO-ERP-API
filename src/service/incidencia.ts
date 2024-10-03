@@ -1,4 +1,3 @@
-import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
@@ -7,15 +6,15 @@ export const _createIncidencia = async (incidencia: any) => {
 
   const queryS = `
     INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
-    VALUES (?,?, ?, ?)`;
+    VALUES (?, ?, ?, ?)`;
 
   try {
-    const [result] = (await query(queryS, [
+    const result = await query(queryS, [
       tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
-    ])) as any;
+    ]);
 
     return {
       message: "EXITO AL AÑADIR",
