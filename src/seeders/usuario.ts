@@ -1,3 +1,4 @@
+import { _createAsistencia } from "../service/asistencia";
 import { _createIncidencia } from "../service/incidencia";
 import { _createPago } from "../service/pago";
 import { _createUsuario } from "../service/usuario";
@@ -201,143 +202,119 @@ const incidencias: any = [
   },
 ];
 
-const horarios: any = [
+const horarios = [
   {
-    horario_id: 1,
-    hora_entrada: "09:00:00",
-    hora_salida: "16:00:00",
+    hora_entrada: "09:15:40",
+    hora_salida: "16:40:03",
     fecha: "2024-08-24",
     usuario_id: 1,
   },
   {
-    horario_id: 2,
-    hora_entrada: "09:00:00",
-    hora_salida: "17:00:00",
+    hora_entrada: "09:05:12",
+    hora_salida: "17:22:45",
     fecha: "2024-08-19",
     usuario_id: 1,
   },
   {
-    horario_id: 3,
-    hora_entrada: "09:00:00",
-    hora_salida: "14:00:00",
+    hora_entrada: "09:12:56",
+    hora_salida: "14:30:21",
     fecha: "2024-08-18",
     usuario_id: 1,
   },
   {
-    horario_id: 4,
-    hora_entrada: "09:00:00",
-    hora_salida: "12:00:00",
+    hora_entrada: "09:00:36",
+    hora_salida: "12:15:58",
     fecha: "2024-08-14",
     usuario_id: 1,
   },
   {
-    horario_id: 5,
-    hora_entrada: "08:00:00",
-    hora_salida: "15:00:00",
+    hora_entrada: "08:10:11",
+    hora_salida: "15:05:55",
     fecha: "2024-08-24",
     usuario_id: 2,
   },
   {
-    horario_id: 6,
-    hora_entrada: "08:00:00",
-    hora_salida: "16:00:00",
+    hora_entrada: "08:25:28",
+    hora_salida: "16:15:30",
     fecha: "2024-08-19",
     usuario_id: 2,
   },
   {
-    horario_id: 7,
-    hora_entrada: "07:30:00",
-    hora_salida: "14:00:00",
+    hora_entrada: "07:45:07",
+    hora_salida: "14:50:22",
     fecha: "2024-08-18",
     usuario_id: 2,
   },
   {
-    horario_id: 8,
-    hora_entrada: "10:00:00",
-    hora_salida: "12:00:00",
+    hora_entrada: "10:03:19",
+    hora_salida: "12:40:11",
     fecha: "2024-08-14",
     usuario_id: 2,
   },
   {
-    horario_id: 9,
-    hora_entrada: "09:00:00",
-    hora_salida: "15:00:00",
+    hora_entrada: "09:00:49",
+    hora_salida: "15:23:14",
     fecha: "2024-08-24",
     usuario_id: 3,
   },
   {
-    horario_id: 10,
-    hora_entrada: "09:00:00",
-    hora_salida: "17:00:00",
+    hora_entrada: "09:12:40",
+    hora_salida: "17:05:32",
     fecha: "2024-08-19",
     usuario_id: 3,
   },
   {
-    horario_id: 11,
-    hora_entrada: "09:00:00",
-    hora_salida: "14:00:00",
+    hora_entrada: "09:30:01",
+    hora_salida: "14:30:29",
     fecha: "2024-08-18",
     usuario_id: 3,
   },
   {
-    horario_id: 12,
-    hora_entrada: "09:00:00",
-    hora_salida: "12:00:00",
+    hora_entrada: "09:05:12",
+    hora_salida: "12:22:40",
     fecha: "2024-08-14",
     usuario_id: 3,
   },
   {
-    horario_id: 13,
-    hora_entrada: "10:00:00",
-    hora_salida: "18:00:00",
+    hora_entrada: "10:20:34",
+    hora_salida: "18:45:50",
     fecha: "2024-08-24",
     usuario_id: 4,
   },
   {
-    horario_id: 14,
-    hora_entrada: "10:00:00",
-    hora_salida: "16:00:00",
+    hora_entrada: "10:15:22",
+    hora_salida: "16:32:11",
     fecha: "2024-08-19",
     usuario_id: 4,
   },
   {
-    horario_id: 15,
-    hora_entrada: "10:00:00",
-    hora_salida: "14:00:00",
+    hora_entrada: "10:02:17",
+    hora_salida: "14:19:30",
     fecha: "2024-08-18",
     usuario_id: 4,
   },
   {
-    horario_id: 16,
-    hora_entrada: "10:00:00",
-    hora_salida: "12:00:00",
+    hora_entrada: "10:05:08",
+    hora_salida: "12:45:33",
     fecha: "2024-08-14",
     usuario_id: 4,
   },
 ];
 
-// const createHorario = async () => {
-
-//   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
-//     await sequelize.query(`
-//       INSERT INTO horario (hora_entrada, hora_salida, fecha, usuario_id) VALUES
-//       ('09:00:00', '16:00:00', '2024-08-24', 1),
-//       ('09:00:00', '17:00:00', '2024-08-19', 1),
-//       ('09:00:00', '14:00:00', '2024-08-18', 1),
-//       ('09:00:00', '12:00:00', '2024-08-14', 1);
-//     `);
-//   }
-// };
-
-const createIncidencias = async () => {
-  for (const incidencia of incidencias) {
+const createHorarios = async () => {
+  for (const horario of horarios) {
     const result = await query(
-      `select * from incidencia where descripcion = ?`,
-      [incidencia.descripcion]
+      `select * from horario where hora_entrada = ? and hora_salida = ? and usuario_id = ?`,
+      [
+        horario.hora_entrada,
+        horario.hora_salida,
+        // horario.fecha,
+        horario.usuario_id,
+      ]
     );
 
     if (result.data.length === 0) {
-      await _createIncidencia(incidencia);
+      await _createAsistencia(horario);
     }
   }
 };
@@ -354,11 +331,25 @@ export const createUsuario = async () => {
       }
     }
 
-    await createPago();
     await createIncidencias();
+    await createPago();
+    await createHorarios();
   } catch (error) {
     console.log("Error en createUsuario:", error);
   }
+};
+const createIncidencias = async () => {
+  for (const incidencia of incidencias) {
+    const result = await query(
+      `select * from incidencia where descripcion = ?`,
+      [incidencia.descripcion]
+    );
+
+    if (result.data.length === 0) {
+      await _createIncidencia(incidencia);
+    }
+  }
+  // await createHorarios();
 };
 
 export const createPago = async () => {

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { validateToken } from "../middleware/validateToken";
+import { getAsistencias } from "../controller/asistencia";
 // import {
 //   deleteAsistencia,
 //   finalAsitencia,
@@ -8,6 +9,8 @@ import { validateToken } from "../middleware/validateToken";
 // } from "../controller/usuario";
 
 const router = Router();
+
+router.get("", getAsistencias);
 
 // router.get("/inicio", validateToken, inicioAsistencia);
 // router.get("/final", validateToken, finalAsitencia);
