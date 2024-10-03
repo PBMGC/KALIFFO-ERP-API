@@ -2,40 +2,23 @@ import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-<<<<<<< HEAD
-  const { descripcion, usuario_id, tipo } = incidencia;
-  incidencia.fecha_creacion = new Date();
-
-  const query = `
-    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion, tipo)
-    VALUES (?, ?, ?, ?)`;
-=======
-  const { tipo,descripcion, usuario_id } = incidencia; 
+  const { tipo, descripcion, usuario_id } = incidencia;
   incidencia.fecha_creacion = new Date();
 
   const queryS = `
     INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
     VALUES (?,?, ?, ?)`;
->>>>>>> 5c70c684a01c8837aa59fe9fa521abeaa8e654e1
-
 
   try {
-
-    const [result] = await query(queryS, [
+    const [result] = (await query(queryS, [
       tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
-<<<<<<< HEAD
-      ,
-      tipo,
-    ]);
-=======
-    ]) as any;
+    ])) as any;
 
->>>>>>> 5c70c684a01c8837aa59fe9fa521abeaa8e654e1
     return {
-      message:"EXITO AL AÑADIR",
+      message: "EXITO AL AÑADIR",
       success: true,
       status: 201,
     };
@@ -55,11 +38,7 @@ export const _getIncidencias = async (usuario_id?: number) => {
     : `SELECT * FROM incidencia`;
 
   try {
-<<<<<<< HEAD
-    const result = await query(consulta, [usuario_id]);
-=======
-    const result = await query(consulta,[usuario_id]) as any;
->>>>>>> 5c70c684a01c8837aa59fe9fa521abeaa8e654e1
+    const result = (await query(consulta, [usuario_id])) as any;
 
     return {
       items: result.data,
@@ -80,8 +59,7 @@ export const _getIncidencia = async (incidencia_id: number) => {
   const queryS = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-
-    const [item] = await query(queryS,[incidencia_id]) as any;
+    const [item] = (await query(queryS, [incidencia_id])) as any;
 
     if (item.length === 0) {
       return {
@@ -110,8 +88,7 @@ export const _deleteIncidencia = async (incidencia_id: number) => {
   const queryS = `DELETE FROM incidencia WHERE incidencia_id = ?`;
 
   try {
-  
-    const result = await query(queryS,[incidencia_id]) as any;
+    const result = (await query(queryS, [incidencia_id])) as any;
 
     if (result[0].affectedRows === 0) {
       return {
@@ -140,16 +117,15 @@ export const _updateIncidencia = async (
   incidencia_id: number,
   updatedIncidencia: any
 ) => {
-  const { tipo ,descripcion } = updatedIncidencia;
+  const { tipo, descripcion } = updatedIncidencia;
 
   try {
-
-    const result = await query(`CALL SP_UpdateIncidencia(?,?,?,?)`,[
+    const result = await query(`CALL SP_UpdateIncidencia(?,?,?,?)`, [
       incidencia_id,
-      tipo||null,
-      descripcion||null,
+      tipo || null,
+      descripcion || null,
       null,
-    ])
+    ]);
 
     if (result.affectedRows === 0) {
       return {

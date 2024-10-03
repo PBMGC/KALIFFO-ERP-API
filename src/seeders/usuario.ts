@@ -201,7 +201,123 @@ const incidencias: any = [
   },
 ];
 
+const horarios: any = [
+  {
+    horario_id: 1,
+    hora_entrada: "09:00:00",
+    hora_salida: "16:00:00",
+    fecha: "2024-08-24",
+    usuario_id: 1,
+  },
+  {
+    horario_id: 2,
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-19",
+    usuario_id: 1,
+  },
+  {
+    horario_id: 3,
+    hora_entrada: "09:00:00",
+    hora_salida: "14:00:00",
+    fecha: "2024-08-18",
+    usuario_id: 1,
+  },
+  {
+    horario_id: 4,
+    hora_entrada: "09:00:00",
+    hora_salida: "12:00:00",
+    fecha: "2024-08-14",
+    usuario_id: 1,
+  },
+  {
+    horario_id: 5,
+    hora_entrada: "08:00:00",
+    hora_salida: "15:00:00",
+    fecha: "2024-08-24",
+    usuario_id: 2,
+  },
+  {
+    horario_id: 6,
+    hora_entrada: "08:00:00",
+    hora_salida: "16:00:00",
+    fecha: "2024-08-19",
+    usuario_id: 2,
+  },
+  {
+    horario_id: 7,
+    hora_entrada: "07:30:00",
+    hora_salida: "14:00:00",
+    fecha: "2024-08-18",
+    usuario_id: 2,
+  },
+  {
+    horario_id: 8,
+    hora_entrada: "10:00:00",
+    hora_salida: "12:00:00",
+    fecha: "2024-08-14",
+    usuario_id: 2,
+  },
+  {
+    horario_id: 9,
+    hora_entrada: "09:00:00",
+    hora_salida: "15:00:00",
+    fecha: "2024-08-24",
+    usuario_id: 3,
+  },
+  {
+    horario_id: 10,
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-19",
+    usuario_id: 3,
+  },
+  {
+    horario_id: 11,
+    hora_entrada: "09:00:00",
+    hora_salida: "14:00:00",
+    fecha: "2024-08-18",
+    usuario_id: 3,
+  },
+  {
+    horario_id: 12,
+    hora_entrada: "09:00:00",
+    hora_salida: "12:00:00",
+    fecha: "2024-08-14",
+    usuario_id: 3,
+  },
+  {
+    horario_id: 13,
+    hora_entrada: "10:00:00",
+    hora_salida: "18:00:00",
+    fecha: "2024-08-24",
+    usuario_id: 4,
+  },
+  {
+    horario_id: 14,
+    hora_entrada: "10:00:00",
+    hora_salida: "16:00:00",
+    fecha: "2024-08-19",
+    usuario_id: 4,
+  },
+  {
+    horario_id: 15,
+    hora_entrada: "10:00:00",
+    hora_salida: "14:00:00",
+    fecha: "2024-08-18",
+    usuario_id: 4,
+  },
+  {
+    horario_id: 16,
+    hora_entrada: "10:00:00",
+    hora_salida: "12:00:00",
+    fecha: "2024-08-14",
+    usuario_id: 4,
+  },
+];
+
 // const createHorario = async () => {
+
 //   if (!(await Horario.findOne({ where: { usuario_id: 1 } }))) {
 //     await sequelize.query(`
 //       INSERT INTO horario (hora_entrada, hora_salida, fecha, usuario_id) VALUES
