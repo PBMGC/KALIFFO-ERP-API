@@ -38,3 +38,10 @@ CREATE TRIGGER `TR_INSproductoTalla` BEFORE INSERT ON `productoTalla`
     SET productoDetalle.stock = productoDetalle.stock + 1 
     WHERE productoDetalle.productoDetalle_id = NEW.productoDetalle_id;
 END
+CREATE TRIGGER `TR_INS_productodetalle` AFTER INSERT ON `productodetalle`
+ FOR EACH ROW BEGIN
+    -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
+    UPDATE producto 
+    SET producto.stockTotal = producto.stockTotal + NEW.stock
+    WHERE producto.producto_id = NEW.producto_id;
+END
