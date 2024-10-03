@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createProducto,
   deleteProducto,
+  getColoresProducto,
   // getColoresProducto,
   getProducto,
   getProductos,
@@ -17,7 +18,7 @@ const router = Router();
 router.get("/", getProductos);
 
 router.get("/lose/:tienda_id", loseProducto);
-// router.get("/colores/:producto_id",getColoresProducto)
+router.get("/colores/:producto_id",getColoresProducto)
 
 router.get("/:producto_id", getProducto);
 

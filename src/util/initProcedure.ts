@@ -30,10 +30,11 @@ const eliminarProcedimiento = async (nombre: string) => {
 
 //consulta
 const queryColoresProductos = `
-  SELECT c.color_id, c.nombre
+  SELECT c.*
   FROM color c
   INNER JOIN productodetalle p ON c.color_id = p.color_id
-  WHERE p.producto_id = id_p;
+  WHERE p.producto_id = id_p
+  GROUP BY c.color_id;
 `;
 
 export const initProcedureColoresProductos = async () => {

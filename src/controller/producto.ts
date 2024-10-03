@@ -4,6 +4,7 @@ import {
   _createProducto,
   _createProductoDetalle,
   _deleteProducto,
+  _getColoresProducto,
   _getProducto,
   _getProductos,
   _getProductosTienda,
@@ -115,13 +116,13 @@ export const loseProducto = async (req: Request, res: Response) => {
   }
 };
 
-// export const getColoresProducto = async (req: Request, res: Response) => {
-//   const { producto_id } = req.params;
+export const getColoresProducto = async (req: Request, res: Response) => {
+  const { producto_id } = req.params;
 
-//   try {
-//     const response = await _getColoresProducto(Number(producto_id));
-//     res.status(response.status).json(response.data);
-//   } catch (error) {
-//     handleHttp(res, "error ", 500);
-//   }
-// };
+  try {
+    const response = await _getColoresProducto(Number(producto_id));
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error ", 500);
+  }
+};
