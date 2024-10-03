@@ -26,7 +26,7 @@ export const getIncidencias = async (req: Request, res: Response) => {
     const response = await _getIncidencias(Number(usuario_id));
     res
       .status(response.status)
-      .json(response.items ? response.items : response);
+      .json(response.items);
   } catch (error) {
     handleHttp(res, "error_getIncidencias", 500);
   }
@@ -55,13 +55,12 @@ export const deleteIncidencia = async (req: Request, res: Response) => {
 
 export const updateIncidencia = async (req: Request, res: Response) => {
   const { incidencia_id } = req.params;
-  const { tipo, descripcion, usuario_id } = req.body;
+  const { tipo, descripcion } = req.body;
 
   try {
     const response = await _updateIncidencia(Number(incidencia_id), {
       tipo,
-      descripcion,
-      usuario_id,
+      descripcion
     });
     res.status(response.status).json(response);
   } catch (error) {
