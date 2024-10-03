@@ -215,12 +215,14 @@ export const _loseProductos = async (tienda_id: string) => {
 
 export const _getColoresProducto = async (producto_id: number) => {
   try {
-    const [data] = (await query(`CALL SP_ColoresProductos(?);`, [
+    const consulta = (await query(`CALL SP_ColoresProductos(?);`, [
       producto_id,
     ])) as any;
 
+    console.log(consulta.data[0])
+
     return {
-      data,
+      items:consulta.data[0],
       success: true,
       status: 200,
     };
