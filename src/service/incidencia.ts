@@ -2,12 +2,12 @@ import connection from "../db/connection";
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-  const { descripcion, usuario_id } = incidencia; // Asumiendo que tienes una descripción y un usuario ID
+  const { descripcion, usuario_id, tipo } = incidencia;
   incidencia.fecha_creacion = new Date();
 
   const query = `
-    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion)
-    VALUES (?, ?, ?)`;
+    INSERT INTO incidencia (descripcion, usuario_id, fecha_creacion, tipo)
+    VALUES (?, ?, ?, ?)`;
 
   let conn;
 
@@ -22,6 +22,8 @@ export const _createIncidencia = async (incidencia: any) => {
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
+      ,
+      tipo,
     ]);
     return {
       message: result,
@@ -48,10 +50,10 @@ export const _getIncidencias = async (usuario_id?: number) => {
     : `SELECT * FROM incidencia`;
 
   try {
-    const result = await query(consulta);
+    const result = await query(consulta, [usuario_id]);
 
     return {
-      items: result,
+      items: result.data,
       success: true,
       status: 200,
     };
