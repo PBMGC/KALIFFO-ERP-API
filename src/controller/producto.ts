@@ -7,6 +7,7 @@ import {
   _getProducto,
   _getProductos,
   _getProductosTienda,
+  _loseProductos,
   _updateProducto,
 } from "../service/producto";
 import { handleHttp } from "../util/error.handler";
@@ -103,16 +104,16 @@ export const deleteProducto = async (req: Request, res: Response) => {
   }
 };
 
-// export const loseProducto = async (req: Request, res: Response) => {
-//   const { tienda_id } = req.params;
+export const loseProducto = async (req: Request, res: Response) => {
+  const { tienda_id } = req.params;
 
-//   try {
-//     const response = await _loseProductos(tienda_id);
-//     res.status(response.status).json(response.items);
-//   } catch (error) {
-//     handleHttp(res, "error_updateProducto", 500);
-//   }
-// };
+  try {
+    const response = await _loseProductos(tienda_id);
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error_updateProducto", 500);
+  }
+};
 
 // export const getColoresProducto = async (req: Request, res: Response) => {
 //   const { producto_id } = req.params;

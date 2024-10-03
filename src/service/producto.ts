@@ -197,27 +197,9 @@ export const _deleteProducto = async (producto_id: number) => {
 
 export const _loseProductos = async (tienda_id: string) => {
   try {
-    const consulta = (await query(
-      `
-      SELECT DISTINCT p.producto_id, p.nombre
-      FROM productoTienda pt
-      INNER JOIN productoDetalle pd ON pd.productoDetalle_id = pt.productoDetalle_id
-      INNER JOIN producto p ON p.producto_id = pd.producto_id
-      LEFT JOIN (
-          SELECT p2.producto_id
-          FROM productoTienda pt2
-          INNER JOIN productoDetalle pd2 ON pd2.productoDetalle_id = pt2.productoDetalle_id
-          INNER JOIN producto p2 ON p2.producto_id = pd2.producto_id
-          WHERE pt2.tienda_id = ?
-      ) AS excluidos ON excluidos.producto_id = p.producto_id
-      WHERE pt.tienda_id != ? AND excluidos.producto_id IS NULL
-      GROUP BY p.producto_id;
-    `,
-      [tienda_id, tienda_id]
-    )) as any;
-
+    const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`,[tienda_id])) as any;
     return {
-      items: consulta[0],
+      items: consulta.data[0],
       success: true,
       status: 202,
     };
