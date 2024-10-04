@@ -11,7 +11,6 @@ import {
   // loseProducto,
   updateProducto,
 } from "../controller/producto";
-import { createProductoDetalle } from "../seeders/producto";
 
 const router = Router();
 
@@ -26,7 +25,7 @@ router.get("/tienda/:tienda_id",getProductosTienda)
 
 router.post("/create", createProducto);
 
-router.post("/detalle/create", createProductoDetalle);
+// router.post("/detalle/create", createProductoDetalle);
 
 router.put("/update/:producto_id", updateProducto);
 

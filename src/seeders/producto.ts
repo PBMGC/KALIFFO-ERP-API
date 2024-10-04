@@ -340,12 +340,11 @@ export const createProductoDetalle = async () => {
   for (const productoDetalle of productoDetalles) {
     try {
       const result = await query(
-        "select * from productoDetalle where producto_id = ? and color_id = ? and tienda_id = ? and stock = ?",
+        "select * from productoDetalle where producto_id = ? and color_id = ? and tienda_id = ?",
         [
           productoDetalle.producto_id,
           productoDetalle.color_id,
-          productoDetalle.tienda_id,
-          productoDetalle.stock,
+          productoDetalle.tienda_id
         ]
       );
 
