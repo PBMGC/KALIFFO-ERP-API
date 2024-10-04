@@ -103,6 +103,65 @@ export const _createProducto = async (producto: any) => {
 //   };
 // };
 
+
+
+export const _createProductoDetalle = async (productoDetalle: any) => {
+  const { producto_id, color_id, tienda_id, stock } = productoDetalle;
+
+  const queryText = `
+        INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
+        VALUES (?, ?, ?, ?);
+  `
+
+  const result = await query(queryText, [
+    producto_id,
+    color_id,
+    tienda_id,
+    stock,
+  ]);
+
+  if (!result.success) {
+    console.error("error");
+    return {
+      message: "error _createProductoDetalle",
+      success: false,
+      status: result.status
+    };
+  }
+
+  return {
+    message: "ProductoDetalle creado con éxito.",
+    success: true,
+    status: 201,
+  };
+};
+
+export const _createProductoTalla = async (productoTalla: any) => {
+  const { productoDetalle_id, talla, codigo } = productoTalla;
+
+  const queryText = `
+        INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
+        VALUES (?, ?, ?);
+  `
+
+  const result = await query(queryText, [productoDetalle_id, talla, codigo]);
+
+  if (!result.success) {
+    console.error("error");
+    return {
+      message: "error _createProductoTalla",
+      success: false,
+      status: result.status || 500,
+    };
+  }
+
+  return {
+    message: "ProductoTalla creado con éxito.",
+    success: true,
+    status: 201,
+  };
+};
+
 export const _getProductos = async () => {
   const queryText = `SELECT * FROM producto`;
 
