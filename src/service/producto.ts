@@ -174,10 +174,10 @@ export const _updateProducto = async (producto: any) => {
   };
 };
 
-export const _deleteProducto = async (producto_id: number) => {
-  const queryText = `DELETE FROM producto WHERE producto_id = ?`;
+export const _deleteProducto = async (producto_id: number,tienda_id:number) => {
+  const queryText = `DELETE FROM productodetalle WHERE producto_id = ? AND tienda_id=?`;
 
-  const result = await query(queryText, [producto_id]);
+  const result = await query(queryText, [producto_id,tienda_id]);
 
   if (!result.success) {
     console.error("Error al borrar el producto:", result.error);
@@ -215,12 +215,14 @@ export const _loseProductos = async (tienda_id: string) => {
 
 export const _getColoresProducto = async (producto_id: number) => {
   try {
-    const [data] = (await query(`CALL SP_ColoresProductos(?);`, [
+    const consulta = (await query(`CALL SP_ColoresProductos(?);`, [
       producto_id,
     ])) as any;
 
+    console.log(consulta.data[0])
+
     return {
-      data,
+      items:consulta.data[0],
       success: true,
       status: 200,
     };
