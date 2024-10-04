@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createProducto,
+  createProductoCompleto,
   deleteProducto,
   getColoresProducto,
   // getColoresProducto,
@@ -11,18 +12,22 @@ import {
   // loseProducto,
   updateProducto,
 } from "../controller/producto";
+import { ValidateCreateProductoCompleto } from "../validation/producto";
 
 const router = Router();
 
 router.get("/", getProductos);
 
 router.get("/lose/:tienda_id", loseProducto);
-router.get("/colores/:producto_id",getColoresProducto)
-
+router.get("/colores/:producto_id", getColoresProducto);
 router.get("/:producto_id", getProducto);
+router.get("/tienda/:tienda_id", getProductosTienda);
 
-router.get("/tienda/:tienda_id",getProductosTienda)
-
+router.post(
+  "/create/detalle",
+  ValidateCreateProductoCompleto,
+  createProductoCompleto
+);
 router.post("/create", createProducto);
 
 // router.post("/detalle/create", createProductoDetalle);

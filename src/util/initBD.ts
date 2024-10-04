@@ -92,9 +92,9 @@ const productoDetalle = `
 
 const productoTalla = `
   CREATE TABLE IF NOT EXISTS productoTalla (
-    productoDetalle_id INT,
-    talla VARCHAR(20),
-    codigo VARCHAR(20),
+    productoDetalle_id INT NOT NULL,
+    talla VARCHAR(20) NOT NULL,
+    codigo VARCHAR(20) NOT NULL UNIQUE,
     FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id) ON DELETE CASCADE,
     INDEX (codigo)
   );`;

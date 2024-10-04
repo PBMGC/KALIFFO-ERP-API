@@ -1,3 +1,4 @@
+import { createCodigo } from "../util/createCodigo";
 import { query } from "../util/query";
 
 export const _createProducto = async (producto: any) => {
@@ -45,8 +46,8 @@ export const _createProducto = async (producto: any) => {
 //         detalleP.color_id,
 //         tienda_id,
 //         detalleP.stock,
-//       ]);    
-      
+//       ]);
+
 //       if(result.insertID){
 //         for(const i in Range(result.insertID)){
 //           await _createProductoTalla({result.insertID,detalleP.talla})
@@ -57,8 +58,6 @@ export const _createProducto = async (producto: any) => {
 //   }else{
 //     console.log("ADIOS")
 //   }
-
-
 
 //   // if (!result.success) {
 //   //   console.error("error");
@@ -103,15 +102,62 @@ export const _createProducto = async (producto: any) => {
 //   };
 // };
 
+export const _createProductoCompleto = async (
+  tienda_id: number,
+  detalles: any
+) => {
+  const queryTextDetalle = `
+    INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
+    VALUES (?, ?, ?, ?)`;
 
+  const queryTextTalla = `
+    INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
+    VALUES (?, ?, ?)`;
 
+  for (let detalle of detalles) {
+    // Inserción en productoDetalle
+    const resultDetalle = await query(queryTextDetalle, [
+      detalle.producto_id,
+      detalle.detalle[0].color_id,
+      tienda_id,
+      detalle.detalle[0].stock,
+    ]);
+
+    const productoDetalle_id = resultDetalle.insertId;
+
+    let codigo = await createCodigo(detalle);
+
+    const codigoExistente = await query(
+      `SELECT COUNT(*) as total FROM productoTalla WHERE codigo = ?`,
+      [codigo]
+    );
+
+    if (codigoExistente.data[0].total > 0) {
+      return {
+        message: `Ya existe producto con color_id ${detalle.detalle[0].color_id} y talla ${detalle.detalle[0].talla}`,
+        success: false,
+        status: 400,
+      };
+    }
+
+    for (let talla of detalle.detalle) {
+      await query(queryTextTalla, [productoDetalle_id, talla.talla, codigo]);
+    }
+  }
+
+  return {
+    message: "Producto creado con éxito.",
+    success: true,
+    status: 201,
+  };
+};
 export const _createProductoDetalle = async (productoDetalle: any) => {
   const { producto_id, color_id, tienda_id, stock } = productoDetalle;
 
   const queryText = `
         INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
         VALUES (?, ?, ?, ?);
-  `
+  `;
 
   const result = await query(queryText, [
     producto_id,
@@ -125,7 +171,7 @@ export const _createProductoDetalle = async (productoDetalle: any) => {
     return {
       message: "error _createProductoDetalle",
       success: false,
-      status: result.status
+      status: result.status,
     };
   }
 
@@ -142,7 +188,7 @@ export const _createProductoTalla = async (productoTalla: any) => {
   const queryText = `
         INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
         VALUES (?, ?, ?);
-  `
+  `;
 
   const result = await query(queryText, [productoDetalle_id, talla, codigo]);
 
@@ -203,7 +249,6 @@ export const _getProducto = async (producto_id: number) => {
 };
 
 export const _getProductosTienda = async (tienda_id: number) => {
-
   const result = await query(`CALL SP_GetProductosTienda(?)`, [tienda_id]);
 
   const TiendaProductosData = result.data[0].map((producto: any) => {
@@ -211,7 +256,7 @@ export const _getProductosTienda = async (tienda_id: number) => {
       ...producto,
     };
   });
-  
+
   return {
     items: TiendaProductosData,
     success: true,
@@ -251,10 +296,13 @@ export const _updateProducto = async (producto: any) => {
   };
 };
 
-export const _deleteProducto = async (producto_id: number,tienda_id:number) => {
+export const _deleteProducto = async (
+  producto_id: number,
+  tienda_id: number
+) => {
   const queryText = `DELETE FROM productodetalle WHERE producto_id = ? AND tienda_id=?`;
 
-  const result = await query(queryText, [producto_id,tienda_id]);
+  const result = await query(queryText, [producto_id, tienda_id]);
 
   if (!result.success) {
     console.error("Error al borrar el producto:", result.error);
@@ -274,7 +322,9 @@ export const _deleteProducto = async (producto_id: number,tienda_id:number) => {
 
 export const _loseProductos = async (tienda_id: string) => {
   try {
-    const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`,[tienda_id])) as any;
+    const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`, [
+      tienda_id,
+    ])) as any;
     return {
       items: consulta.data[0],
       success: true,
@@ -296,10 +346,10 @@ export const _getColoresProducto = async (producto_id: number) => {
       producto_id,
     ])) as any;
 
-    console.log(consulta.data[0])
+    console.log(consulta.data[0]);
 
     return {
-      items:consulta.data[0],
+      items: consulta.data[0],
       success: true,
       status: 200,
     };
