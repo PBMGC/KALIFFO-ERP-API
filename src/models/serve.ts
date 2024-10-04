@@ -7,6 +7,7 @@ import { initBD } from "../util/initBD";
 import { initProcedure } from "../util/initProcedure";
 import morgan from "morgan";
 import { initSeeders } from "../seeders/initSeeders";
+import { initTriggers } from "../db/triggers/initTrigger";
 
 class Serve {
   app: express.Application;
@@ -48,6 +49,7 @@ class Serve {
   async db() {
     try {
       await initBD();
+      await initTriggers();
       await initSeeders();
       await initProcedure();
     } catch (error) {
