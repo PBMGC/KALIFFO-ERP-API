@@ -326,6 +326,7 @@ export const initiProcedureGetLoseProductosTienda = async () =>{
 const queryGetDetalleProducto =`
 SET @consulta = '
     SELECT 
+        pd.productoDetalle_id,
         c.nombre AS color_nombre, 
         pd.stock
     FROM 
