@@ -30,9 +30,14 @@ export const _getPagos = async (usuario_id: number) => {
       SELECT * FROM pago WHERE usuario_id = ?;
     `;
     const result = await query(sql, [usuario_id]);
+    
+    const dataPagos = result.data.map((pago: any) => ({
+      ...pago,
+      fecha: new Date(pago.fecha).toISOString().split('T')[0] // Formato YYYY-MM-DD
+    }));
 
     return {
-      items: result.data,
+      items: dataPagos,
       success: true,
       status: 200,
     };
