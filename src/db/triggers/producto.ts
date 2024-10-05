@@ -17,3 +17,14 @@ export const createTrigger = async () => {
     console.log("Error al crear el trigger:", result.error);
   }
 };
+
+export const dropTrigger = async () => {
+  const trigger = `DROP TRIGGER IF EXISTS TR_INS_productodetalle;`;
+
+  const result = await executeDDL(trigger);
+  if (result.success) {
+    console.log("Trigger eliminado exitosamente.");
+  } else {
+    console.log("Error al eliminar el trigger:", result.error);
+  }
+};

@@ -17,6 +17,7 @@ export const query = async (consulta: string, params?: any[]) => {
       success: true,
       data: result,
       affectedRows: result.affectedRows,
+      insertId: result.insertId || null,
     };
   } catch (error) {
     console.error("Error en la consulta:", error);
