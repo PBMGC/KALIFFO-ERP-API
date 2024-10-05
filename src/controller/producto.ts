@@ -5,9 +5,11 @@ import {
   _createProductoCompleto,
   _deleteProducto,
   _getColoresProducto,
+  _getDetalleProducto,
   _getProducto,
   _getProductos,
   _getProductosTienda,
+  _getTallaProducto,
   _loseProductos,
   _updateProducto,
 } from "../service/producto";
@@ -135,6 +137,29 @@ export const getColoresProducto = async (req: Request, res: Response) => {
 
   try {
     const response = await _getColoresProducto(Number(producto_id));
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error ", 500);
+  }
+};
+
+export const getDetalleProducto = async (req: Request, res: Response) => {
+  const { producto_id } = req.params;
+  const id_tienda = req.query.id_tienda
+  
+  try {
+    const response = await _getDetalleProducto(Number(producto_id),Number(id_tienda));
+    res.status(response.status).json(response.items);
+  } catch (error) {
+    handleHttp(res, "error ", 500);
+  }
+};
+
+export const getTallaProducto = async (req: Request, res: Response) => {
+  const { detalle_id } = req.params;
+
+  try {
+    const response = await _getTallaProducto(Number(detalle_id));
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error ", 500);

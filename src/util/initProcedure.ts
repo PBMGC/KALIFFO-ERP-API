@@ -323,6 +323,33 @@ export const initiProcedureGetLoseProductosTienda = async () =>{
   await crearProcedimiento("SP_GetLoseProductosTienda",queryGetLoseProductosTienda,"IN t_id INT")
 }
 
+const queryGetDetalleProducto =`
+SET @consulta = '
+    SELECT 
+        c.nombre AS color_nombre, 
+        pd.stock
+    FROM 
+        productodetalle pd
+    INNER JOIN 
+        color c ON pd.color_id = c.color_id
+    WHERE 
+        pd.producto_id = ?
+';
+
+IF t_id IS NOT NULL AND t_id != ' ' THEN
+  SET @consulta = CONCAT(@consulta, ' AND pd.tienda_id = ', t_id);
+END IF;
+
+PREPARE stmt FROM @consulta;
+EXECUTE stmt using p_id;
+DEALLOCATE PREPARE stmt;
+`;
+
+export const initiProcedureGetDetalleProducto = async () =>{
+  await eliminarProcedimiento("SP_GetDetalleProducto");
+  await crearProcedimiento("SP_GetDetalleProducto",queryGetDetalleProducto,"IN p_id INT,IN t_id INT")
+}
+
 
 
 export const initProcedure = async () => {
@@ -339,4 +366,5 @@ export const initProcedure = async () => {
   await initProcedureDeletePago();
   await initiProcedureGetProductoTienda();
   await initiProcedureGetLoseProductosTienda();
+  await initiProcedureGetDetalleProducto()
 };

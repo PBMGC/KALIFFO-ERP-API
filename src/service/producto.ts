@@ -362,3 +362,52 @@ export const _getColoresProducto = async (producto_id: number) => {
     };
   }
 };
+
+export const _getDetalleProducto = async (producto_id: number,tienda_id: number) => {
+  try {
+    const consulta = (await query(`CALL SP_GetDetalleProducto(?,?);`, [
+      producto_id,
+      tienda_id||null,
+    ])) as any;
+
+    console.log(consulta.data[0])
+
+    return {
+      items:consulta.data[0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getTallaProducto = async (detalle_id: number) => {
+  try {
+    const consulta = (await query(`
+        SELECT talla, COUNT(*) AS cantidad FROM productotalla WHERE productoDetalle_id = ? GROUP BY talla;
+      `, [
+        detalle_id
+    ])) as any;
+
+    console.log(consulta.data)
+
+    return {
+      items:consulta.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};

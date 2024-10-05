@@ -4,10 +4,12 @@ import {
   createProductoCompleto,
   deleteProducto,
   getColoresProducto,
+  getDetalleProducto,
   // getColoresProducto,
   getProducto,
   getProductos,
   getProductosTienda,
+  getTallaProducto,
   loseProducto,
   // loseProducto,
   updateProducto,
@@ -17,6 +19,8 @@ import { ValidateCreateProductoCompleto } from "../validation/producto";
 const router = Router();
 
 router.get("/", getProductos);
+router.get("/detalle/:producto_id",getDetalleProducto)
+router.get("/talladetalle/:detalle_id",getTallaProducto)
 
 router.get("/lose/:tienda_id", loseProducto);
 router.get("/colores/:producto_id", getColoresProducto);
