@@ -13,7 +13,7 @@ const crearProcedimiento = async (
         ${queryCodigo}
       END;
     `;
-    await executeDDL(sql); // Usar executeDDL para crear el procedimiento
+    await executeDDL(sql);
   } catch (error) {
     console.error(`Error al crear el procedimiento ${nombre}:`, error);
   }
@@ -54,7 +54,6 @@ UPDATE incidencia
         fecha_creacion = IF(p_fecha IS NOT NULL, p_fecha, fecha_creacion)
     WHERE incidencia_id = i_id;
 `;
-
 
 export const initProcedureUpdateIncidencia = async () => {
   await eliminarProcedimiento("SP_UpdateIncidencia");
@@ -126,19 +125,23 @@ ORDER BY
 
 `;
 
-export const initProcedureGetReporteUsuario = async () =>{
-  await eliminarProcedimiento("SP_ReporteUsuario")
-  await crearProcedimiento("SP_ReporteUsuario",queryGetReporteUsuario,"IN u_id INT")
-}
+export const initProcedureGetReporteUsuario = async () => {
+  await eliminarProcedimiento("SP_ReporteUsuario");
+  await crearProcedimiento(
+    "SP_ReporteUsuario",
+    queryGetReporteUsuario,
+    "IN u_id INT"
+  );
+};
 
 const queryDeletePago = `
   DELETE FROM pago WHERE pago_id = p_id;
 `;
 
-export const initProcedureDeletePago = async () =>{
-  await eliminarProcedimiento("SP_DeletePago")
-  await crearProcedimiento("SP_DeletePago",queryDeletePago,"IN p_id INT")
-}
+export const initProcedureDeletePago = async () => {
+  await eliminarProcedimiento("SP_DeletePago");
+  await crearProcedimiento("SP_DeletePago", queryDeletePago, "IN p_id INT");
+};
 const queryGetUsuarios = `
     SET @consulta = '
         SELECT 
@@ -185,15 +188,18 @@ const queryGetUsuarios = `
 `;
 
 export const initProcedureGetUsuarios = async () => {
-    await eliminarProcedimiento("SP_GetUsuarios");
+  await eliminarProcedimiento("SP_GetUsuarios");
 
-    await crearProcedimiento("SP_GetUsuarios", queryGetUsuarios, `
+  await crearProcedimiento(
+    "SP_GetUsuarios",
+    queryGetUsuarios,
+    `
         IN p_rol INT, 
         IN p_tienda_id INT, 
         IN p_antiTienda_id INT
-    `);
+    `
+  );
 };
-
 
 const queryGetUsuario = `
 SELECT 
@@ -218,12 +224,12 @@ WHERE
 GROUP BY 
     usuario.usuario_id;
 
-`
+`;
 
-export const initProcedureGetUsuario= async () =>{
-  await eliminarProcedimiento("SP_GetUsuario")
-  await crearProcedimiento("SP_GetUsuario",queryGetUsuario,"IN u_id INT")
-}
+export const initProcedureGetUsuario = async () => {
+  await eliminarProcedimiento("SP_GetUsuario");
+  await crearProcedimiento("SP_GetUsuario", queryGetUsuario, "IN u_id INT");
+};
 
 const queryUpdateUsuario = `
   UPDATE usuario 
@@ -240,14 +246,16 @@ const queryUpdateUsuario = `
     WHERE usuario_id = u_id;
 `;
 
-export const initiProcedureUpdateUsuario = async () =>{
+export const initiProcedureUpdateUsuario = async () => {
   await eliminarProcedimiento("SP_UpdateUsuario");
-  await crearProcedimiento("SP_UpdateUsuario",queryUpdateUsuario,
+  await crearProcedimiento(
+    "SP_UpdateUsuario",
+    queryUpdateUsuario,
     "u_id INT,p_nombre varchar(30),p_ap_paterno varchar(30),p_ap_materno varchar(30),p_fecha_nacimiento DATE,p_telefono varchar(10),p_dni varchar(10),p_sueldo INT,p_tienda_id INT,p_rol INT"
-  )
-}
+  );
+};
 
-const queryGetTiendas =`
+const queryGetTiendas = `
 SELECT 
   tienda.tienda_id,
   tienda.tienda,
@@ -265,13 +273,12 @@ GROUP BY
   tienda.tienda, tienda.direccion, tienda.telefono;
 `;
 
-export const initiProcedureGetTiendas = async () =>{
+export const initiProcedureGetTiendas = async () => {
   await eliminarProcedimiento("SP_GetTiendas");
-  await crearProcedimiento("SP_GetTiendas",queryGetTiendas,
-  )
-}
+  await crearProcedimiento("SP_GetTiendas", queryGetTiendas);
+};
 
-const queryGetTienda =`
+const queryGetTienda = `
 SELECT 
   tienda.tienda,
   tienda.direccion,
@@ -287,13 +294,12 @@ LEFT JOIN
 WHERE tienda.tienda_id = t_id;
 `;
 
-export const initiProcedureGetTienda = async () =>{
+export const initiProcedureGetTienda = async () => {
   await eliminarProcedimiento("SP_GetTienda");
-  await crearProcedimiento("SP_GetTienda",queryGetTienda,"IN t_id INT")
-}
+  await crearProcedimiento("SP_GetTienda", queryGetTienda, "IN t_id INT");
+};
 
-
-const queryGetProductoTienda =`
+const queryGetProductoTienda = `
 SELECT producto.producto_id, producto.nombre,SUM(productodetalle.stock) as stock,producto.precioBase,producto.descuento
 FROM producto
 INNER JOIN productodetalle
@@ -302,13 +308,16 @@ WHERE productodetalle.tienda_id=t_id
 GROUP BY producto.producto_id;
 `;
 
-export const initiProcedureGetProductoTienda = async () =>{
+export const initiProcedureGetProductoTienda = async () => {
   await eliminarProcedimiento("SP_GetProductosTienda");
-  await crearProcedimiento("SP_GetProductosTienda",queryGetProductoTienda,"IN t_id INT")
-}
+  await crearProcedimiento(
+    "SP_GetProductosTienda",
+    queryGetProductoTienda,
+    "IN t_id INT"
+  );
+};
 
-
-const queryGetLoseProductosTienda =`
+const queryGetLoseProductosTienda = `
 SELECT producto.nombre, producto.producto_id 
 FROM producto
 INNER JOIN productodetalle pd1 ON producto.producto_id = pd1.producto_id
@@ -318,12 +327,16 @@ AND pd2.producto_id IS NULL
 GROUP BY producto.producto_id;
 `;
 
-export const initiProcedureGetLoseProductosTienda = async () =>{
+export const initiProcedureGetLoseProductosTienda = async () => {
   await eliminarProcedimiento("SP_GetLoseProductosTienda");
-  await crearProcedimiento("SP_GetLoseProductosTienda",queryGetLoseProductosTienda,"IN t_id INT")
-}
+  await crearProcedimiento(
+    "SP_GetLoseProductosTienda",
+    queryGetLoseProductosTienda,
+    "IN t_id INT"
+  );
+};
 
-const queryGetDetalleProducto =`
+const queryGetDetalleProducto = `
 SET @consulta = '
     SELECT 
         pd.productoDetalle_id,
@@ -346,12 +359,14 @@ EXECUTE stmt using p_id;
 DEALLOCATE PREPARE stmt;
 `;
 
-export const initiProcedureGetDetalleProducto = async () =>{
+export const initiProcedureGetDetalleProducto = async () => {
   await eliminarProcedimiento("SP_GetDetalleProducto");
-  await crearProcedimiento("SP_GetDetalleProducto",queryGetDetalleProducto,"IN p_id INT,IN t_id INT")
-}
-
-
+  await crearProcedimiento(
+    "SP_GetDetalleProducto",
+    queryGetDetalleProducto,
+    "IN p_id INT,IN t_id INT"
+  );
+};
 
 export const initProcedure = async () => {
   await initProcedureColoresProductos();
@@ -359,7 +374,7 @@ export const initProcedure = async () => {
   await initProcedureDeleteIncidencia();
   await initProcedureDeleteHorario();
   await initProcedureGetUsuarios();
-  await initProcedureGetUsuario(); 
+  await initProcedureGetUsuario();
   await initiProcedureUpdateUsuario();
   await initProcedureGetReporteUsuario();
   await initiProcedureGetTiendas();
@@ -367,5 +382,5 @@ export const initProcedure = async () => {
   await initProcedureDeletePago();
   await initiProcedureGetProductoTienda();
   await initiProcedureGetLoseProductosTienda();
-  await initiProcedureGetDetalleProducto()
+  await initiProcedureGetDetalleProducto();
 };
