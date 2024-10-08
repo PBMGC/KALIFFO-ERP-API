@@ -12,6 +12,7 @@ const connection = async () => {
       database: process.env.DB_DATABASE || "",
       port: Number(process.env.DB_PORT) || 3306,
     });
+
     return connection;
   } catch (error) {
     console.error("Error al conectarse a la base de datos:", error);

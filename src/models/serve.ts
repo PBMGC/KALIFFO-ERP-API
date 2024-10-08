@@ -4,11 +4,11 @@ import { router } from "../routes";
 import cookieParser from "cookie-parser";
 import { initCronJobs } from "../job/correo";
 import { initBD } from "../util/initBD";
-import { initProcedure } from "../util/initProcedure";
 import morgan from "morgan";
 import { initSeeders } from "../seeders/initSeeders";
 import { initTriggers } from "../db/triggers/initTrigger";
-import { ts } from "../util/tr";
+import { initSp } from "../db/sp/initSp";
+// import { ts } from "../util/tr";
 
 class Serve {
   app: express.Application;
@@ -49,11 +49,10 @@ class Serve {
 
   async db() {
     try {
-      // ts();
       await initBD();
       await initTriggers();
       await initSeeders();
-      await initProcedure();
+      await initSp();
     } catch (error) {
       console.log(error);
     }

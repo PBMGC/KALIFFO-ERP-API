@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-
 import { handleHttp } from "../util/error.handler";
 import { _createTienda, _getTienda, _getTiendas } from "../service/tienda";
 

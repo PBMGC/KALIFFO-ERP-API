@@ -1,3 +1,4 @@
+import redisClient from "../redis/redisClient";
 import { createCodigo } from "../util/createCodigo";
 import { query } from "../util/query";
 
@@ -31,126 +32,93 @@ export const _createProducto = async (producto: any) => {
   };
 };
 
-// export const _createProductoDetalle = async (tienda_id:number,productoDetalle: any) => {
-//   const { producto_id, detalle } = productoDetalle;
-
-//   if(detalle){
-//     for(const detalleP of detalle){
-
-//       const queryText = `
-//       INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
-//       VALUES (?, ?, ?, ?)`;
-
-//       const result = await query(queryText, [
-//         producto_id,
-//         detalleP.color_id,
-//         tienda_id,
-//         detalleP.stock,
-//       ]);
-
-//       if(result.insertID){
-//         for(const i in Range(result.insertID)){
-//           await _createProductoTalla({result.insertID,detalleP.talla})
-//         }
-//       }
-
-//     }
-//   }else{
-//     console.log("ADIOS")
-//   }
-
-//   // if (!result.success) {
-//   //   console.error("error");
-//   //   return {
-//   //     message: "error _createProductoDetalle",
-//   //     success: false,
-//   //     status: result.status || 500,
-//   //   };
-//   // }
-
-//   return {
-//     message: "ProductoDetalle creado con éxito.",
-//     success: true,
-//     status: 201,
-//   };
-// };
-
-// export const _createProductoTalla = async (productoTalla: any) => {
-//   const { productoDetalle_id, talla } = productoTalla;
-
-//   const data = await query("SELECT * from productoTalla")
-
-//   const queryText = `
-//         INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
-//         VALUES (?, ?, ?)`;
-
-//   const result = await query(queryText, [productoDetalle_id, talla, codigo]);
-
-//   if (!result.success) {
-//     console.error("error");
-//     return {
-//       message: "error _createProductoTalla",
-//       success: false,
-//       status: result.status || 500,
-//     };
-//   }
-
-//   return {
-//     message: "ProductoTalla creado con éxito.",
-//     success: true,
-//     status: 201,
-//   };
-// };
-
 export const _createProductoCompleto = async (
   tienda_id: number,
   detalles: any
 ) => {
-  const queryTextDetalle = `
-    INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
-    VALUES (?, ?, ?, ?)`;
-
-  const queryTextTalla = `
-    INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
-    VALUES (?, ?, ?)`;
+  let errors: any[] = [];
 
   for (let detalle of detalles) {
-    // Inserción en productoDetalle
-    const resultDetalle = await query(queryTextDetalle, [
-      detalle.producto_id,
-      detalle.detalle[0].color_id,
-      tienda_id,
-      detalle.detalle[0].stock,
-    ]);
+    try {
+      const resultDetalle = await _createProductoDetalle({
+        producto_id: detalle.producto_id,
+        color_id: detalle.detalle[0].color_id,
+        tienda_id: tienda_id,
+        stock: detalle.detalle[0].stock,
+      });
 
-    const productoDetalle_id = resultDetalle.insertId;
+      const productoDetalle_id = resultDetalle.insertId;
 
-    let codigo = await createCodigo(detalle);
+      const codigo = await createCodigo(detalle);
 
-    const codigoExistente = await query(
-      `SELECT COUNT(*) as total FROM productoTalla WHERE codigo = ?`,
-      [codigo]
-    );
+      const codigoExistente = await query(
+        `SELECT COUNT(*) as total FROM productoTalla WHERE codigo = ?`,
+        [codigo]
+      );
 
-    if (codigoExistente.data[0].total > 0) {
-      return {
-        message: `Ya existe producto con color_id ${detalle.detalle[0].color_id} y talla ${detalle.detalle[0].talla}`,
-        success: false,
-        status: 400,
-      };
-    }
+      if (codigoExistente.data[0].total > 0) {
+        errors.push({
+          message: `Ya existe producto con color_id ${detalle.detalle[0].color_id} y talla ${detalle.detalle[0].talla}`,
+          producto_id: detalle.producto_id,
+          talla: detalle.detalle[0].talla,
+          color_id: detalle.detalle[0].color_id,
+        });
+        continue;
+      }
 
-    for (let talla of detalle.detalle) {
-      await query(queryTextTalla, [productoDetalle_id, talla.talla, codigo]);
+      for (let talla of detalle.detalle) {
+        await _createProductoTalla({
+          productoDetalle_id: productoDetalle_id,
+          talla: talla.talla,
+          codigo,
+        });
+      }
+    } catch (error: any) {
+      errors.push({
+        message: `Error al procesar el producto_id ${detalle.producto_id} con color_id ${detalle.detalle[0].color_id}`,
+        error: error.message,
+      });
     }
   }
 
   return {
-    message: "Producto creado con éxito.",
+    message:
+      errors.length > 0
+        ? "Se encontraron errores en algunos productos."
+        : "Producto(s) creado(s) con éxito.",
+    errors,
+    success: errors.length === 0, // Si no hubo errores, success es true
+    status: errors.length > 0 ? 400 : 201,
+  };
+};
+
+export const _createProductoTalla = async (productoTalla: any) => {
+  const { productoDetalle_id, talla, codigo } = productoTalla;
+
+  const queryText = `
+        INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
+        VALUES (?, ?, ?);
+  `;
+
+  const result = await query(queryText, [productoDetalle_id, talla, codigo]);
+
+  if (!result.success) {
+    console.error("error");
+    return {
+      message: "error _createProductoTalla",
+      success: false,
+      status: result.status || 500,
+    };
+  }
+
+  return {
+    message: "ProductoTalla creado con éxito.",
     success: true,
+
     status: 201,
   };
 };
+
 export const _createProductoDetalle = async (productoDetalle: any) => {
   const { producto_id, color_id, tienda_id, stock } = productoDetalle;
 
@@ -178,54 +146,54 @@ export const _createProductoDetalle = async (productoDetalle: any) => {
   return {
     message: "ProductoDetalle creado con éxito.",
     success: true,
-    status: 201,
-  };
-};
-
-export const _createProductoTalla = async (productoTalla: any) => {
-  const { productoDetalle_id, talla, codigo } = productoTalla;
-
-  const queryText = `
-        INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
-        VALUES (?, ?, ?);
-  `;
-
-  const result = await query(queryText, [productoDetalle_id, talla, codigo]);
-
-  if (!result.success) {
-    console.error("error");
-    return {
-      message: "error _createProductoTalla",
-      success: false,
-      status: result.status || 500,
-    };
-  }
-
-  return {
-    message: "ProductoTalla creado con éxito.",
-    success: true,
+    insertId: result.insertId,
     status: 201,
   };
 };
 
 export const _getProductos = async () => {
-  const queryText = `SELECT * FROM producto`;
+  const cacheKey = "productos";
 
-  const result = await query(queryText);
+  try {
+    const cachedProductos = await redisClient.get(cacheKey);
+    if (cachedProductos) {
+      console.log("Productos obtenidos de caché");
+      return {
+        items: JSON.parse(cachedProductos),
+        success: true,
+        status: 200,
+      };
+    }
 
-  if (!result.success) {
+    const queryText = `SELECT * FROM producto`;
+    const result = await query(queryText);
+
+    if (!result.success) {
+      return {
+        message: result.error,
+        success: false,
+        status: result.status || 500,
+      };
+    }
+
+    await redisClient.set(cacheKey, JSON.stringify(result.data), {
+      EX: 3600,
+    });
+
+    console.log("Productos guardados en caché");
     return {
-      message: result.error,
+      items: result.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return {
+      message: "Error al obtener productos",
       success: false,
-      status: result.status || 500,
+      status: 500,
     };
   }
-
-  return {
-    items: result.data,
-    success: true,
-    status: 200,
-  };
 };
 
 export const _getProducto = async (producto_id: number) => {
@@ -363,17 +331,20 @@ export const _getColoresProducto = async (producto_id: number) => {
   }
 };
 
-export const _getDetalleProducto = async (producto_id: number,tienda_id: number) => {
+export const _getDetalleProducto = async (
+  producto_id: number,
+  tienda_id: number
+) => {
   try {
     const consulta = (await query(`CALL SP_GetDetalleProducto(?,?);`, [
       producto_id,
-      tienda_id||null,
+      tienda_id || null,
     ])) as any;
 
-    console.log(consulta.data[0])
+    console.log(consulta.data[0]);
 
     return {
-      items:consulta.data[0],
+      items: consulta.data[0],
       success: true,
       status: 200,
     };
@@ -389,16 +360,17 @@ export const _getDetalleProducto = async (producto_id: number,tienda_id: number)
 
 export const _getTallaProducto = async (detalle_id: number) => {
   try {
-    const consulta = (await query(`
+    const consulta = (await query(
+      `
         SELECT talla, COUNT(*) AS cantidad FROM productotalla WHERE productoDetalle_id = ? GROUP BY talla;
-      `, [
-        detalle_id
-    ])) as any;
+      `,
+      [detalle_id]
+    )) as any;
 
-    console.log(consulta.data)
+    console.log(consulta.data);
 
     return {
-      items:consulta.data,
+      items: consulta.data,
       success: true,
       status: 200,
     };
