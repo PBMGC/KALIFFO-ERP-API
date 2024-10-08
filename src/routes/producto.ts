@@ -28,7 +28,7 @@ router.get("/tienda/:tienda_id", getProductosTienda);
 
 router.post(
   "/create/detalle",
-  ValidateCreateProductoCompleto,
+  // ValidateCreateProductoCompleto,
   createProductoCompleto
 );
 router.post("/create", createProducto);

@@ -1,9 +1,9 @@
 import { query } from "./query";
 
-export const createCodigo = async (detalle: any) => {
+export const createCodigo = async (producto_id: number, detalle: any) => {
   const productoResult = await query(
     `select * from producto where producto_id = ?`,
-    [detalle.producto_id]
+    [producto_id]
   );
 
   const producto = productoResult.data[0];
@@ -17,9 +17,9 @@ export const createCodigo = async (detalle: any) => {
 
   const cantidadProductosConInicial = countResult.data[0].total;
 
-  const codigo = `${inicialProducto}${cantidadProductosConInicial + 1}-${
-    detalle.producto_id
-  }${detalle.detalle[0].color_id}-${detalle.detalle[0].talla}`;
+  const codigo = `${inicialProducto}${
+    cantidadProductosConInicial + 1
+  }-${producto_id}${detalle.color_id}-${detalle.talla}`;
 
   return codigo;
 };

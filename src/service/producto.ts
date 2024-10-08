@@ -34,6 +34,7 @@ export const _createProducto = async (producto: any) => {
 
 export const _createProductoCompleto = async (
   tienda_id: number,
+  producto_id: number,
   detalles: any
 ) => {
   let errors: any[] = [];
@@ -41,15 +42,15 @@ export const _createProductoCompleto = async (
   for (let detalle of detalles) {
     try {
       const resultDetalle = await _createProductoDetalle({
-        producto_id: detalle.producto_id,
-        color_id: detalle.detalle[0].color_id,
+        producto_id: producto_id,
+        color_id: detalle.color_id,
         tienda_id: tienda_id,
-        stock: detalle.detalle[0].stock,
+        stock: detalle.stock,
       });
 
       const productoDetalle_id = resultDetalle.insertId;
 
-      const codigo = await createCodigo(detalle);
+      const codigo = await createCodigo(producto_id, detalle);
 
       const codigoExistente = await query(
         `SELECT COUNT(*) as total FROM productoTalla WHERE codigo = ?`,
@@ -58,24 +59,24 @@ export const _createProductoCompleto = async (
 
       if (codigoExistente.data[0].total > 0) {
         errors.push({
-          message: `Ya existe producto con color_id ${detalle.detalle[0].color_id} y talla ${detalle.detalle[0].talla}`,
-          producto_id: detalle.producto_id,
-          talla: detalle.detalle[0].talla,
-          color_id: detalle.detalle[0].color_id,
+          message: `Ya existe producto con color_id ${detalle.color_id} y talla ${detalle.talla}`,
+          producto_id: producto_id,
+          talla: detalle.talla,
+          color_id: detalle.color_id,
         });
         continue;
       }
 
-      for (let talla of detalle.detalle) {
-        await _createProductoTalla({
-          productoDetalle_id: productoDetalle_id,
-          talla: talla.talla,
-          codigo,
-        });
-      }
+      await _createProductoTalla({
+        productoDetalle_id: productoDetalle_id,
+        talla: detalle.talla,
+        codigo,
+      });
     } catch (error: any) {
+      console.log(error);
+
       errors.push({
-        message: `Error al procesar el producto_id ${detalle.producto_id} con color_id ${detalle.detalle[0].color_id}`,
+        message: `Error al procesar el producto_id ${producto_id} con color_id ${detalle.color_id}`,
         error: error.message,
       });
     }
