@@ -1,47 +1,8 @@
-CREATE TRIGGER `TR_INS_productodetalle` BEFORE INSERT ON `productoDetalle`
- FOR EACH ROW BEGIN
-    -- Verificar si el color es nuevo para el producto
-    IF NOT EXISTS (SELECT 1 FROM productoDetalle WHERE producto_id = NEW.producto_id AND color_id = NEW.color_id) THEN
-        UPDATE producto
-        SET variacion_colores = variacion_colores + 1 
-        WHERE idproducto = NEW.producto_id;
-    END IF;
-
-    -- Actualizar el stock total del producto
-    UPDATE producto 
-    SET stocktotal = stocktotal + NEW.stock 
-    WHERE idproducto = NEW.producto_id;
-END
-
-CREATE TRIGGER `TR_DELproductodetalle` AFTER DELETE ON `productoDetalle`
- FOR EACH ROW BEGIN
-    UPDATE producto 
-    SET producto.stocktotal = producto.stocktotal - OLD.stock,
-        producto.variacion_colores = producto.variacion_colores - 1
-    WHERE producto.idproducto = OLD.producto_id;
-END
-
-
-CREATE TRIGGER `TR_INS_productodetalle` 
-AFTER UPDATE ON `productodetalle`
-FOR EACH ROW 
-BEGIN
-    -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
-    UPDATE producto 
-    SET producto.stockTotal = producto.stockTotal - OLD.stock + NEW.stock
-    WHERE producto.producto_id = NEW.producto_id;
-END$$
-
-CREATE TRIGGER `TR_INSproductoTalla` BEFORE INSERT ON `productoTalla`
- FOR EACH ROW BEGIN
-    UPDATE productoDetalle 
-    SET productoDetalle.stock = productoDetalle.stock + 1 
-    WHERE productoDetalle.productoDetalle_id = NEW.productoDetalle_id;
-END
 CREATE TRIGGER `TR_INS_productodetalle` AFTER INSERT ON `productodetalle`
  FOR EACH ROW BEGIN
-    -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
-    UPDATE producto 
-    SET producto.stockTotal = producto.stockTotal + NEW.stock
-    WHERE producto.producto_id = NEW.producto_id;
-END
+        -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
+        UPDATE producto 
+        SET producto.stockTotal = producto.stockTotal + NEW.stock
+        WHERE producto.producto_id = NEW.producto_id;
+    END
+

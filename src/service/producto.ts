@@ -177,20 +177,15 @@ export const _getProductos = async () => {
       };
     }
 
-    await redisClient.set(cacheKey, JSON.stringify(result.data), {
-      EX: 3600,
-    });
-
-    console.log("Productos guardados en caché");
     return {
       items: result.data,
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al obtener productos:", error);
+    console.log(error);
     return {
-      message: "Error al obtener productos",
+      message: "Error al obtener productos.",
       success: false,
       status: 500,
     };
@@ -198,20 +193,66 @@ export const _getProductos = async () => {
 };
 
 export const _getProducto = async (producto_id: number) => {
-  const queryText = `SELECT * FROM producto WHERE producto_id = ?`;
+  const queryBase = `
+    SELECT p.*, COUNT(c.color_id) AS cantidad_colores
+FROM producto p
+LEFT JOIN productodetalle pd ON p.producto_id = pd.producto_id
+LEFT JOIN color c ON pd.color_id = c.color_id
+WHERE p.producto_id = ?
+GROUP BY p.producto_id;
 
-  const result = await query(queryText, [producto_id]);
+  `;
+  const queryTienda = `
+    SELECT tienda.tienda_id,tienda.tienda, SUM(productodetalle.stock) as "STOCK"
+    FROM productodetalle
+    INNER JOIN tienda ON tienda.tienda_id = productodetalle.tienda_id
+    WHERE productodetalle.producto_id=?
+    GROUP BY tienda.tienda;
+  `;
+  const queryColores = `
+    SELECT productodetalle.productoDetalle_id,color.nombre, SUM(productodetalle.stock) as "STOCK"
+    FROM productodetalle
+    INNER JOIN color ON color.color_id = productodetalle.color_id
+    WHERE productodetalle.producto_id=?
+    GROUP BY color.nombre;
+  `;
+  const queryTallas = `
+    SELECT talla, COUNT(*) AS cantidad 
+    FROM productotalla 
+    WHERE productoDetalle_id IN (
+      SELECT productodetalle.productoDetalle_id 
+      FROM productodetalle 
+      WHERE producto_id=?
+    ) 
+    GROUP BY talla;
+  `;
 
-  if (!result.success) {
+  // Ejecutar todas las consultas en paralelo
+  const [result1, result2, result3, result4] = await Promise.all([
+    query(queryBase, [producto_id]),
+    query(queryTienda, [producto_id]),
+    query(queryColores, [producto_id]),
+    query(queryTallas, [producto_id])
+  ]);
+
+  if (!result1.success || !result2.success || !result3.success || !result4.success) {
+    const error = result1.error || result2.error || result3.error || result4.error;
     return {
-      message: result.error,
+      message: error,
       success: false,
-      status: result.status || 404,
+      status: result1.status || result2.status || result3.status || result4.status || 500,
     };
   }
 
+  const DataProductos = {
+    ...result1.data[0], 
+    tiendas: result2.data,
+    colores: result3.data,
+    tallas: result4.data
+  };
+
   return {
-    item: result.data,
+    item: DataProductos,
     success: true,
     status: 200,
   };
@@ -289,7 +330,7 @@ export const _deleteProducto = async (
   };
 };
 
-export const _loseProductos = async (tienda_id: string) => {
+export const _loseProductos = async (tienda_id: number) => {
   try {
     const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`, [
       tienda_id,
@@ -332,32 +373,66 @@ export const _getColoresProducto = async (producto_id: number) => {
   }
 };
 
-export const _getDetalleProducto = async (
-  producto_id: number,
-  tienda_id: number
-) => {
+export const _getDetalleProducto = async (producto_id: number, tienda_id: number, tipo: string) => {
   try {
-    const consulta = (await query(`CALL SP_GetDetalleProducto(?,?);`, [
-      producto_id,
-      tienda_id || null,
-    ])) as any;
+    let queryS: string;
+    let params: Array<number>;
 
-    console.log(consulta.data[0]);
+    if (tipo === "tiendas") {
+      queryS = `
+      SELECT tienda.tienda_id, tienda.tienda, SUM(productodetalle.stock) as "STOCK"
+      FROM productodetalle
+      INNER JOIN tienda ON tienda.tienda_id = productodetalle.tienda_id
+      WHERE productodetalle.producto_id=?
+      GROUP BY tienda.tienda;
+      `;
+      params = [producto_id];
+    } 
+    else if (tipo === "colores") {
+      queryS = `CALL SP_GetColoresProducto(?, ?);`; 
+      params = [producto_id, tienda_id]; 
+    } 
+    else if (tipo === "tallas") {
+      queryS = `
+        SELECT talla, COUNT(*) AS cantidad 
+        FROM productotalla 
+        WHERE productoDetalle_id IN (
+          SELECT productodetalle.productoDetalle_id 
+          FROM productodetalle 
+          WHERE producto_id=?
+        ) 
+        GROUP BY talla;
+      `;
+      params = [producto_id]; 
+    } 
+    else {
+      throw new Error("Tipo no válido");
+    }
+
+    const consulta = await query(queryS, params);
+
+    let data
+    if(tipo==="colores"){
+      data=consulta.data[0]
+    }else{
+      data=consulta.data
+    }
 
     return {
-      items: consulta.data[0],
+      items: data,
       success: true,
       status: 200,
     };
   } catch (error) {
     console.log(error);
     return {
-      message: error,
+      message: error instanceof Error ? error.message : 'Error desconocido',
       success: false,
       status: 500,
     };
   }
 };
+
 
 export const _getTallaProducto = async (detalle_id: number) => {
   try {

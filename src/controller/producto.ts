@@ -63,8 +63,24 @@ export const createProductoCompleto = async (req: Request, res: Response) => {
 // };
 
 export const getProductos = async (req: Request, res: Response) => {
+  const tienda_id = req.query.tienda_id;
+  const loose_id = req.query.loose_id
   try {
-    const response = await _getProductos();
+    let response
+    
+    if(tienda_id){
+      response = await _getProductosTienda(Number(tienda_id));
+      console.log(tienda_id)
+    }
+    else if(loose_id){
+      response = await _loseProductos(Number(loose_id));
+      console.log(loose_id)
+    }
+    else{
+      response = await _getProductos();
+      console.log("NO HAY PARAM")
+    }
+
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getProductos", 500);
@@ -77,17 +93,6 @@ export const getProducto = async (req: Request, res: Response) => {
   try {
     const response = await _getProducto(Number(producto_id));
     res.status(response.status).json(response.item);
-  } catch (error) {
-    handleHttp(res, "error_getProducto", 500);
-  }
-};
-
-export const getProductosTienda = async (req: Request, res: Response) => {
-  const { tienda_id } = req.params;
-
-  try {
-    const response = await _getProductosTienda(Number(tienda_id));
-    res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getProducto", 500);
   }
@@ -126,16 +131,6 @@ export const deleteProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const loseProducto = async (req: Request, res: Response) => {
-  const { tienda_id } = req.params;
-
-  try {
-    const response = await _loseProductos(tienda_id);
-    res.status(response.status).json(response.items);
-  } catch (error) {
-    handleHttp(res, "error_updateProducto", 500);
-  }
-};
 
 export const getColoresProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
@@ -150,13 +145,13 @@ export const getColoresProducto = async (req: Request, res: Response) => {
 
 export const getDetalleProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
-  const id_tienda = req.query.id_tienda;
+  const tienda_id = req.query.tienda_id;
+  const tipo = req.query.tipo as string;
+  
+  console.log(tipo)
 
   try {
-    const response = await _getDetalleProducto(
-      Number(producto_id),
-      Number(id_tienda)
-    );
+    const response = await _getDetalleProducto(Number(producto_id),Number(tienda_id),tipo);
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error ", 500);
