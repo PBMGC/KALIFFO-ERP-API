@@ -195,60 +195,71 @@ export const _getProductos = async () => {
 export const _getProducto = async (producto_id: number) => {
   const queryBase = `
     SELECT p.*, COUNT(c.color_id) AS cantidad_colores
-FROM producto p
-LEFT JOIN productodetalle pd ON p.producto_id = pd.producto_id
-LEFT JOIN color c ON pd.color_id = c.color_id
-WHERE p.producto_id = ?
-GROUP BY p.producto_id;
+    FROM producto p
+    LEFT JOIN productodetalle pd ON p.producto_id = pd.producto_id
+    LEFT JOIN color c ON pd.color_id = c.color_id
+    WHERE p.producto_id = ?
+    GROUP BY p.producto_id;
+  `;
 
-  `;
-  const queryTienda = `
-    SELECT tienda.tienda_id,tienda.tienda, SUM(productodetalle.stock) as "STOCK"
-    FROM productodetalle
-    INNER JOIN tienda ON tienda.tienda_id = productodetalle.tienda_id
-    WHERE productodetalle.producto_id=?
-    GROUP BY tienda.tienda;
-  `;
-  const queryColores = `
-    SELECT productodetalle.productoDetalle_id,color.nombre, SUM(productodetalle.stock) as "STOCK"
-    FROM productodetalle
-    INNER JOIN color ON color.color_id = productodetalle.color_id
-    WHERE productodetalle.producto_id=?
-    GROUP BY color.nombre;
-  `;
-  const queryTallas = `
-    SELECT talla, COUNT(*) AS cantidad 
-    FROM productotalla 
-    WHERE productoDetalle_id IN (
-      SELECT productodetalle.productoDetalle_id 
-      FROM productodetalle 
-      WHERE producto_id=?
-    ) 
-    GROUP BY talla;
-  `;
+  // const queryTienda = `
+  //   SELECT tienda.tienda_id,tienda.tienda, SUM(productodetalle.stock) as "STOCK"
+  //   FROM productodetalle
+  //   INNER JOIN tienda ON tienda.tienda_id = productodetalle.tienda_id
+  //   WHERE productodetalle.producto_id=?
+  //   GROUP BY tienda.tienda;
+  // `;
+
+  // const queryColores = `
+  //   SELECT productodetalle.productoDetalle_id,color.nombre, SUM(productodetalle.stock) as "STOCK"
+  //   FROM productodetalle
+  //   INNER JOIN color ON color.color_id = productodetalle.color_id
+  //   WHERE productodetalle.producto_id=?
+  //   GROUP BY color.nombre;
+  // `;
+
+  // const queryTallas = `
+  //   SELECT talla, COUNT(*) AS cantidad
+  //   FROM productotalla
+  //   WHERE productoDetalle_id IN (
+  //     SELECT productodetalle.productoDetalle_id
+  //     FROM productodetalle
+  //     WHERE producto_id=?
+  //   )
+  //   GROUP BY talla;
+  // `;
 
   // Ejecutar todas las consultas en paralelo
-  const [result1, result2, result3, result4] = await Promise.all([
+  const [result1] = await Promise.all([
     query(queryBase, [producto_id]),
-    query(queryTienda, [producto_id]),
-    query(queryColores, [producto_id]),
-    query(queryTallas, [producto_id])
+    // query(queryTienda, [producto_id]),
+    // query(queryColores, [producto_id]),
+    // query(queryTallas, [producto_id])
   ]);
 
-  if (!result1.success || !result2.success || !result3.success || !result4.success) {
-    const error = result1.error || result2.error || result3.error || result4.error;
+  // if (!result1.success || !result2.success || !result3.success || !result4.success) {
+  //   const error = result1.error || result2.error || result3.error || result4.error;
+  //   return {
+  //     message: error,
+  //     success: false,
+  //     status: result1.status || result2.status || result3.status || result4.status || 500,
+  //   };
+  // }
+
+  if (!result1.success) {
+    const error = result1.error;
     return {
       message: error,
       success: false,
-      status: result1.status || result2.status || result3.status || result4.status || 500,
+      status: result1.status || 500,
     };
   }
 
   const DataProductos = {
-    ...result1.data[0], 
-    tiendas: result2.data,
-    colores: result3.data,
-    tallas: result4.data
+    ...result1.data[0],
+    // tiendas: result2.data,
+    // colores: result3.data,
+    // tallas: result4.data
   };
 
   return {
@@ -373,7 +384,11 @@ export const _getColoresProducto = async (producto_id: number) => {
   }
 };
 
-export const _getDetalleProducto = async (producto_id: number, tienda_id: number, tipo: string) => {
+export const _getDetalleProducto = async (
+  producto_id: number,
+  tienda_id: number,
+  tipo: string
+) => {
   try {
     let queryS: string;
     let params: Array<number>;
@@ -387,12 +402,10 @@ export const _getDetalleProducto = async (producto_id: number, tienda_id: number
       GROUP BY tienda.tienda;
       `;
       params = [producto_id];
-    } 
-    else if (tipo === "colores") {
-      queryS = `CALL SP_GetColoresProducto(?, ?);`; 
-      params = [producto_id, tienda_id]; 
-    } 
-    else if (tipo === "tallas") {
+    } else if (tipo === "colores") {
+      queryS = `CALL SP_GetColoresProducto(?, ?);`;
+      params = [producto_id, tienda_id];
+    } else if (tipo === "tallas") {
       queryS = `
         SELECT talla, COUNT(*) AS cantidad 
         FROM productotalla 
@@ -403,19 +416,18 @@ export const _getDetalleProducto = async (producto_id: number, tienda_id: number
         ) 
         GROUP BY talla;
       `;
-      params = [producto_id]; 
-    } 
-    else {
+      params = [producto_id];
+    } else {
       throw new Error("Tipo no válido");
     }
 
     const consulta = await query(queryS, params);
 
-    let data
-    if(tipo==="colores"){
-      data=consulta.data[0]
-    }else{
-      data=consulta.data
+    let data;
+    if (tipo === "colores") {
+      data = consulta.data[0];
+    } else {
+      data = consulta.data;
     }
 
     return {
@@ -426,13 +438,12 @@ export const _getDetalleProducto = async (producto_id: number, tienda_id: number
   } catch (error) {
     console.log(error);
     return {
-      message: error instanceof Error ? error.message : 'Error desconocido',
+      message: error instanceof Error ? error.message : "Error desconocido",
       success: false,
       status: 500,
     };
   }
 };
-
 
 export const _getTallaProducto = async (detalle_id: number) => {
   try {
