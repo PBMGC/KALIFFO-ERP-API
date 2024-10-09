@@ -136,7 +136,6 @@ CREATE TABLE IF NOT EXISTS venta (
     FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE
 );`;
 
-// Nueva tabla 'detalleVenta'
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
     venta_id INT NOT NULL,

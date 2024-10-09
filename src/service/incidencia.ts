@@ -89,7 +89,8 @@ export const _deleteIncidencia = async (incidencia_id: number) => {
   try {
     const result = (await query(queryS, [incidencia_id])) as any;
 
-    if (result[0].affectedRows === 0) {
+    // Aquí accedes directamente a result.affectedRows, ya que no es un arreglo
+    if (result.affectedRows === 0) {
       return {
         msg: "No se encontró la incidencia",
         success: false,
@@ -105,7 +106,7 @@ export const _deleteIncidencia = async (incidencia_id: number) => {
   } catch (error) {
     console.error("Error al eliminar la incidencia:", error);
     return {
-      msg: "error _deleteIncidencia",
+      msg: "Error al eliminar la incidencia",
       success: false,
       status: 500,
     };
