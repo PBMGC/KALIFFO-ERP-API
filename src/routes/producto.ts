@@ -24,7 +24,7 @@ router.get("/:producto_id", getProducto);
 
 router.post(
   "/create/detalle",
-  ValidateCreateProductoCompleto,
+  // ValidateCreateProductoCompleto,
   createProductoCompleto
 );
 router.post("/create", createProducto);

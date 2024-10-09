@@ -33,11 +33,16 @@ export const createProducto = async (req: Request, res: Response) => {
 
 export const createProductoCompleto = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id as string;
-  const detalles = req.body;
+  const { producto_id, detalles } = req.body;
 
   try {
-    const response = await _createProductoCompleto(Number(tienda_id), detalles);
+    const response = await _createProductoCompleto(
+      Number(tienda_id),
+      producto_id,
+      detalles
+    );
     res.status(response.status).json(response);
+    // res.status(200).json("dasd");
   } catch (error) {
     handleHttp(res, "error_createProductoCompleto", 500);
   }

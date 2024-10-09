@@ -29,22 +29,22 @@ CREATE TABLE IF NOT EXISTS usuario (
     INDEX I_dni (dni),
     INDEX I_tiendaid (tienda_id),
     INDEX I_rol (rol),
-    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id)
+    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE SET NULL
 );`;
 
 const horario = `
-    CREATE TABLE IF NOT EXISTS horario (
-      horario_id INT AUTO_INCREMENT PRIMARY KEY,
-      hora_entrada TIME NOT NULL,
-      hora_salida TIME,
-      fecha DATE NOT NULL,
-      usuario_id INT NOT NULL,
-      INDEX I_usuarioID (usuario_id),
-      FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
-    );`;
+CREATE TABLE IF NOT EXISTS horario (
+    horario_id INT AUTO_INCREMENT PRIMARY KEY,
+    hora_entrada TIME NOT NULL,
+    hora_salida TIME,
+    fecha DATE NOT NULL,
+    usuario_id INT NOT NULL,
+    INDEX I_usuarioID (usuario_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
+);`;
 
 const incidencia = `
-  CREATE TABLE IF NOT EXISTS incidencia (
+CREATE TABLE IF NOT EXISTS incidencia (
     incidencia_id INT AUTO_INCREMENT PRIMARY KEY,
     tipo INT NOT NULL,
     descripcion TEXT NOT NULL,
@@ -54,7 +54,7 @@ const incidencia = `
     INDEX I_usuarioID (usuario_id),
     INDEX I_fechacreacion (fecha_creacion),
     FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
-  );`;
+);`;
 
 const producto = `
 CREATE TABLE IF NOT EXISTS producto (
@@ -76,28 +76,28 @@ CREATE TABLE IF NOT EXISTS color (
 );`;
 
 const productoDetalle = `
-  CREATE TABLE IF NOT EXISTS productoDetalle (
+CREATE TABLE IF NOT EXISTS productoDetalle (
     productoDetalle_id INT AUTO_INCREMENT PRIMARY KEY, 
     producto_id INT NOT NULL,
     color_id INT NOT NULL,
     tienda_id INT NOT NULL,
     stock INT NOT NULL,
-    FOREIGN KEY (producto_id) REFERENCES producto(producto_id),
+    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE, -- Al eliminar producto, eliminará también el productoDetalle
     FOREIGN KEY (color_id) REFERENCES color(color_id),
     FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id),
     INDEX (producto_id),
     INDEX (color_id),
     INDEX (tienda_id)
-  );`;
+);`;
 
 const productoTalla = `
-  CREATE TABLE IF NOT EXISTS productoTalla (
+CREATE TABLE IF NOT EXISTS productoTalla (
     productoDetalle_id INT NOT NULL,
     talla VARCHAR(20) NOT NULL,
     codigo VARCHAR(20) NOT NULL UNIQUE,
-    FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id) ON DELETE CASCADE,
+    FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id) ON DELETE CASCADE, -- Borrar productoDetalle elimina productoTalla
     INDEX (codigo)
-  );`;
+);`;
 
 const pago = `
 CREATE TABLE IF NOT EXISTS pago (
@@ -110,11 +110,11 @@ CREATE TABLE IF NOT EXISTS pago (
     INDEX I_fecha (fecha),
     INDEX I_estado (estado),
     INDEX I_usuarioid (usuario_id),
-    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
 );`;
 
 const venta = `
-  CREATE TABLE IF NOT EXISTS venta (
+CREATE TABLE IF NOT EXISTS venta (
     venta_id INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(45) NOT NULL,
     tipoVenta INT NOT NULL,
@@ -133,24 +133,24 @@ const venta = `
     tienda_id INT NOT NULL,
     INDEX I_fecha (fecha),
     INDEX I_tiendaid (tienda_id),
-    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id)
-  );`;
+    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE
+);`;
 
 // Nueva tabla 'detalleVenta'
 const detalleVenta = `
-  CREATE TABLE IF NOT EXISTS detalleVenta (
-    detalleVenta_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS detalleVenta (
     venta_id INT NOT NULL,
-    producto_id INT NOT NULL,
+    productoDetalle_id INT NOT NULL,
+    codigo VARCHAR(10) NOT NULL, 
     cantidad INT NOT NULL,
     precioUnitario DECIMAL(10, 2) NOT NULL,
     precioNeto DECIMAL(10, 2) NOT NULL,
     igv DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (venta_id) REFERENCES venta(venta_id),
-    FOREIGN KEY (producto_id) REFERENCES producto(producto_id),
+    FOREIGN KEY (venta_id) REFERENCES venta(venta_id) ON DELETE CASCADE,
+    FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id) ON DELETE CASCADE,
     INDEX I_ventaid (venta_id),
-    INDEX I_productoid (producto_id)
-  );`;
+    INDEX I_productoDetalleid (productoDetalle_id)
+);`;
 
 export const initBD = async () => {
   const conn = await connection();
