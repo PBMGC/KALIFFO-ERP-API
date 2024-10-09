@@ -446,10 +446,15 @@ export const _getDetalleProducto = async (producto_id: number, tienda_id: number
 
     const consulta = await query(queryS, params);
 
-    console.log(consulta.data[0])
+    let data
+    if(tipo==="colores"){
+      data=consulta.data[0]
+    }else{
+      data=consulta.data
+    }
 
     return {
-      items: consulta.data,
+      items: data,
       success: true,
       status: 200,
     };
