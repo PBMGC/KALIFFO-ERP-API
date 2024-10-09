@@ -323,7 +323,7 @@ export const initiProcedureGetLoseProductosTienda = async () =>{
   await crearProcedimiento("SP_GetLoseProductosTienda",queryGetLoseProductosTienda,"IN t_id INT")
 }
 
-const queryGetDetalleProducto =`
+const queryGetColoresProducto =`
 SET @consulta = '
     SELECT 
         pd.productoDetalle_id,
@@ -346,9 +346,9 @@ EXECUTE stmt using p_id;
 DEALLOCATE PREPARE stmt;
 `;
 
-export const initiProcedureGetDetalleProducto = async () =>{
-  await eliminarProcedimiento("SP_GetDetalleProducto");
-  await crearProcedimiento("SP_GetDetalleProducto",queryGetDetalleProducto,"IN p_id INT,IN t_id INT")
+export const initiProcedureGetColoresProducto= async () =>{
+  await eliminarProcedimiento("SP_GetColoresProducto");
+  await crearProcedimiento("SP_GetColoresProducto",queryGetColoresProducto,"IN p_id INT,IN t_id INT")
 }
 
 
@@ -367,5 +367,5 @@ export const initProcedure = async () => {
   await initProcedureDeletePago();
   await initiProcedureGetProductoTienda();
   await initiProcedureGetLoseProductosTienda();
-  await initiProcedureGetDetalleProducto()
+  await initiProcedureGetColoresProducto()
 };
