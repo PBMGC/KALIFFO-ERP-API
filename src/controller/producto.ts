@@ -3,7 +3,7 @@ import { Request, response, Response } from "express";
 import {
   _createProducto,
   _createProductoCompleto,
-  _deleteProducto,
+  _desactivarProducto,
   _getColoresProducto,
   _getDetalleProducto,
   _getProducto,
@@ -64,21 +64,19 @@ export const createProductoCompleto = async (req: Request, res: Response) => {
 
 export const getProductos = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id;
-  const loose_id = req.query.loose_id
+  const loose_id = req.query.loose_id;
   try {
-    let response
-    
-    if(tienda_id){
+    let response;
+
+    if (tienda_id) {
       response = await _getProductosTienda(Number(tienda_id));
-      console.log(tienda_id)
-    }
-    else if(loose_id){
+      console.log(tienda_id);
+    } else if (loose_id) {
       response = await _loseProductos(Number(loose_id));
-      console.log(loose_id)
-    }
-    else{
+      console.log(loose_id);
+    } else {
       response = await _getProductos();
-      console.log("NO HAY PARAM")
+      console.log("NO HAY PARAM");
     }
 
     res.status(response.status).json(response.items);
@@ -100,13 +98,12 @@ export const getProducto = async (req: Request, res: Response) => {
 
 export const updateProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
-  const { nombre, stockTotal, precioBase, descuento } = req.body;
+  const { nombre, precioBase, descuento } = req.body;
 
   try {
     const response = await _updateProducto({
       producto_id,
       nombre,
-      stockTotal,
       precioBase,
       descuento,
     });
@@ -116,21 +113,18 @@ export const updateProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProducto = async (req: Request, res: Response) => {
+export const desactivarProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
-  const id_tienda = req.query.id_tienda;
 
   try {
-    const response = await _deleteProducto(
+    const response = await _desactivarProducto(
       Number(producto_id),
-      Number(id_tienda)
     );
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_deleteProducto", 500);
+    handleHttp(res, "error_desactivarProducto", 500);
   }
 };
-
 
 export const getColoresProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
@@ -147,11 +141,17 @@ export const getDetalleProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
   const tienda_id = req.query.tienda_id;
   const tipo = req.query.tipo as string;
-  
-  console.log(tipo)
+
+  console.log("producto_id => ", producto_id);
+  console.log("tienda_id => ", tienda_id);
+  console.log("tipo => ", tipo);
 
   try {
-    const response = await _getDetalleProducto(Number(producto_id),Number(tienda_id),tipo);
+    const response = await _getDetalleProducto(
+      Number(producto_id),
+      Number(tienda_id),
+      tipo
+    );
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error ", 500);

@@ -8,6 +8,7 @@ import { initProcedureDeletePago } from "./pago";
 import {
   initiProcedureGetDetalleProducto,
   initProcedureColoresProductos,
+  initProcedureGetColoresProductos,
 } from "./producto";
 import {
   initiProcedureGetLoseProductosTienda,
@@ -43,6 +44,7 @@ export const initSp = async () => {
     await initiProcedureGetProductoTienda();
     await initiProcedureGetLoseProductosTienda();
     await initiProcedureGetDetalleProducto();
+    await initProcedureGetColoresProductos();
 
     console.log("Se crearon los sp");
   } catch (error) {
@@ -67,6 +69,7 @@ export const dropSp = async () => {
     //producto
     await eliminarProcedimiento("SP_ColoresProductos");
     await eliminarProcedimiento("SP_GetDetalleProducto");
+    await eliminarProcedimiento("SP_GetColoresProducto");
 
     //pago
     await eliminarProcedimiento("SP_DeletePago");

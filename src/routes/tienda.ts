@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { createTienda, getTienda, getTiendas, } from "../controller/tienda";
+import {
+  activarTienda,
+  createTienda,
+  desactivarTienda,
+  getTienda,
+  getTiendas,
+  updateTienda,
+} from "../controller/tienda";
 import { ValidateCreateTienda } from "../validation/tienda";
 
 const router = Router();
@@ -7,5 +14,9 @@ const router = Router();
 router.post("/create", ValidateCreateTienda, createTienda);
 router.get("/", getTiendas);
 router.get("/:tienda_id", getTienda);
+
+router.put("/update/:tienda_id", updateTienda);
+router.put("/desactivar/:tienda_id", desactivarTienda);
+router.put("/activar/:tienda_id", activarTienda);
 
 export { router };

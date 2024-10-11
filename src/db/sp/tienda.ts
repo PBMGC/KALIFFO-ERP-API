@@ -14,6 +14,8 @@ LEFT JOIN
   productodetalle ON productodetalle.tienda_id = tienda.tienda_id
 LEFT JOIN 
   usuario ON usuario.tienda_id = tienda.tienda_id
+WHERE 
+	estado = true
 GROUP BY 
   tienda.tienda, tienda.direccion, tienda.telefono;
 `;
@@ -39,7 +41,7 @@ SELECT producto.producto_id, producto.nombre,SUM(productodetalle.stock) as stock
 FROM producto
 INNER JOIN productodetalle
 on producto.producto_id = productodetalle.producto_id
-WHERE productodetalle.tienda_id=t_id
+WHERE productodetalle.tienda_id=t_id AND producto.estado=1
 GROUP BY producto.producto_id;
 `;
 
