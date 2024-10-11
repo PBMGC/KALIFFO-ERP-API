@@ -58,3 +58,20 @@ export const executeDDL = async (ddl: string) => {
     if (conn) await conn.end();
   }
 };
+
+// Función genérica para crear entradas en la base de datos
+export const _insertIntoTable = async (queryText: string, params: any[]) => {
+  try {
+    const result = await query(queryText, params);
+    return {
+      success: true,
+      insertId: result.insertId,
+    };
+  } catch (error: any) {
+    console.error("Error al insertar en la base de datos:", error);
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};

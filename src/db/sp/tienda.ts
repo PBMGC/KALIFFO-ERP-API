@@ -14,6 +14,8 @@ LEFT JOIN
   productodetalle ON productodetalle.tienda_id = tienda.tienda_id
 LEFT JOIN 
   usuario ON usuario.tienda_id = tienda.tienda_id
+WHERE 
+	estado = true
 GROUP BY 
   tienda.tienda, tienda.direccion, tienda.telefono;
 `;

@@ -290,12 +290,11 @@ export const _updateProducto = async (producto: any) => {
 
   const queryText = `
         UPDATE producto 
-        SET nombre = ?, stockTotal = ?, precioBase = ?, descuento = ?
+        SET nombre = ?, precioBase = ?, descuento = ?
         WHERE producto_id = ?`;
 
   const result = await query(queryText, [
     nombre,
-    stockTotal,
     precioBase,
     descuento,
     producto_id,

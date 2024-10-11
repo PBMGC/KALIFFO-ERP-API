@@ -6,12 +6,18 @@ CREATE TABLE IF NOT EXISTS tienda (
     tienda VARCHAR(255) NOT NULL UNIQUE,
     direccion VARCHAR(255) NOT NULL UNIQUE,
     telefono VARCHAR(9) NOT NULL UNIQUE,
-    estado VARCHAR(255) DEFAULT 'activo' NOT NULL,
+    estado INT NOT NULL DEFAULT 1,
     INDEX I_tienda (tienda),
     INDEX I_telefono (telefono),
     INDEX I_estado (estado)
 );
 `;
+
+//producto update
+//ventas
+//movimiento producto
+//campras
+//envio
 
 const usuario = `
 CREATE TABLE IF NOT EXISTS usuario (
@@ -116,10 +122,9 @@ CREATE TABLE IF NOT EXISTS pago (
 const venta = `
 CREATE TABLE IF NOT EXISTS venta (
     venta_id INT AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(45) NOT NULL,
+    codigo VARCHAR(45) NOT NULL UNIQUE,
     tipoVenta INT NOT NULL,
     tipoComprobante INT NOT NULL,
-    cantidad INT NOT NULL,
     fecha DATE NOT NULL,
     totalBruto DECIMAL(10, 2) NOT NULL,
     totalIgv DECIMAL(10, 2) NOT NULL,
@@ -135,6 +140,17 @@ CREATE TABLE IF NOT EXISTS venta (
     INDEX I_tiendaid (tienda_id),
     FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE
 );`;
+
+/*
+  tipoVenta => 
+    1 => por menor
+    2 => por mayor
+
+  tipoComprobante => 
+    1 => boleta
+    2 => factura
+
+*/
 
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (

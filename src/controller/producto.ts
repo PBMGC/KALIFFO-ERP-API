@@ -98,13 +98,12 @@ export const getProducto = async (req: Request, res: Response) => {
 
 export const updateProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
-  const { nombre, stockTotal, precioBase, descuento } = req.body;
+  const { nombre, precioBase, descuento } = req.body;
 
   try {
     const response = await _updateProducto({
       producto_id,
       nombre,
-      stockTotal,
       precioBase,
       descuento,
     });
