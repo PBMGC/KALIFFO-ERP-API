@@ -345,34 +345,36 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="reporte.pdf"');
 
-    const data: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
+    const dataUsuario: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
 
-    const horariodata: any = data[0].horarios
+    const horariodata: any = dataUsuario.data[0][0].horarios
       .split("), (")
       .map((item: string) => {
-        const [hora_entrada, hora_salida] = item
+        const [fecha ,hora_entrada, hora_salida] = item
           .replace(/\(|\)/g, "")
           .trim()
           .split(", ");
         return {
+          fecha:fecha,
           hora_entrada: hora_entrada,
           hora_salida: hora_salida,
         };
       });
 
-    const pagosData = data[0].pagos.split("), (").map((item: string) => {
-      const [pago_total, pago_faltante] = item
+    const pagosData = dataUsuario.data[0][0].pagos.split("), (").map((item: string) => {
+      const [fecha ,pago_total, pago_faltante] = item
         .replace(/\(|\)/g, "")
         .trim()
         .split(", ");
       return {
+        fecha:fecha,
         pago_total: pago_total,
         pago_faltante: pago_faltante,
       };
     });
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
-    const incidenciasData = data[0].incidencias.split("; ").map((item: any) => {
+    const incidenciasData = dataUsuario.data[0][0].incidencias.split("; ").map((item: any) => {
       const [id, descripcion, fecha] = item
         .replace(/\(|\)/g, "")
         .trim()
@@ -408,7 +410,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       .text("REPORTE DE TRABAJADOR", 190, 75);
 
     const tablaDatosTrabajador = {
-      title: `Datos de ${data[0].nombre} ${data[0].ap_paterno} ${data[0].ap_materno}`,
+      title: `Datos de ${dataUsuario.data[0][0].nombre} ${dataUsuario.data[0][0].ap_paterno} ${dataUsuario.data[0][0].ap_materno}`,
       headers: [
         {
           label: "Nombre",
@@ -438,14 +440,14 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       datas: [
         {
           nombre:
-            data[0].nombre +
+          dataUsuario.data[0][0].nombre +
             " " +
-            data[0].ap_paterno +
+            dataUsuario.data[0][0].ap_paterno +
             " " +
-            data[0].ap_materno,
-          telefono: data[0].telefono,
-          dni: data[0].dni,
-          tienda: data[0].tienda,
+            dataUsuario.data[0][0].ap_materno,
+          telefono: dataUsuario.data[0][0].telefono,
+          dni: dataUsuario.data[0][0].dni,
+          tienda: dataUsuario.data[0][0].tienda,
         },
       ],
     };
@@ -453,6 +455,12 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
     const tablaDatosHorario = {
       title: "Asistencia del Trabajador",
       headers: [
+        {
+          label:"Fecha",
+          property:"fecha",
+          headerAlign: "center",
+          align: "center",
+        },
         {
           label: "Hora de Entrada",
           property: "horadeentrada",
@@ -474,6 +482,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       ],
       datas: horariodata.map((horario: any) => {
         return {
+          fecha:horario.fecha,
           horadeentrada: horario.hora_entrada,
           horasalida: horario.hora_salida,
           horatrabajadas: "8",
@@ -504,8 +513,9 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
         },
       ],
       datas: pagosData.map((pago: any) => {
+        console.log(pago)
         return {
-          fecha: pago.pago_fecha,
+          fecha: pago.fecha,
           montoP: pago.pago_total,
           montoF: pago.pago_faltante,
         };

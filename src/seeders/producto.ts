@@ -11,12 +11,14 @@ const productos: any = [
     stockTotal: 0,
     precioBase: 49.99,
     descuento: 10,
+    estado:1
   },
   {
     nombre: "Jeans Recto Negro",
     stockTotal: 0,
     precioBase: 59.99,
     descuento: 15,
+    estado:1
   },
   {
     nombre: "Jeans Slim Fit Gris",
@@ -29,30 +31,35 @@ const productos: any = [
     stockTotal: 0,
     precioBase: 44.99,
     descuento: 20,
+    estado:1
   },
   {
     nombre: "Jeans Mom Fit Celeste",
     stockTotal: 0,
     precioBase: 39.99,
     descuento: 12,
+    estado:1
   },
   {
     nombre: "Jeans Bootcut Azul Oscuro",
     stockTotal: 0,
     precioBase: 64.99,
     descuento: 18,
+    estado:1
   },
   {
     nombre: "Jeans Wide Leg Beige",
     stockTotal: 0,
     precioBase: 69.99,
     descuento: 8,
+    estado:1
   },
   {
     nombre: "Jeans High-Waist Gris Oscuro",
     stockTotal: 0,
     precioBase: 49.99,
     descuento: 10,
+    estado:1
   },
 ];
 

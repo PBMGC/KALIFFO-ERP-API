@@ -1,38 +1,47 @@
 import { createSp } from "../../util/funcion_sp";
 
 const queryGetReporteUsuario = `
-  SELECT
-    u.usuario_id,
-    u.nombre,
-    u.ap_paterno,
-    u.ap_materno,
-    u.telefono,
-    u.dni,
-    t.tienda,
-    h.horarios,
-    i.incidencias,
-    pg.pagos
-FROM
-    usuario u
-LEFT JOIN
-    tienda t ON u.tienda_id = t.tienda_id
-LEFT JOIN
-    (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", hora_entrada, ', ', hora_salida, ")") ORDER BY fecha DESC SEPARATOR ', ') AS horarios
-        FROM horario
-        GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id
-LEFT JOIN
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion,", ",fecha_creacion,")") ORDER BY tipo SEPARATOR "; ") AS incidencias
-     FROM incidencia
-     GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id
-LEFT JOIN
-    (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
-     FROM pago
-     GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id
-WHERE
-    u.usuario_id = u_id
-ORDER BY
-    u.usuario_id;
+SET @consulta = '
+    SELECT
+        u.usuario_id,
+        u.nombre,
+        u.ap_paterno,
+        u.ap_materno,
+        u.telefono,
+        u.dni,
+        t.tienda,
+        h.horarios,
+        i.incidencias,
+        pg.pagos
+    FROM
+        usuario u
+    LEFT JOIN
+        tienda t ON u.tienda_id = t.tienda_id
+    LEFT JOIN
+        (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", fecha, ", " , hora_entrada, ", ", hora_salida, ")") ORDER BY fecha DESC SEPARATOR ", ") AS horarios
+         FROM horario
+         GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id
+    LEFT JOIN
+        (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ", ", fecha_creacion, ")") ORDER BY tipo SEPARATOR "; ") AS incidencias
+         FROM incidencia
+         GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id
+    LEFT JOIN
+        (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", fecha, ", " , montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
+         FROM pago
+         GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id
+    WHERE
+        u.usuario_id = ?
+';
 
+IF fecha_r IS NOT NULL AND fecha_r != '' THEN
+    SET @consulta = CONCAT(@consulta, ' AND h.fecha = "', fecha_r, '" AND i.fecha_creacion = "', fecha_r, '" AND pg.fecha = "', fecha_r, '"');
+END IF;
+
+SET @consulta = CONCAT(@consulta, ' ORDER BY u.usuario_id;');
+
+PREPARE stmt FROM @consulta;
+EXECUTE stmt USING u_id;
+DEALLOCATE PREPARE stmt;
 `;
 
 const queryGetUsuarios = `
@@ -121,7 +130,7 @@ const queryUpdateUsuario = `
 `;
 
 export const initProcedureGetReporteUsuario = async () => {
-  await createSp("SP_ReporteUsuario", queryGetReporteUsuario, "IN u_id INT");
+  await createSp("SP_ReporteUsuario", queryGetReporteUsuario, "IN u_id INT,IN fecha_r DATE");
 };
 
 export const initProcedureGetUsuarios = async () => {

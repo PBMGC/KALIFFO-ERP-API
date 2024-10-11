@@ -3,7 +3,7 @@ import { Request, response, Response } from "express";
 import {
   _createProducto,
   _createProductoCompleto,
-  _deleteProducto,
+  _desactivarProducto,
   _getColoresProducto,
   _getDetalleProducto,
   _getProducto,
@@ -113,18 +113,16 @@ export const updateProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProducto = async (req: Request, res: Response) => {
+export const desactivarProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
-  const id_tienda = req.query.id_tienda;
 
   try {
-    const response = await _deleteProducto(
+    const response = await _desactivarProducto(
       Number(producto_id),
-      Number(id_tienda)
     );
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_deleteProducto", 500);
+    handleHttp(res, "error_desactivarProducto", 500);
   }
 };
 

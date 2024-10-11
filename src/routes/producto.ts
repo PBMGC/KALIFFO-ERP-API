@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createProducto,
   createProductoCompleto,
-  deleteProducto,
+  desactivarProducto,
   getColoresProducto,
   getDetalleProducto,
   // getColoresProducto,
@@ -32,7 +32,6 @@ router.post("/create", createProducto);
 // router.post("/detalle/create", createProductoDetalle);
 
 router.put("/update/:producto_id", updateProducto);
-
-router.delete("/delete/:producto_id", deleteProducto);
+router.put("/desactivar/:producto_id",desactivarProducto)
 
 export { router };
