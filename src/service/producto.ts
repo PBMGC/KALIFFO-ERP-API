@@ -200,7 +200,6 @@ LEFT JOIN productodetalle pd ON p.producto_id = pd.producto_id
 LEFT JOIN color c ON pd.color_id = c.color_id
 WHERE p.producto_id = ?
 GROUP BY p.producto_id;
-
   `;
   const queryTienda = `
     SELECT tienda.tienda_id,tienda.tienda, SUM(productodetalle.stock) as "STOCK"

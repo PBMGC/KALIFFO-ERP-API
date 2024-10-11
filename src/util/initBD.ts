@@ -152,6 +152,25 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
     INDEX I_productoDetalleid (productoDetalle_id)
 );`;
 
+const movimientoMercaderia= `
+CREATE TABLE IF NOT EXISTS movimientoMercaderia (
+    movimiento_ID INT AUTO_INCREMENT PRIMARY KEY,
+    tienda_idO INT NOT NULL,
+    tienda_idD INT NOT NULL,
+    producto_id INT NOT NULL, 
+    producto_Did INT NOT NULL,
+    talla INT NOT NULL,
+    cantidad INT NOT NULL,
+    fecha DATE NOT NULL,
+    FOREIGN KEY (tienda_idI) REFERENCES tienda(tienda_id),
+    FOREIGN KEY (tienda_idF) REFERENCES tienda(tienda_id),
+    FOREIGN KEY (producto_Did) REFERENCES productoDetalle(productoDetalle_id),
+    INDEX I_tienda_idI (tienda_idI),
+    INDEX I_tienda_idF (tienda_idF),
+    INDEX I_producto_Did (producto_Did)
+);
+`
+
 export const initBD = async () => {
   const conn = await connection();
 
@@ -168,6 +187,7 @@ export const initBD = async () => {
       await conn.execute(pago);
       await conn.execute(venta);
       await conn.execute(detalleVenta);
+      await conn.execute(movimientoMercaderia)
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -192,6 +212,7 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS horario");
       await conn.execute("DROP TABLE IF EXISTS usuario");
       await conn.execute("DROP TABLE IF EXISTS tienda");
+      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia")
 
       console.log("Tablas borradas correctamente.");
     } catch (error) {
