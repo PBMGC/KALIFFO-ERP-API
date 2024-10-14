@@ -19,9 +19,6 @@ export const _createVenta = async (venta: any) => {
     detalles,
   } = venta;
 
-  // console.log("===================================");
-  // console.log(detalles);
-
   const ventaExistente = (await query(`SELECT * FROM venta WHERE codigo = ?`, [
     codigo,
   ])) as any;

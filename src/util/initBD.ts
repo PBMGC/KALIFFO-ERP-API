@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS tienda (
 );
 `;
 
-//producto update
 //ventas
 //movimiento producto
 //campras
@@ -123,6 +122,7 @@ const venta = `
 CREATE TABLE IF NOT EXISTS venta (
     venta_id INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(45) NOT NULL UNIQUE,
+    estado INT NOT NULL DEFAULT 1,
     tipoVenta INT NOT NULL,
     tipoComprobante INT NOT NULL,
     fecha DATE NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS venta (
     1 => boleta
     2 => factura
 
-*/
+*/ 
 
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
