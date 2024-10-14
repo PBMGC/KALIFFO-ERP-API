@@ -3,17 +3,18 @@ import { createCodigo } from "../util/createCodigo";
 import { query } from "../util/query";
 
 export const _createProducto = async (producto: any) => {
-  const { nombre, stockTotal, precioBase, descuento } = producto;
+  const { nombre, stockTotal, precioBase, descuento,estado } = producto;
 
   const queryText = `
-        INSERT INTO producto (nombre, stockTotal, precioBase, descuento)
-        VALUES (?, ?, ?, ?)`;
+        INSERT INTO producto (nombre, stockTotal, precioBase, descuento,estado)
+        VALUES (?, ?, ?, ?, ?)`;
 
   const result = await query(queryText, [
     nombre,
     stockTotal,
     precioBase,
     descuento,
+    estado
   ]);
 
   if (!result.success) {
@@ -166,7 +167,7 @@ export const _getProductos = async () => {
       };
     }
 
-    const queryText = `SELECT * FROM producto`;
+    const queryText = `SELECT * FROM producto where estado=1`;
     const result = await query(queryText);
 
     if (!result.success) {
@@ -316,18 +317,17 @@ export const _updateProducto = async (producto: any) => {
   };
 };
 
-export const _deleteProducto = async (
+export const _desactivarProducto = async (
   producto_id: number,
-  tienda_id: number
 ) => {
-  const queryText = `DELETE FROM productodetalle WHERE producto_id = ? AND tienda_id=?`;
+  const queryText = `UPDATE producto SET estado = 0 WHERE producto_id = ?`;
 
-  const result = await query(queryText, [producto_id, tienda_id]);
+  const result = await query(queryText, [producto_id]);
 
   if (!result.success) {
-    console.error("Error al borrar el producto:", result.error);
+    console.error("Error al desactivar el producto:", result.error);
     return {
-      message: "Error al borrar el producto. Intente nuevamente más tarde.",
+      message: "Error al desactivar el producto. Intente nuevamente más tarde.",
       success: false,
       status: result.status || 500,
     };
