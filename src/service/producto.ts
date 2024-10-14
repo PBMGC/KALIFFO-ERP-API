@@ -1,9 +1,9 @@
 import redisClient from "../redis/redisClient";
-import { createCodigo } from "../util/createCodigo";
+import { createCodigoProductoTalla } from "../util/createCodigos";
 import { query } from "../util/query";
 
 export const _createProducto = async (producto: any) => {
-  const { nombre, stockTotal, precioBase, descuento,estado } = producto;
+  const { nombre, stockTotal, precioBase, descuento, estado } = producto;
 
   const queryText = `
         INSERT INTO producto (nombre, stockTotal, precioBase, descuento,estado)
@@ -14,7 +14,7 @@ export const _createProducto = async (producto: any) => {
     stockTotal,
     precioBase,
     descuento,
-    estado
+    estado,
   ]);
 
   if (!result.success) {
@@ -51,7 +51,7 @@ export const _createProductoCompleto = async (
 
       const productoDetalle_id = resultDetalle.insertId;
 
-      const codigo = await createCodigo(producto_id, detalle);
+      const codigo = await createCodigoProductoTalla(producto_id, detalle);
 
       const codigoExistente = await query(
         `SELECT COUNT(*) as total FROM productoTalla WHERE codigo = ?`,
@@ -317,9 +317,7 @@ export const _updateProducto = async (producto: any) => {
   };
 };
 
-export const _desactivarProducto = async (
-  producto_id: number,
-) => {
+export const _desactivarProducto = async (producto_id: number) => {
   const queryText = `UPDATE producto SET estado = 0 WHERE producto_id = ?`;
 
   const result = await query(queryText, [producto_id]);

@@ -1,6 +1,7 @@
 import { executeDDL } from "../../util/query";
 
-export const createTrigger = async () => {
+//Agrega estock a la tabla producto cuando agregas productosDetalle
+export const triggerInsertProductoDetalle = async () => {
   const trigger = `
     CREATE TRIGGER TR_INS_productodetalle AFTER INSERT ON productodetalle
     FOR EACH ROW BEGIN
@@ -12,19 +13,61 @@ export const createTrigger = async () => {
 
   const result = await executeDDL(trigger);
   if (result.success) {
-    console.log("Trigger creado exitosamente.");
+    // console.log("Trigger creado exitosamente.");
   } else {
-    console.log("Error al crear el trigger:", result.error);
+    // console.log("Error al crear el trigger:", result.error);
   }
 };
 
-export const dropTrigger = async () => {
+export const dropTriggerInsertProductoDetalle = async () => {
   const trigger = `DROP TRIGGER IF EXISTS TR_INS_productodetalle;`;
 
   const result = await executeDDL(trigger);
   if (result.success) {
-    console.log("Trigger eliminado exitosamente.");
+    // console.log("Trigger eliminado exitosamente.");
   } else {
-    console.log("Error al eliminar el trigger:", result.error);
+    // console.log("Error al eliminar el trigger:", result.error);
+  }
+};
+
+//Resta el stock de productoDetalle y producto cuando se crea vetalleVenta
+export const triggerRestaStockProducto = async () => {
+  const trigger = `
+  CREATE TRIGGER restar_stock AFTER INSERT ON detalleVenta
+FOR EACH ROW
+BEGIN
+	-- Restar stock del producto general
+    UPDATE producto
+    SET stockTotal = stockTotal - NEW.cantidad
+    WHERE producto_id = (
+        SELECT producto_id 
+        FROM productoDetalle 
+        WHERE productoDetalle_id = NEW.productoDetalle_id
+    );
+
+    -- Restar stock de productoDetalle
+    UPDATE productoDetalle
+    SET stock = stock - NEW.cantidad
+    WHERE productoDetalle_id = NEW.productoDetalle_id;
+
+    
+END;
+  `;
+  const result = await executeDDL(trigger);
+  if (result.success) {
+    // console.log("Trigger creado exitosamente.");
+  } else {
+    // console.log("Error al crear el trigger:", result.error);
+  }
+};
+
+export const dropTriggerRestaStockProducto = async () => {
+  const trigger = `DROP TRIGGER IF EXISTS restar_stock;`;
+
+  const result = await executeDDL(trigger);
+  if (result.success) {
+    // console.log("Trigger eliminado exitosamente.");
+  } else {
+    // console.log("Error al eliminar el trigger:", result.error);
   }
 };

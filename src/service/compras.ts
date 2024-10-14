@@ -1,4 +1,3 @@
-import { param } from "express-validator";
 import { query } from "../util/query";
 
 export const _createCompra = async (compra: any) => {
