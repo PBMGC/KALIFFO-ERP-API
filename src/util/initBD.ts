@@ -13,11 +13,6 @@ CREATE TABLE IF NOT EXISTS tienda (
 );
 `;
 
-//ventas
-//movimiento producto
-//campras
-//envio
-
 const usuario = `
 CREATE TABLE IF NOT EXISTS usuario (
     usuario_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -153,7 +148,7 @@ CREATE TABLE IF NOT EXISTS venta (
     1 => boleta
     2 => factura
 
-*/ 
+*/
 
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
@@ -170,7 +165,10 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
     INDEX I_productoDetalleid (productoDetalle_id)
 );`;
 
-const movimientoMercaderia= `
+// producto_id => 120
+//productoDetalle_id => 42
+
+const movimientoMercaderia = `
 CREATE TABLE IF NOT EXISTS movimientoMercaderia (
     movimiento_ID INT AUTO_INCREMENT PRIMARY KEY,
     tienda_origen_id INT NOT NULL,
@@ -187,9 +185,9 @@ CREATE TABLE IF NOT EXISTS movimientoMercaderia (
     INDEX I_productoDetalle_id (productoDetalle_id),
     INDEX I_fecha (fecha)
 );
-`
+`;
 
-const Compras= `
+const compras = `
   CREATE TABLE IF NOT EXISTS compras (
     compra_id INT AUTO_INCREMENT PRIMARY KEY,
     empresa_proveedor VARCHAR(30) NOT NULL,
@@ -201,9 +199,9 @@ const Compras= `
     INDEX I_fecha_compra (fecha_compra),
     INDEX I_empresa_proveedor (empresa_proveedor)
 );
-`
+`;
 
-const compras_detalle= `
+const compras_detalle = `
 CREATE TABLE IF NOT EXISTS compras_detalle (
     compra_id INT NOT NULL,                        
     producto VARCHAR(40) NOT NULL,                 
@@ -212,7 +210,7 @@ CREATE TABLE IF NOT EXISTS compras_detalle (
     FOREIGN KEY (compra_id) REFERENCES compras(compra_id) ON DELETE CASCADE,
     INDEX I_producto (producto)
 );
-`
+`;
 
 const Envios = `
   CREATE TABLE IF NOT EXISTS envios (
@@ -222,11 +220,11 @@ const Envios = `
     cantidad INT NOT NULL,
     estado INT NOT NULL,
     costo_envio DECIMAL(10, 2) NULL,
-    FOREIGN KEY (pedido_id) REFERENCES pedido(pedido_id) ON DELETE CASCADE,
+    FOREIGN KEY (pedido_id) REFERENCES pedido(pedido_id) ON DELETE CASCADE
     INDEX I_pedido_id(pedido_id),
     INDEX I_estado (estado)
 );
-`
+`;
 
 const Almacenes = `
 CREATE TABLE IF NOT EXISTS almacenes (
@@ -237,8 +235,7 @@ CREATE TABLE IF NOT EXISTS almacenes (
     STOCK INT,               
     INDEX I_estado (estado)   
 );
-`
-
+`;
 
 export const initBD = async () => {
   const conn = await connection();
@@ -253,12 +250,10 @@ export const initBD = async () => {
       await conn.execute(color);
       await conn.execute(productoDetalle);
       await conn.execute(productoTalla);
-      await conn.execute(pago);
+      await conn.execute(movimientoMercaderia), await conn.execute(pago);
       await conn.execute(venta);
       await conn.execute(detalleVenta);
-      await conn.execute(movimientoMercaderia),
-      await conn.execute(Compras),
-      await conn.execute(compras_detalle)
+      await conn.execute(compras), await conn.execute(compras_detalle);
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -275,7 +270,11 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS detalleVenta");
       await conn.execute("DROP TABLE IF EXISTS venta");
       await conn.execute("DROP TABLE IF EXISTS pago");
+      await conn.execute("DROP TABLE IF EXISTS compras_detalle");
+      await conn.execute("DROP TABLE IF EXISTS compras");
+      await conn.execute("DROP TABLE IF EXISTS envios");
       await conn.execute("DROP TABLE IF EXISTS productoTalla");
+      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia");
       await conn.execute("DROP TABLE IF EXISTS productoDetalle");
       await conn.execute("DROP TABLE IF EXISTS producto");
       await conn.execute("DROP TABLE IF EXISTS color");
@@ -283,7 +282,6 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS horario");
       await conn.execute("DROP TABLE IF EXISTS usuario");
       await conn.execute("DROP TABLE IF EXISTS tienda");
-      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia")
 
       console.log("Tablas borradas correctamente.");
     } catch (error) {
@@ -293,3 +291,5 @@ export const borrarBD = async () => {
     }
   }
 };
+//ventas
+//pagos

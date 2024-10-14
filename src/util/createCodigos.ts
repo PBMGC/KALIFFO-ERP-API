@@ -1,6 +1,9 @@
 import { query } from "./query";
 
-export const createCodigo = async (producto_id: number, detalle: any) => {
+export const createCodigoProductoTalla = async (
+  producto_id: number,
+  detalle: any
+) => {
   const productoResult = await query(
     `select * from producto where producto_id = ?`,
     [producto_id]
@@ -20,6 +23,20 @@ export const createCodigo = async (producto_id: number, detalle: any) => {
   const codigo = `${inicialProducto}${
     cantidadProductosConInicial + 1
   }-${producto_id}${detalle.color_id}-${detalle.talla}`;
+
+  return codigo;
+};
+
+export const createCodigoVenta = async (
+  tipoComprobante: number,
+  tienda_id: number
+) => {
+  const result = await query(`SELECT COUNT(*) as numero FROM venta;`);
+
+  let codigo =
+    tipoComprobante === 1
+      ? `BT${tienda_id}${result.data[0].numero + 1}`
+      : `FT${tienda_id}${result.data[0].numero + 1}`;
 
   return codigo;
 };

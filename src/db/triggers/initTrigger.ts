@@ -1,7 +1,16 @@
-import { createTrigger, dropTrigger } from "./producto";
+import {
+  dropTriggerInsertProductoDetalle,
+  dropTriggerRestaStockProducto,
+  triggerInsertProductoDetalle,
+  triggerRestaStockProducto,
+} from "./producto";
 
 export const initTriggers = async () => {
-  await dropTrigger();
+  //borrar
+  await dropTriggerInsertProductoDetalle();
+  await dropTriggerRestaStockProducto();
 
-  await createTrigger();
+  //crear
+  await triggerInsertProductoDetalle();
+  await triggerRestaStockProducto();
 };

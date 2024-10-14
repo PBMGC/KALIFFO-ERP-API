@@ -1,8 +1,8 @@
+import { createCodigoVenta } from "../util/createCodigos";
 import { query } from "../util/query";
 
 export const _createVenta = async (venta: any) => {
   const {
-    codigo,
     tipoVenta,
     tipoComprobante,
     fecha,
@@ -19,6 +19,13 @@ export const _createVenta = async (venta: any) => {
     detalles,
   } = venta;
 
+  const codigo = await createCodigoVenta(tipoComprobante, tienda_id);
+
+  // return {
+  //   message: `codigo creado ${codigo}`,
+  //   success: false,
+  //   status: 400,
+  // };
   const ventaExistente = (await query(`SELECT * FROM venta WHERE codigo = ?`, [
     codigo,
   ])) as any;
@@ -56,7 +63,6 @@ export const _createVenta = async (venta: any) => {
     ]);
 
     const venta_id = resultVenta.insertId;
-    console.log("Venta creada con éxito =>", venta_id);
 
     const detallesResult = await _createDetalleVenta(venta_id, detalles);
 
@@ -134,7 +140,7 @@ export const _getVentas = async () => {
   try {
     const queryVentas = `
       SELECT 
-        venta_id, codigo, tipoVenta, tipoComprobante, fecha, 
+        venta_id,estado, codigo, tipoVenta, tipoComprobante, fecha, 
         totalBruto, totalIgv, totalNeto, tipoPago, dni, 
         ruc, direccion, telefono, nombre, tienda_id 
       FROM venta
