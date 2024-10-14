@@ -1,4 +1,5 @@
 import { eliminarProcedimiento } from "../../util/funcion_sp";
+import { initiProcedureUpdateCompra, initiProcedureUpdateCompraDetalle } from "./compras";
 import { initProcedureDeleteHorario } from "./horario";
 import {
   initProcedureDeleteIncidencia,
@@ -45,6 +46,8 @@ export const initSp = async () => {
     await initiProcedureGetLoseProductosTienda();
     await initiProcedureGetDetalleProducto();
     await initProcedureGetColoresProductos();
+    await initiProcedureUpdateCompra();
+    await initiProcedureUpdateCompraDetalle();
 
     console.log("Se crearon los sp");
   } catch (error) {
@@ -80,6 +83,10 @@ export const dropSp = async () => {
 
     //horario
     await eliminarProcedimiento("SP_DeleteHorario");
+
+    //compras
+    await eliminarProcedimiento("SP_UpdateCompra");
+    await eliminarProcedimiento("SP_UpdateCompraDetalle");
 
     console.log("Se borraron los sp");
   } catch (error) {
