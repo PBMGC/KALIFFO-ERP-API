@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS productoDetalle (
     color_id INT NOT NULL,
     tienda_id INT NOT NULL,
     stock INT NOT NULL,
-    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE, -- Al eliminar producto, eliminará también el productoDetalle
+    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
     FOREIGN KEY (color_id) REFERENCES color(color_id),
     FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id),
     INDEX (producto_id),
@@ -173,21 +173,72 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
 const movimientoMercaderia= `
 CREATE TABLE IF NOT EXISTS movimientoMercaderia (
     movimiento_ID INT AUTO_INCREMENT PRIMARY KEY,
-    tienda_idO INT NOT NULL,
-    tienda_idD INT NOT NULL,
-    producto_id INT NOT NULL, 
-    producto_Did INT NOT NULL,
-    talla INT NOT NULL,
+    tienda_origen_id INT NOT NULL,
+    tienda_destino_id INT NOT NULL,
+    productoDetalle_id INT NOT NULL,
+    talla VARCHAR(20) NOT NULL,
     cantidad INT NOT NULL,
     fecha DATE NOT NULL,
-    FOREIGN KEY (tienda_idI) REFERENCES tienda(tienda_id),
-    FOREIGN KEY (tienda_idF) REFERENCES tienda(tienda_id),
-    FOREIGN KEY (producto_Did) REFERENCES productoDetalle(productoDetalle_id),
-    INDEX I_tienda_idI (tienda_idI),
-    INDEX I_tienda_idF (tienda_idF),
-    INDEX I_producto_Did (producto_Did)
+    FOREIGN KEY (tienda_origen_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE,  
+    FOREIGN KEY (tienda_destino_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE,
+    FOREIGN KEY (productoDetalle_id) REFERENCES productoDetalle(productoDetalle_id) ON DELETE CASCADE,
+    INDEX I_tienda_origen (tienda_origen_id),
+    INDEX I_tienda_destino (tienda_destino_id),
+    INDEX I_productoDetalle_id (productoDetalle_id),
+    INDEX I_fecha (fecha)
 );
 `
+
+const Compras= `
+  CREATE TABLE IF NOT EXISTS compras (
+    compra_id INT AUTO_INCREMENT PRIMARY KEY,
+    empresa_proveedor VARCHAR(30) NOT NULL,
+    fecha_compra DATE NOT NULL,
+    cantidad INT NOT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    tienda_id INT NOT NULL,
+    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE,
+    INDEX I_fecha_compra (fecha_compra),
+    INDEX I_empresa_proveedor (empresa_proveedor)
+);
+`
+
+const compras_detalle= `
+CREATE TABLE IF NOT EXISTS compras_detalle (
+    compra_id INT NOT NULL,                        
+    producto VARCHAR(40) NOT NULL,                 
+    cantidad INT NOT NULL,                          
+    total DECIMAL(10, 2) NOT NULL,                 
+    FOREIGN KEY (compra_id) REFERENCES compras(compra_id) ON DELETE CASCADE,
+    INDEX I_producto (producto)
+);
+`
+
+const Envios = `
+  CREATE TABLE IF NOT EXISTS envios (
+    envio_id INT AUTO_INCREMENT PRIMARY KEY,  
+    pedido_id INT NOT NULL,
+    fecha_envio DATE NOT NULL, 
+    cantidad INT NOT NULL,
+    estado INT NOT NULL,
+    costo_envio DECIMAL(10, 2) NULL,
+    FOREIGN KEY (pedido_id) REFERENCES pedido(pedido_id) ON DELETE CASCADE,
+    INDEX I_pedido_id(pedido_id),
+    INDEX I_estado (estado)
+);
+`
+
+const Almacenes = `
+CREATE TABLE IF NOT EXISTS almacenes (
+    almacen_id INT AUTO_INCREMENT PRIMARY KEY,    
+    nombre VARCHAR(255) NOT NULL UNIQUE,  
+    direccion VARCHAR(255) NOT NULL,              
+    estado INT NOT NULL,                 
+    STOCK INT,               
+    INDEX I_estado (estado)   
+);
+`
+
 
 export const initBD = async () => {
   const conn = await connection();
@@ -205,7 +256,9 @@ export const initBD = async () => {
       await conn.execute(pago);
       await conn.execute(venta);
       await conn.execute(detalleVenta);
-      await conn.execute(movimientoMercaderia)
+      await conn.execute(movimientoMercaderia),
+      await conn.execute(Compras),
+      await conn.execute(compras_detalle)
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
