@@ -197,7 +197,7 @@ const Compras= `
     cantidad INT NOT NULL,
     total DECIMAL(10, 2) NOT NULL,
     tienda_id INT NOT NULL,
-    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE,
+    FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id),
     INDEX I_fecha_compra (fecha_compra),
     INDEX I_empresa_proveedor (empresa_proveedor)
 );
@@ -205,6 +205,7 @@ const Compras= `
 
 const compras_detalle= `
 CREATE TABLE IF NOT EXISTS compras_detalle (
+    compraDetalle_id INT AUTO_INCREMENT PRIMARY KEY,
     compra_id INT NOT NULL,                        
     producto VARCHAR(40) NOT NULL,                 
     cantidad INT NOT NULL,                          
