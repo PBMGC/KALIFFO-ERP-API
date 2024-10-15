@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  activarProducto,
   createProducto,
   createProductoCompleto,
   desactivarProducto,
@@ -30,6 +31,7 @@ router.post("/create", createProducto);
 // router.post("/detalle/create", createProductoDetalle);
 
 router.put("/update/:producto_id", updateProducto);
-router.put("/desactivar/:producto_id",desactivarProducto)
+router.put("/desactivar/:producto_id", desactivarProducto);
+router.put("/activar/:producto_id", activarProducto);
 
 export { router };

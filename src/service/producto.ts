@@ -317,27 +317,6 @@ export const _updateProducto = async (producto: any) => {
   };
 };
 
-export const _desactivarProducto = async (producto_id: number) => {
-  const queryText = `UPDATE producto SET estado = 0 WHERE producto_id = ?`;
-
-  const result = await query(queryText, [producto_id]);
-
-  if (!result.success) {
-    console.error("Error al desactivar el producto:", result.error);
-    return {
-      message: "Error al desactivar el producto. Intente nuevamente más tarde.",
-      success: false,
-      status: result.status || 500,
-    };
-  }
-
-  return {
-    message: "Producto borrado con éxito.",
-    success: true,
-    status: 200,
-  };
-};
-
 export const _loseProductos = async (tienda_id: number) => {
   try {
     const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`, [
@@ -462,6 +441,67 @@ export const _getTallaProducto = async (detalle_id: number) => {
     console.log(error);
     return {
       message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _desactivarProducto = async (producto_id: number) => {
+  const queryText =
+    "UPDATE producto SET estado = false WHERE producto_id = ? AND estado != false;";
+
+  try {
+    const result = await query(queryText, [producto_id]);
+    console.log(result);
+
+    if (result.success && result.affectedRows > 0) {
+      return {
+        message: `El producto con ID ${producto_id} ha sido desactivada correctamente.`,
+        success: true,
+        status: 200,
+      };
+    } else {
+      return {
+        message: `No se encontró producto con ID ${producto_id} o ya estaba desactivada.`,
+        success: false,
+        status: 400,
+      };
+    }
+  } catch (error: any) {
+    console.error("Error al desactivar la producto:", error);
+    return {
+      message: error.message || "Error desconocido al desactivar producto.",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _activarProducto = async (producto_id: number) => {
+  const queryText =
+    "UPDATE producto SET estado = true WHERE producto_id = ? AND estado != true;";
+
+  try {
+    const result = await query(queryText, [producto_id]);
+
+    if (result.success && result.affectedRows > 0) {
+      return {
+        message: `El producto con ID ${producto_id} ha sido activada correctamente.`,
+        success: true,
+        status: 200,
+      };
+    } else {
+      return {
+        message: `No se encontró producto con ID ${producto_id} o ya estaba activada.`,
+        success: false,
+        status: 400,
+      };
+    }
+  } catch (error: any) {
+    console.error("Error al activar producto:", error);
+    return {
+      message: error.message || "Error desconocido al desactivar producto.",
       success: false,
       status: 500,
     };

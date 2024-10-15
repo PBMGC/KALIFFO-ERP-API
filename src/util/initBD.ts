@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS venta (
     estado INT NOT NULL DEFAULT 1,
     tipoVenta INT NOT NULL,
     tipoComprobante INT NOT NULL,
-    fecha DATE NOT NULL,
+    fecha DATETIME NOT NULL,
     totalBruto DECIMAL(10, 2) NOT NULL,
     totalIgv DECIMAL(10, 2) NOT NULL,
     totalNeto DECIMAL(10, 2) NOT NULL,
@@ -320,6 +320,7 @@ export const borrarBD = async () => {
 
   if (conn) {
     try {
+      await conn.execute("SET foreign_key_checks = 0;");
       await conn.execute("DROP TABLE IF EXISTS detalleVenta");
       await conn.execute("DROP TABLE IF EXISTS venta");
       await conn.execute("DROP TABLE IF EXISTS pago");
@@ -338,7 +339,7 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS almacen_telas");
       await conn.execute("DROP TABLE IF EXISTS lotes");
       await conn.execute("DROP TABLE IF EXISTS cortes");
-
+      await conn.execute("SET foreign_key_checks = 1;");
       console.log("Tablas borradas correctamente.");
     } catch (error) {
       console.error("Error al borrar las tablas:", error);

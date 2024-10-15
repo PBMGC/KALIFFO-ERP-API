@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateToken } from "../middleware/validateToken";
-import { getAsistencias } from "../controller/asistencia";
+import { getAsistencias, horasTrabajadas } from "../controller/asistencia";
 // import {
 //   deleteAsistencia,
 //   finalAsitencia,
@@ -17,6 +17,6 @@ router.get("", getAsistencias);
 
 // router.delete("/delete/:horario_id",deleteAsistencia)
 
-// router.get("/horasTrabajadas/:usuario_id", horasTrabajadas);
+router.post("/horasTrabajadas/:usuario_id", horasTrabajadas);
 
 export { router };
