@@ -1,3 +1,4 @@
+import { droptriggerInsertCorte, triggerInsertCorte } from "./cortes";
 import {
   dropTriggerInsertProductoDetalle,
   dropTriggerRestaStockProducto,
@@ -9,8 +10,10 @@ export const initTriggers = async () => {
   //borrar
   await dropTriggerInsertProductoDetalle();
   await dropTriggerRestaStockProducto();
+  await droptriggerInsertCorte();
 
   //crear
   await triggerInsertProductoDetalle();
   await triggerRestaStockProducto();
+  await triggerInsertCorte();
 };
