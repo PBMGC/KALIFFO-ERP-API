@@ -5,8 +5,6 @@ const router = Router();
 
 router.get("/:usuario_id", getPagos);
 router.delete("/delete/:pago_id", deletePagos);
+// router.post()
 
 export { router };
-
-//crear, ver
-//usuario agregar pago
