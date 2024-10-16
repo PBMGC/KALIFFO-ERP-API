@@ -142,7 +142,7 @@ export const _getVentas = async (tipoComprobante?: number) => {
       SELECT 
         v.*, 
         t.tienda, 
-        SUM(dv.cantidad) AS total_cantidad
+        SUM(dv.cantidad) AS cantidad
       FROM venta v
       JOIN tienda t ON t.tienda_id = v.tienda_id
       JOIN detalleVenta dv ON dv.venta_id = v.venta_id
