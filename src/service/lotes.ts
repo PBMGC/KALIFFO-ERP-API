@@ -49,3 +49,41 @@ export const _createLote = async () => {
     }
   };
   
+
+  export const _UpdateLote = async (lote_id: number, estado: number, etapa: string) => {
+    try {
+      let queryS;
+  
+      if (etapa === "cortes") {
+        queryS = `
+            UPDATE cortes SET estado = ? WHERE lote_id = ?;
+        `;
+      } else if (etapa === "lavanderia") {
+        queryS = `
+            UPDATE lavanderia SET estado = ? WHERE lote_id = ?;
+        `;
+      } else {
+        return {
+          message: "Etapa no válida.",
+          success: false,
+          status: 400,
+        };
+      }
+  
+      await query(queryS, [estado, lote_id]); 
+  
+      return {
+        message: "Lote actualizado con éxito.",
+        success: true,
+        status: 200,
+      };
+    } catch (error: any) {
+      return {
+        message: "Error al actualizar el lote.",
+        success: false,
+        error: error.message || error,
+        status: 500,
+      };
+    } 
+  };
+  
