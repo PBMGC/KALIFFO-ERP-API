@@ -57,3 +57,38 @@ export const _getAsistencias = async (ususario_id?: number) => {
     status: 200,
   };
 };
+
+export const _horasTrabajadas = async (
+  fechaInicio: string,
+  fechaFinal: string,
+  usuario_id: number
+) => {
+  const queryText = `
+  SELECT 
+    u.usuario_id,
+    u.sueldo,
+    SEC_TO_TIME(SUM(TIMESTAMPDIFF(SECOND, h.hora_entrada, h.hora_salida))) AS horas_trabajadas
+  FROM 
+      horario h
+  JOIN 
+      usuario u ON h.usuario_id = u.usuario_id
+  WHERE 
+      h.usuario_id = ?
+      AND h.fecha BETWEEN ? AND ?;
+  `;
+  const result = await query(queryText, [usuario_id, fechaInicio, fechaFinal]);
+
+  if (!result.success) {
+    return {
+      message: result.error,
+      success: false,
+      status: result.status || 500,
+    };
+  }
+
+  return {
+    item: result.data[0],
+    success: true,
+    status: 200,
+  };
+};

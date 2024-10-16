@@ -203,114 +203,240 @@ const incidencias: any = [
 ];
 
 const horarios = [
+  // Usuario 1 (Semana 1)
   {
-    hora_entrada: "09:15:40",
-    hora_salida: "16:40:03",
-    fecha: "2024-08-24",
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-12",
     usuario_id: 1,
   },
   {
-    hora_entrada: "09:05:12",
-    hora_salida: "17:22:45",
-    fecha: "2024-08-19",
+    hora_entrada: "09:15:00",
+    hora_salida: "17:20:00",
+    fecha: "2024-08-13",
     usuario_id: 1,
   },
   {
-    hora_entrada: "09:12:56",
-    hora_salida: "14:30:21",
-    fecha: "2024-08-18",
-    usuario_id: 1,
-  },
-  {
-    hora_entrada: "09:00:36",
-    hora_salida: "12:15:58",
+    hora_entrada: "09:10:00",
+    hora_salida: "16:30:00",
     fecha: "2024-08-14",
     usuario_id: 1,
   },
   {
-    hora_entrada: "08:10:11",
-    hora_salida: "15:05:55",
-    fecha: "2024-08-24",
-    usuario_id: 2,
+    hora_entrada: "09:20:00",
+    hora_salida: "16:40:00",
+    fecha: "2024-08-15",
+    usuario_id: 1,
   },
   {
-    hora_entrada: "08:25:28",
-    hora_salida: "16:15:30",
+    hora_entrada: "09:05:00",
+    hora_salida: "15:45:00",
+    fecha: "2024-08-16",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "08:55:00",
+    hora_salida: "16:25:00",
+    fecha: "2024-08-17",
+    usuario_id: 1,
+  },
+
+  // Usuario 1 (Semana 2)
+  {
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
     fecha: "2024-08-19",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "09:15:00",
+    hora_salida: "17:20:00",
+    fecha: "2024-08-20",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "09:10:00",
+    hora_salida: "16:30:00",
+    fecha: "2024-08-21",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "09:20:00",
+    hora_salida: "16:40:00",
+    fecha: "2024-08-22",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "09:05:00",
+    hora_salida: "15:45:00",
+    fecha: "2024-08-23",
+    usuario_id: 1,
+  },
+  {
+    hora_entrada: "08:55:00",
+    hora_salida: "16:25:00",
+    fecha: "2024-08-24",
+    usuario_id: 1,
+  },
+
+  // Usuario 2 (Semana 1)
+  {
+    hora_entrada: "08:30:00",
+    hora_salida: "16:30:00",
+    fecha: "2024-08-12",
     usuario_id: 2,
   },
   {
-    hora_entrada: "07:45:07",
-    hora_salida: "14:50:22",
-    fecha: "2024-08-18",
+    hora_entrada: "08:45:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-13",
     usuario_id: 2,
   },
   {
-    hora_entrada: "10:03:19",
-    hora_salida: "12:40:11",
+    hora_entrada: "08:40:00",
+    hora_salida: "16:15:00",
     fecha: "2024-08-14",
     usuario_id: 2,
   },
   {
-    hora_entrada: "09:00:49",
-    hora_salida: "15:23:14",
-    fecha: "2024-08-24",
-    usuario_id: 3,
+    hora_entrada: "08:50:00",
+    hora_salida: "16:35:00",
+    fecha: "2024-08-15",
+    usuario_id: 2,
   },
   {
-    hora_entrada: "09:12:40",
-    hora_salida: "17:05:32",
+    hora_entrada: "08:35:00",
+    hora_salida: "16:20:00",
+    fecha: "2024-08-16",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:25:00",
+    hora_salida: "16:05:00",
+    fecha: "2024-08-17",
+    usuario_id: 2,
+  },
+
+  // Usuario 2 (Semana 2)
+  {
+    hora_entrada: "08:30:00",
+    hora_salida: "16:30:00",
     fecha: "2024-08-19",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:45:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-20",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:40:00",
+    hora_salida: "16:15:00",
+    fecha: "2024-08-21",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:50:00",
+    hora_salida: "16:35:00",
+    fecha: "2024-08-22",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:35:00",
+    hora_salida: "16:20:00",
+    fecha: "2024-08-23",
+    usuario_id: 2,
+  },
+  {
+    hora_entrada: "08:25:00",
+    hora_salida: "16:05:00",
+    fecha: "2024-08-24",
+    usuario_id: 2,
+  },
+
+  // Usuario 3 (Semana 1)
+  {
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
+    fecha: "2024-08-12",
     usuario_id: 3,
   },
   {
-    hora_entrada: "09:30:01",
-    hora_salida: "14:30:29",
-    fecha: "2024-08-18",
+    hora_entrada: "09:10:00",
+    hora_salida: "17:20:00",
+    fecha: "2024-08-13",
     usuario_id: 3,
   },
   {
-    hora_entrada: "09:05:12",
-    hora_salida: "12:22:40",
+    hora_entrada: "09:05:00",
+    hora_salida: "16:30:00",
     fecha: "2024-08-14",
     usuario_id: 3,
   },
   {
-    hora_entrada: "10:20:34",
-    hora_salida: "18:45:50",
-    fecha: "2024-08-24",
-    usuario_id: 4,
+    hora_entrada: "09:15:00",
+    hora_salida: "16:40:00",
+    fecha: "2024-08-15",
+    usuario_id: 3,
   },
   {
-    hora_entrada: "10:15:22",
-    hora_salida: "16:32:11",
+    hora_entrada: "09:00:00",
+    hora_salida: "15:30:00",
+    fecha: "2024-08-16",
+    usuario_id: 3,
+  },
+  {
+    hora_entrada: "09:20:00",
+    hora_salida: "16:00:00",
+    fecha: "2024-08-17",
+    usuario_id: 3,
+  },
+
+  // Usuario 3 (Semana 2)
+  {
+    hora_entrada: "09:00:00",
+    hora_salida: "17:00:00",
     fecha: "2024-08-19",
-    usuario_id: 4,
+    usuario_id: 3,
   },
   {
-    hora_entrada: "10:02:17",
-    hora_salida: "14:19:30",
-    fecha: "2024-08-18",
-    usuario_id: 4,
+    hora_entrada: "09:10:00",
+    hora_salida: "17:20:00",
+    fecha: "2024-08-20",
+    usuario_id: 3,
   },
   {
-    hora_entrada: "10:05:08",
-    hora_salida: "12:45:33",
-    fecha: "2024-08-14",
-    usuario_id: 4,
+    hora_entrada: "09:05:00",
+    hora_salida: "16:30:00",
+    fecha: "2024-08-21",
+    usuario_id: 3,
+  },
+  {
+    hora_entrada: "09:15:00",
+    hora_salida: "16:40:00",
+    fecha: "2024-08-22",
+    usuario_id: 3,
+  },
+  {
+    hora_entrada: "09:00:00",
+    hora_salida: "15:30:00",
+    fecha: "2024-08-23",
+    usuario_id: 3,
+  },
+  {
+    hora_entrada: "09:20:00",
+    hora_salida: "16:00:00",
+    fecha: "2024-08-24",
+    usuario_id: 3,
   },
 ];
 
 const createHorarios = async () => {
   for (const horario of horarios) {
     const result = await query(
-      `select * from horario where hora_entrada = ? and hora_salida = ? and usuario_id = ?`,
-      [
-        horario.hora_entrada,
-        horario.hora_salida,
-        // horario.fecha,
-        horario.usuario_id,
-      ]
+      `select * from horario where fecha = ? and usuario_id = ?`,
+      [horario.fecha, horario.usuario_id]
     );
 
     if (result.data.length === 0) {

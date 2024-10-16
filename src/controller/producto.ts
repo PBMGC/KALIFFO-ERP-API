@@ -1,6 +1,7 @@
 import { Request, response, Response } from "express";
 // import { Producto } from "../interface/producto";
 import {
+  _activarProducto,
   _createProducto,
   _createProductoCompleto,
   _desactivarProducto,
@@ -47,20 +48,6 @@ export const createProductoCompleto = async (req: Request, res: Response) => {
     handleHttp(res, "error_createProductoCompleto", 500);
   }
 };
-
-// export const createProductoDetalle = async (req: Request, res: Response) => {
-//   const producto_data  = req.body;
-//   const tienda_id = req.query.tienda_id
-
-//   try {
-//    for(const producto of producto_data){
-//     const response = await _createProductoDetalle(Number(tienda_id),producto);
-//    }
-//     res.status(200).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_createProductoDetalle", 500);
-//   }
-// };
 
 export const getProductos = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id;
@@ -113,19 +100,6 @@ export const updateProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const desactivarProducto = async (req: Request, res: Response) => {
-  const { producto_id } = req.params;
-
-  try {
-    const response = await _desactivarProducto(
-      Number(producto_id),
-    );
-    res.status(response.status).json(response);
-  } catch (error) {
-    handleHttp(res, "error_desactivarProducto", 500);
-  }
-};
-
 export const getColoresProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
 
@@ -166,5 +140,27 @@ export const getTallaProducto = async (req: Request, res: Response) => {
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error ", 500);
+  }
+};
+
+export const desactivarProducto = async (req: Request, res: Response) => {
+  const { producto_id } = req.params;
+
+  try {
+    const response = await _desactivarProducto(Number(producto_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_desactivarProducto", 500);
+  }
+};
+
+export const activarProducto = async (req: Request, res: Response) => {
+  const { producto_id } = req.params;
+
+  try {
+    const response = await _activarProducto(Number(producto_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_desactivarProducto", 500);
   }
 };

@@ -136,16 +136,29 @@ export const _createDetalleVenta = async (
   };
 };
 
-export const _getVentas = async () => {
+export const _getVentas = async (tipoComprobante?: number) => {
   try {
-    const queryVentas = `
+    let queryVentas = `
       SELECT 
-        venta_id,estado, codigo, tipoVenta, tipoComprobante, fecha, 
-        totalBruto, totalIgv, totalNeto, tipoPago, dni, 
-        ruc, direccion, telefono, nombre, tienda_id 
-      FROM venta
+        v.*, 
+        t.tienda, 
+        SUM(dv.cantidad) AS cantidad
+      FROM venta v
+      JOIN tienda t ON t.tienda_id = v.tienda_id
+      JOIN detalleVenta dv ON dv.venta_id = v.venta_id
     `;
-    const resultVentas = await query(queryVentas);
+
+    if (tipoComprobante) {
+      queryVentas += ` WHERE v.tipoComprobante = ?`;
+    }
+
+    queryVentas += `
+      GROUP BY v.venta_id, t.tienda;
+    `;
+
+    const resultVentas = tipoComprobante
+      ? await query(queryVentas, [tipoComprobante])
+      : await query(queryVentas);
 
     return {
       items: resultVentas.data,
@@ -187,7 +200,6 @@ export const _getVenta = async (venta_id: number) => {
     venta.detalles = resultDetalles.data;
 
     return {
-      // message: "Venta recuperada con éxito",
       item: resultVenta.data[0],
       success: true,
       status: 200,
@@ -196,6 +208,66 @@ export const _getVenta = async (venta_id: number) => {
     console.error("Error al obtener la venta:", error);
     return {
       message: "Error al obtener la venta",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _desactivarVenta = async (venta_id: number) => {
+  const queryText =
+    "UPDATE venta SET estado = false WHERE venta_id = ? AND estado != false;";
+
+  try {
+    const result = await query(queryText, [venta_id]);
+
+    if (result.success && result.affectedRows > 0) {
+      return {
+        message: `La venta con ID ${venta_id} ha sido desactivada correctamente.`,
+        success: true,
+        status: 200,
+      };
+    } else {
+      return {
+        message: `No se encontró venta con ID ${venta_id} o ya estaba desactivada.`,
+        success: false,
+        status: 400,
+      };
+    }
+  } catch (error: any) {
+    console.error("Error al desactivar la venta:", error);
+    return {
+      message: error.message || "Error desconocido al desactivar venta.",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _activarVenta = async (venta_id: number) => {
+  const queryText =
+    "UPDATE venta SET estado = true WHERE venta_id = ? AND estado != true;";
+
+  try {
+    const result = await query(queryText, [venta_id]);
+
+    if (result.success && result.affectedRows > 0) {
+      return {
+        message: `La venta con ID ${venta_id} ha sido activada correctamente.`,
+        success: true,
+        status: 200,
+      };
+    } else {
+      return {
+        message: `No se encontró venta con ID ${venta_id} o ya estaba activada.`,
+        success: false,
+        status: 400,
+      };
+    }
+  } catch (error: any) {
+    console.error("Error al activar venta:", error);
+    return {
+      message: error.message || "Error desconocido al activar venta.",
       success: false,
       status: 500,
     };
