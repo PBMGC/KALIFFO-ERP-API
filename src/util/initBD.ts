@@ -254,6 +254,11 @@ const almacen_telas = `
 );
 `;
 
+//estado 0 = desactivado
+//estado 1 = corte
+//estado 2 = lavanderia
+// estado 3 = taller
+// estado 4 = almacen
 const lotes = `
   CREATE TABLE IF NOT EXISTS lotes (
     lote_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -264,6 +269,11 @@ const lotes = `
   );
 `;
 
+
+//estado 0 = desactivado
+//estado 1 = inicio
+//estado 2 = proceso
+//estado 3 = finalizado
 const cortes = `
 CREATE TABLE IF NOT EXISTS cortes (
     corte_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -274,16 +284,34 @@ CREATE TABLE IF NOT EXISTS cortes (
     cantidad INT NOT NULL,
     talla VARCHAR(20) NOT NULL,
     metraje_asignado DECIMAL(10, 2) NOT NULL,
-    tela_id INT NOT NULL,
+    tipo_tela VARCHAR(20) NOT NULL,
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
     FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
-    FOREIGN KEY (tela_id) REFERENCES almacen_telas(tela_id),
     INDEX I_estado (estado),
     INDEX I_lote_id (lote_id),
     INDEX I_taller_id (taller_id),
     INDEX I_producto_id(producto_id),
     INDEX I_cantidad(cantidad)
+);
+`;
+
+//estado 0 = desactivado
+//estado 1 = inicio
+//estado 2 = proceso
+//estado 3 = finalizado
+const lavanderia = `
+CREATE TABLE IF NOT EXISTS lavanderia (
+  lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
+  lote_id INT NOT NULL,
+  cantidad INT NOT NULL,
+  color VARCHAR(50) NOT NULL,
+  talla VARCHAR(20) NOT NULL,
+  estado INT NOT NULL, 
+  precio_unidad DECIMAL(10, 2) NOT NULL,
+  lavanderia_asignada VARCHAR(255) NOT NULL,
+  fecha_envio DATE,  
+  fecha_recepcion DATE
 );
 `;
 
@@ -307,6 +335,7 @@ export const initBD = async () => {
       await conn.execute(almacen_telas);
       await conn.execute(lotes);
       await conn.execute(cortes);
+      await conn.execute(lavanderia);
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -338,6 +367,7 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS almacen_telas");
       await conn.execute("DROP TABLE IF EXISTS lotes");
       await conn.execute("DROP TABLE IF EXISTS cortes");
+      await conn.execute("DROP TABLE IF EXISTS lavanderia");
 
       console.log("Tablas borradas correctamente.");
     } catch (error) {

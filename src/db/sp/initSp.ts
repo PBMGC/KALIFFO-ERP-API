@@ -1,5 +1,6 @@
 import { eliminarProcedimiento } from "../../util/funcion_sp";
 import { initiProcedureUpdateCompra, initiProcedureUpdateCompraDetalle } from "./compras";
+import { initiProcedureUpdateCorte } from "./cortes";
 import { initProcedureDeleteHorario } from "./horario";
 import {
   initProcedureDeleteIncidencia,
@@ -50,6 +51,7 @@ export const initSp = async () => {
     await initiProcedureUpdateCompra();
     await initiProcedureUpdateCompraDetalle();
     await initiProcedureUpdateTela();
+    await initiProcedureUpdateCorte();
     console.log("Se crearon los sp");
   } catch (error) {
     console.error("Error al inicializar procedimientos almacenados:", error);
@@ -91,6 +93,9 @@ export const dropSp = async () => {
 
     //telas 
     await eliminarProcedimiento("SP_UpdateTela");
+
+    //cortes
+    await eliminarProcedimiento("SP_UpdateCorte");
 
     console.log("Se borraron los sp");
   } catch (error) {

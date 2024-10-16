@@ -27,7 +27,7 @@ UPDATE compras_detalle
         total = IF(p_total IS NOT NULL AND p_total != 0, p_total, total)
     WHERE compraDetalle_id = c_id;
 `;
-
+ 
 export const initiProcedureUpdateCompraDetalle = async () => {
     await createSp(
       "SP_UpdateCompraDetalle",
