@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
-import { _createCorte, _UpdateCorte } from "../service/cortes";
+import {
+  _createCorte,
+  _UpdateCorte,
+  _getCortes,
+  _getCorte,
+} from "../service/cortes";
 
 export const createCorte = async (req: Request, res: Response) => {
   const {
@@ -45,18 +50,38 @@ export const updateCorte = async (req: Request, res: Response) => {
 
   const updateCorte: any = {
     corte_id: Number(corte_id),
-    taller_id,
-    producto_id,
-    cantidad,
-    talla,
-    metraje_asignado,
-    tipo_tela,
+    taller_id: taller_id || null,
+    producto_id: producto_id || null,
+    cantidad: cantidad || null,
+    talla: talla || null,
+    metraje_asignado: metraje_asignado || null,
+    tipo_tela: tipo_tela || null,
   };
 
   try {
     const response = await _UpdateCorte(updateCorte);
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_createCompra", 500);
+    handleHttp(res, "error_updateCorte", 500);
+  }
+};
+
+export const getCortes = async (req: Request, res: Response) => {
+  try {
+    const response = await _getCortes();
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_getCortes", 500);
+  }
+};
+
+export const getCorte = async (req: Request, res: Response) => {
+  const { corte_id } = req.params;
+
+  try {
+    const response = await _getCorte(Number(corte_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_getCorte", 500);
   }
 };

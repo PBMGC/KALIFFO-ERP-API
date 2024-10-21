@@ -1,6 +1,5 @@
 import { executeDDL } from "../../util/query";
 
-//Resta metraje a la tela usada
 export const triggerInsertCorte = async () => {
   const trigger = `
       CREATE TRIGGER TR_INS_Corte 
@@ -39,8 +38,9 @@ BEGIN
             END IF;
     END WHILE;
 
+    -- Aquí se cambia NEW.cantidad por NEW.cantidad_enviada
     UPDATE lotes
-    SET cantidad_total = cantidad_total + NEW.cantidad
+    SET cantidad_total = cantidad_total + NEW.cantidad_enviada
     WHERE lote_id = NEW.lote_id;
 
 END;
@@ -67,33 +67,33 @@ export const droptriggerInsertCorte = async () => {
 };
 
 export const triggerUpdatecorte = async () => {
-    const trigger = `
-        CREATE TRIGGER TR_UPD_Corte 
-        AFTER UPDATE ON cortes
-        FOR EACH ROW 
-        BEGIN
-            UPDATE lotes
-                SET cantidad_total = cantidad_total + (NEW.cantidad - OLD.cantidad)
-                WHERE lote_id = NEW.lote_id;
-        END;
-    `;
-  
-    const result = await executeDDL(trigger);
-    if (result.success) {
-      // console.log("Trigger creado exitosamente.");
-    } else {
-      // console.log("Error al crear el trigger:", result.error);
-    }
-  };
-  
-  export const droptriggerUpdatecorte = async () => {
-    const trigger = `DROP TRIGGER IF EXISTS TR_UPD_Corte;`;
-  
-    const result = await executeDDL(trigger);
-    if (result.success) {
-      // console.log("Trigger eliminado exitosamente.");
-    } else {
-      // console.log("Error al eliminar el trigger:", result.error);
-    }
-  };
-  
+  const trigger = `
+      CREATE TRIGGER TR_UPD_Corte 
+      AFTER UPDATE ON cortes
+      FOR EACH ROW 
+      BEGIN
+          -- Cambiar NEW.cantidad y OLD.cantidad por cantidad_enviada
+          UPDATE lotes
+          SET cantidad_total = cantidad_total + (NEW.cantidad_enviada - OLD.cantidad_enviada)
+          WHERE lote_id = NEW.lote_id;
+      END;
+  `;
+
+  const result = await executeDDL(trigger);
+  if (result.success) {
+    // console.log("Trigger creado exitosamente.");
+  } else {
+    // console.log("Error al crear el trigger:", result.error);
+  }
+};
+
+export const droptriggerUpdatecorte = async () => {
+  const trigger = `DROP TRIGGER IF EXISTS TR_UPD_Corte;`;
+
+  const result = await executeDDL(trigger);
+  if (result.success) {
+    // console.log("Trigger eliminado exitosamente.");
+  } else {
+    // console.log("Error al eliminar el trigger:", result.error);
+  }
+};

@@ -1,4 +1,4 @@
-import { createSp } from "../../util/funcion_sp";
+import { createSp, eliminarProcedimiento } from "../../util/funcion_sp";
 
 const queryUpdateTela = `
     UPDATE almacen_telas
@@ -12,10 +12,39 @@ const queryUpdateTela = `
     WHERE tela_id = p_t_id;
 `;
 
-export const initiProcedureUpdateTela = async () => {
-    await createSp(
-      "SP_UpdateTela",
-      queryUpdateTela,
-      "p_t_id INT , p_tipo VARCHAR(15), p_metraje DECIMAL(10, 2), p_articulo INT, p_empresa_compra VARCHAR(15), p_estado INT, p_fecha_compra DATE"
-    );
-  };
+const queryGetTelas = `
+    SELECT * FROM almacen_telas
+    WHERE (u_tipo IS NULL OR u_tipo = '' OR tipo = u_tipo);
+`;
+
+const queryGetTela = `
+  SELECT * FROM almacen_telas WHERE tela_id = u_tela_id;
+`;
+
+const initProcedureGetTela = async () => {
+  await createSp("SP_GetTela", queryGetTela, "IN u_tela_id INT");
+};
+
+const initProcedureGetTelas = async () => {
+  await createSp("SP_GetTelas", queryGetTelas, "IN u_tipo VARCHAR(255)");
+};
+
+const initiProcedureUpdateTela = async () => {
+  await createSp(
+    "SP_UpdateTela",
+    queryUpdateTela,
+    "p_t_id INT , p_tipo VARCHAR(15), p_metraje DECIMAL(10, 2), p_articulo INT, p_empresa_compra VARCHAR(15), p_estado INT, p_fecha_compra DATE"
+  );
+};
+
+export const initProcedureTela = async () => {
+  await initProcedureGetTelas();
+  await initProcedureGetTela();
+  await initiProcedureUpdateTela();
+};
+
+export const dropProcedureTela = async () => {
+  await eliminarProcedimiento("SP_GetTelas");
+  await eliminarProcedimiento("SP_GetTela");
+  await eliminarProcedimiento("SP_UpdateTela");
+};

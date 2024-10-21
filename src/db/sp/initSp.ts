@@ -12,7 +12,7 @@ import {
   initProcedureColoresProductos,
   initProcedureGetColoresProductos,
 } from "./producto";
-import { initiProcedureUpdateTela } from "./telas";
+import { dropProcedureTela, initProcedureTela } from "./telas";
 import {
   initiProcedureGetLoseProductosTienda,
   initiProcedureGetProductoTienda,
@@ -40,6 +40,9 @@ export const initSp = async () => {
     //incidencias
     await initProcedureIncidencia();
 
+    //tela
+    await initProcedureTela();
+
     await initProcedureColoresProductos();
     await initProcedureDeleteHorario();
 
@@ -52,7 +55,6 @@ export const initSp = async () => {
     await initProcedureGetColoresProductos();
     await initiProcedureUpdateCompra();
     await initiProcedureUpdateCompraDetalle();
-    await initiProcedureUpdateTela();
     await initiProcedureUpdateCorte();
     console.log("Se crearon los sp");
   } catch (error) {
@@ -70,6 +72,9 @@ export const dropSp = async () => {
 
     //incidencia
     await dropProcedureIncidencia();
+
+    //tela
+    await dropProcedureTela();
 
     //tienda
     await eliminarProcedimiento("SP_GetLoseProductosTienda");
@@ -91,9 +96,6 @@ export const dropSp = async () => {
     //compras
     await eliminarProcedimiento("SP_UpdateCompra");
     await eliminarProcedimiento("SP_UpdateCompraDetalle");
-
-    //telas
-    await eliminarProcedimiento("SP_UpdateTela");
 
     //cortes
     await eliminarProcedimiento("SP_UpdateCorte");

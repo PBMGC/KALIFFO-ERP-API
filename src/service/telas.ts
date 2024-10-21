@@ -38,7 +38,7 @@ export const _UpdateTela = async (updateTela: any) => {
       updateTela.tipo || null,
       updateTela.metraje || null,
       updateTela.articulo || null,
-      updateTela.estado||null,
+      updateTela.estado || null,
       updateTela.empresa_compra || null,
       updateTela.fecha_compra || null,
     ]);
@@ -82,6 +82,60 @@ export const _desactivarTela = async (tela_id: number) => {
     return {
       msg: "Error al eliminar la tela",
       success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getTiposTelas = async () => {
+  const queryText = `select a_t.tipo from almacen_telas a_t group by a_t.tela_id;`;
+
+  try {
+    const result = await query(queryText, []);
+    return {
+      items: result.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      msg: "Error _getTipos",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getTelas = async (tipo: string) => {
+  try {
+    const result = await query("call SP_GetTelas(?)", [tipo]);
+
+    return {
+      items: result.data[0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      msg: error,
+      success: true,
+      status: 500,
+    };
+  }
+};
+
+export const _getTela = async (tela_id: number) => {
+  try {
+    const result = await query("call SP_GetTela(?)", [tela_id]);
+    return {
+      item: result.data[0][0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      msg: error,
+      success: true,
       status: 500,
     };
   }
