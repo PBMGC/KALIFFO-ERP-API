@@ -106,9 +106,9 @@ export const _getTiposTelas = async () => {
   }
 };
 
-export const _getTelas = async (tipo: string) => {
+export const _getTelas = async (tipo?: string) => {
   try {
-    const result = await query("call SP_GetTelas(?)", [tipo]);
+    const result = await query("call SP_GetTelas(?)", [tipo || null]);
 
     return {
       items: result.data[0],
@@ -116,6 +116,8 @@ export const _getTelas = async (tipo: string) => {
       status: 200,
     };
   } catch (error) {
+    console.log(error);
+
     return {
       msg: error,
       success: true,

@@ -1,5 +1,4 @@
 import { createColores } from "./color";
-import { createCortes } from "./corte";
 import { createProducto } from "./producto";
 import { createTelas } from "./tela";
 import { createTienda } from "./tienda";
