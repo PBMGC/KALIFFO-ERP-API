@@ -1,4 +1,4 @@
-import { createSp } from "../../util/funcion_sp";
+import { createSp, eliminarProcedimiento } from "../../util/funcion_sp";
 
 const queryGetReporteUsuario = `
 SET @consulta = '
@@ -115,25 +115,60 @@ GROUP BY
 `;
 
 const queryUpdateUsuario = `
-  UPDATE usuario 
-  SET
-    nombre = IF(p_nombre IS NOT NULL AND p_nombre != '',p_nombre,nombre),
-    ap_paterno = IF(p_ap_paterno IS NOT NULL AND p_ap_paterno != '',p_ap_paterno,ap_paterno),
-    ap_materno = IF(p_ap_materno IS NOT NULL AND p_ap_materno != '',p_ap_materno,ap_materno),
-    fecha_nacimiento = IF(p_fecha_nacimiento IS NOT NULL AND p_fecha_nacimiento != '',p_fecha_nacimiento,fecha_nacimiento),
-    telefono = IF(p_telefono IS NOT NULL AND p_telefono != '',p_telefono,telefono),
-    dni= IF(p_dni IS NOT NULL AND p_dni != '',p_dni,dni),
-    sueldo= IF(p_sueldo IS NOT NULL AND p_sueldo != '',p_sueldo,sueldo),
-    tienda_id=IF(p_tienda_id IS NOT NULL AND p_tienda_id != '',p_tienda_id,tienda_id),
-    rol=IF(p_rol IS NOT NULL AND p_rol != '',p_rol,rol)
-    WHERE usuario_id = u_id;
+UPDATE usuario 
+SET
+  nombre = IF(p_nombre IS NOT NULL AND p_nombre != '',p_nombre,nombre),
+  ap_paterno = IF(p_ap_paterno IS NOT NULL AND p_ap_paterno != '',p_ap_paterno,ap_paterno),
+  ap_materno = IF(p_ap_materno IS NOT NULL AND p_ap_materno != '',p_ap_materno,ap_materno),
+  fecha_nacimiento = IF(p_fecha_nacimiento IS NOT NULL AND p_fecha_nacimiento != '',p_fecha_nacimiento,fecha_nacimiento),
+  telefono = IF(p_telefono IS NOT NULL AND p_telefono != '',p_telefono,telefono),
+  dni= IF(p_dni IS NOT NULL AND p_dni != '',p_dni,dni),
+  sueldo= IF(p_sueldo IS NOT NULL AND p_sueldo != '',p_sueldo,sueldo),
+  tienda_id=IF(p_tienda_id IS NOT NULL AND p_tienda_id != '',p_tienda_id,tienda_id),
+  rol=IF(p_rol IS NOT NULL AND p_rol != '',p_rol,rol)
+  WHERE usuario_id = u_id;
 `;
 
-export const initProcedureGetReporteUsuario = async () => {
-  await createSp("SP_ReporteUsuario", queryGetReporteUsuario, "IN u_id INT,IN fecha_r DATE");
+const queryDeleteUsuario = `
+    DELETE FROM usuario WHERE usuario_id = u_id;
+`;
+
+const queryCreateUsuario = `
+  INSERT INTO usuario (nombre, ap_paterno, ap_materno, fecha_nacimiento, telefono, dni, contraseña, sueldo, tienda_id, rol) 
+  VALUES (p_nombre, p_ap_paterno, p_ap_materno, p_fecha_nacimiento, p_telefono, p_dni, p_contraseña, p_sueldo, p_tienda_id, p_rol);`;
+
+const initProcedureCreateUsuario = async () => {
+  await createSp(
+    "SP_CreateUsuario",
+    queryCreateUsuario,
+    `
+      IN p_nombre VARCHAR(50), 
+      IN p_ap_paterno VARCHAR(50), 
+      IN p_ap_materno VARCHAR(50), 
+      IN p_fecha_nacimiento DATE, 
+      IN p_telefono VARCHAR(15), 
+      IN p_dni VARCHAR(10), 
+      IN p_contraseña VARCHAR(255), 
+      IN p_sueldo DECIMAL(10,2), 
+      IN p_tienda_id INT, 
+      IN p_rol INT
+      `
+  );
 };
 
-export const initProcedureGetUsuarios = async () => {
+const initProcedureDeleteUsuario = async () => {
+  await createSp("SP_DeleteUsuario", queryDeleteUsuario, "IN u_id INT");
+};
+
+const initProcedureGetReporteUsuario = async () => {
+  await createSp(
+    "SP_ReporteUsuario",
+    queryGetReporteUsuario,
+    "IN u_id INT,IN fecha_r DATE"
+  );
+};
+
+const initProcedureGetUsuarios = async () => {
   await createSp(
     "SP_GetUsuarios",
     queryGetUsuarios,
@@ -145,14 +180,32 @@ export const initProcedureGetUsuarios = async () => {
   );
 };
 
-export const initProcedureGetUsuario = async () => {
+const initProcedureGetUsuario = async () => {
   await createSp("SP_GetUsuario", queryGetUsuario, "IN u_id INT");
 };
 
-export const initiProcedureUpdateUsuario = async () => {
+const initiProcedureUpdateUsuario = async () => {
   await createSp(
     "SP_UpdateUsuario",
     queryUpdateUsuario,
     "u_id INT,p_nombre varchar(30),p_ap_paterno varchar(30),p_ap_materno varchar(30),p_fecha_nacimiento DATE,p_telefono varchar(10),p_dni varchar(10),p_sueldo INT,p_tienda_id INT,p_rol INT"
   );
+};
+
+export const initProcedureUsuario = async () => {
+  await initProcedureDeleteUsuario();
+  await initProcedureGetUsuarios();
+  await initProcedureGetUsuario();
+  await initiProcedureUpdateUsuario();
+  await initProcedureGetReporteUsuario();
+  await initProcedureCreateUsuario();
+};
+
+export const dropProcedureUsuario = async () => {
+  await eliminarProcedimiento("SP_DeleteUsuario");
+  await eliminarProcedimiento("SP_ReporteUsuario");
+  await eliminarProcedimiento("SP_GetUsuarios");
+  await eliminarProcedimiento("SP_GetUsuario");
+  await eliminarProcedimiento("SP_UpdateUsuario");
+  await eliminarProcedimiento("SP_CreateUsuario");
 };

@@ -14,6 +14,9 @@ import {
 
 const router = Router();
 
+//Rutas revisadas
+//Rutas sin revisar
+
 router.get("/", getProductos);
 router.get("/detalle/:producto_id", getDetalleProducto);
 router.get("/talla/:detalle_id", getTallaProducto);

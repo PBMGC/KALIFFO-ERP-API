@@ -3,16 +3,11 @@ import { query } from "../util/query";
 export const _createColor = async (color: any) => {
   const { nombre, codigo } = color;
 
-  const queryText = `
-    INSERT INTO color (nombre, codigo) 
-    VALUES (?, ?)`;
-
-  const result = await query(queryText, [nombre, codigo]);
+  const result = await query("call SP_CreateColor(?, ?)", [nombre, codigo]);
 
   if (!result.success) {
-    console.error("Error al crear el color:", result.error);
     return {
-      message: "Error al crear el color. Intente nuevamente más tarde.",
+      error: result.error,
       success: false,
       status: result.status || 500,
     };
@@ -26,9 +21,7 @@ export const _createColor = async (color: any) => {
 };
 
 export const _getColores = async () => {
-  const queryText = `SELECT * FROM color`;
-
-  const result = await query(queryText);
+  const result = await query("call SP_GetColores()");
 
   if (!result.success) {
     return {

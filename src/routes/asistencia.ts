@@ -10,6 +10,8 @@ import { getAsistencias, horasTrabajadas } from "../controller/asistencia";
 
 const router = Router();
 
+//Rutas revisadas
+//Rutas sin revisar
 router.get("", getAsistencias);
 
 // router.get("/inicio", validateToken, inicioAsistencia);

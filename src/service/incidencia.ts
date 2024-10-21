@@ -4,17 +4,16 @@ export const _createIncidencia = async (incidencia: any) => {
   const { tipo, descripcion, usuario_id } = incidencia;
   incidencia.fecha_creacion = new Date();
 
-  const queryS = `
-    INSERT INTO incidencia (tipo,descripcion,usuario_id, fecha_creacion)
-    VALUES (?, ?, ?, ?)`;
-
   try {
-    const result = await query(queryS, [
+    const result = await query("call SP_CreateIncidencia(?, ?, ?, ?)", [
       tipo,
       descripcion,
       usuario_id,
       incidencia.fecha_creacion,
     ]);
+
+    console.log("=========================");
+    console.log(result);
 
     return {
       message: "EXITO AL AÑADIR",
@@ -24,7 +23,7 @@ export const _createIncidencia = async (incidencia: any) => {
   } catch (error) {
     console.error("Error al crear incidencia:", error);
     return {
-      msg: "error _createIncidencia",
+      message: "error _createIncidencia",
       success: false,
       status: 500,
     };
@@ -32,22 +31,19 @@ export const _createIncidencia = async (incidencia: any) => {
 };
 
 export const _getIncidencias = async (usuario_id?: number) => {
-  const consulta = usuario_id
-    ? `SELECT * FROM incidencia WHERE usuario_id = ?`
-    : `SELECT * FROM incidencia`;
-
   try {
-    const result = (await query(consulta, [usuario_id])) as any;
+    const result = await query("call SP_GetIncidencias(?)", [
+      usuario_id || null,
+    ]);
 
     return {
-      items: result.data,
+      items: result.data[0],
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al obtener incidencias:", error);
     return {
-      msg: "error _getIncidencias",
+      message: "error _getIncidencias",
       success: false,
       status: 500,
     };
@@ -55,28 +51,17 @@ export const _getIncidencias = async (usuario_id?: number) => {
 };
 
 export const _getIncidencia = async (incidencia_id: number) => {
-  const queryS = `SELECT * FROM incidencia WHERE incidencia_id = ?`;
-
   try {
-    const [item] = (await query(queryS, [incidencia_id])) as any;
-
-    if (item.length === 0) {
-      return {
-        msg: "Incidencia no encontrada",
-        success: false,
-        status: 404,
-      };
-    }
+    const result = await query("call SP_GetIncidencia(?)", [incidencia_id]);
 
     return {
-      item: item[0],
+      item: result.data[0][0],
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al obtener la incidencia:", error);
     return {
-      msg: "error _getIncidencia",
+      message: "error _getIncidencia",
       success: false,
       status: 500,
     };
@@ -84,28 +69,25 @@ export const _getIncidencia = async (incidencia_id: number) => {
 };
 
 export const _deleteIncidencia = async (incidencia_id: number) => {
-  const queryS = `DELETE FROM incidencia WHERE incidencia_id = ?`;
-
   try {
-    const result = (await query(queryS, [incidencia_id])) as any;
+    const result = await query("call SP_DeleteIncidencia(?)", [incidencia_id]);
 
-    if (result.affectedRows === 0) {
+    if (result.data.affectedRows === 0) {
       return {
-        msg: "No se encontró la incidencia",
+        message: "Error al borrar o no se encontro incidencia",
         success: false,
-        status: 404,
+        status: 500,
       };
     }
 
     return {
-      msg: "Incidencia eliminada",
+      message: `Se elimino incidencia con id : ${incidencia_id}`,
       success: true,
       status: 200,
     };
   } catch (error) {
-    console.error("Error al eliminar la incidencia:", error);
     return {
-      msg: "Error al eliminar la incidencia",
+      message: "error _deleteIncidencia",
       success: false,
       status: 500,
     };
@@ -128,21 +110,21 @@ export const _updateIncidencia = async (
 
     if (result.affectedRows === 0) {
       return {
-        msg: "Incidencia no encontrada o no actualizada",
+        message: "Incidencia no encontrada o no actualizada",
         success: false,
         status: 404,
       };
     }
 
     return {
-      msg: "Incidencia actualizada correctamente",
+      message: "Incidencia actualizada correctamente",
       success: true,
       status: 200,
     };
   } catch (error) {
     console.error("Error al actualizar la incidencia:", error);
     return {
-      msg: "error _updateIncidencia",
+      message: "error _updateIncidencia",
       success: false,
       status: 500,
     };

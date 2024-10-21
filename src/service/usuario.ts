@@ -6,29 +6,10 @@ dotenv.config();
 
 export const _createUsuario = async (usuario: any) => {
   try {
-    if (usuario.tienda_id) {
-      const checkTiendaQuery = `SELECT * FROM tienda WHERE tienda_id = ?`;
-      const tiendaResult = (await query(checkTiendaQuery, [
-        usuario.tienda_id,
-      ])) as any;
-
-      if (tiendaResult.length === 0) {
-        return {
-          message: "Esta tienda no existe",
-          success: false,
-          status: 400,
-        };
-      }
-    }
-
     const hashPassword = await bcrypt.hash(usuario.contraseña, 8);
     usuario.contraseña = hashPassword;
 
-    const createUserQuery = `
-      INSERT INTO usuario (nombre, ap_paterno, ap_materno, fecha_nacimiento, telefono, dni, contraseña, sueldo, tienda_id, rol) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const result = await query(createUserQuery, [
+    const result = await query("call SP_CreateUsuario(?,?,?,?,?,?,?,?,?,?)", [
       usuario.nombre,
       usuario.ap_paterno,
       usuario.ap_materno,
@@ -41,11 +22,11 @@ export const _createUsuario = async (usuario: any) => {
       usuario.rol,
     ]);
 
-    if (result.affectedRows === 0) {
+    if (result.error) {
       return {
-        message: "No se pudo crear el usuario",
+        error: result.error,
         success: false,
-        status: 500,
+        status: 400,
       };
     }
 
@@ -55,9 +36,8 @@ export const _createUsuario = async (usuario: any) => {
       status: 201,
     };
   } catch (error) {
-    console.error("Error al crear el usuario:", error);
     return {
-      message: "Error al crear el usuario",
+      message: "Error _createUsuario",
       success: false,
       status: 500,
     };
@@ -65,8 +45,6 @@ export const _createUsuario = async (usuario: any) => {
 };
 
 export const _getUsuarios = async (
-  inicio?: number,
-  final?: number,
   rol?: number,
   tienda_id?: number,
   antiTienda_id?: number
@@ -110,14 +88,14 @@ export const _getUsuario = async (usuario_id: string) => {
     });
 
     return {
-      items:usuariosData[0],
-      success:true,
-      status:200
-    }
+      items: usuariosData[0],
+      success: true,
+      status: 200,
+    };
   } catch (error) {
-    console.error("Error al obtener usuario:", error);
+    console.error("Error _getUsuario", error);
     return {
-      message: "Error al obtener usuario",
+      message: "Error _getUsuario",
       success: false,
       status: 500,
     };
@@ -126,7 +104,7 @@ export const _getUsuario = async (usuario_id: string) => {
 
 export const _deleteUsuario = async (usuario_id: string) => {
   try {
-    await query(`Delete from usuario where usuario_id= ${usuario_id}`);
+    await query(`Call SP_DeleteUsuario(?)`, [usuario_id]);
 
     return {
       message: "Usuario eliminado exitosamente",
@@ -158,7 +136,7 @@ export const _updateUsuario = async (usuario: any) => {
     ])) as any;
 
     return {
-      message: "ACTUALIZADO CON EXITO",
+      message: "Usuario actualizado",
       success: true,
       status: 200,
     };
@@ -345,46 +323,52 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="reporte.pdf"');
 
-    const dataUsuario: any = await query(`CALL SP_ReporteUsuario(${usuario_id})`);
+    const dataUsuario: any = await query(
+      `CALL SP_ReporteUsuario(${usuario_id})`
+    );
 
     const horariodata: any = dataUsuario.data[0][0].horarios
       .split("), (")
       .map((item: string) => {
-        const [fecha ,hora_entrada, hora_salida] = item
+        const [fecha, hora_entrada, hora_salida] = item
           .replace(/\(|\)/g, "")
           .trim()
           .split(", ");
         return {
-          fecha:fecha,
+          fecha: fecha,
           hora_entrada: hora_entrada,
           hora_salida: hora_salida,
         };
       });
 
-    const pagosData = dataUsuario.data[0][0].pagos.split("), (").map((item: string) => {
-      const [fecha ,pago_total, pago_faltante] = item
-        .replace(/\(|\)/g, "")
-        .trim()
-        .split(", ");
-      return {
-        fecha:fecha,
-        pago_total: pago_total,
-        pago_faltante: pago_faltante,
-      };
-    });
+    const pagosData = dataUsuario.data[0][0].pagos
+      .split("), (")
+      .map((item: string) => {
+        const [fecha, pago_total, pago_faltante] = item
+          .replace(/\(|\)/g, "")
+          .trim()
+          .split(", ");
+        return {
+          fecha: fecha,
+          pago_total: pago_total,
+          pago_faltante: pago_faltante,
+        };
+      });
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
-    const incidenciasData = dataUsuario.data[0][0].incidencias.split("; ").map((item: any) => {
-      const [id, descripcion, fecha] = item
-        .replace(/\(|\)/g, "")
-        .trim()
-        .split(", ");
-      return {
-        tipo: incidenciaTIPO[Number(id)],
-        descripcion: descripcion,
-        fecha: fecha,
-      };
-    });
+    const incidenciasData = dataUsuario.data[0][0].incidencias
+      .split("; ")
+      .map((item: any) => {
+        const [id, descripcion, fecha] = item
+          .replace(/\(|\)/g, "")
+          .trim()
+          .split(", ");
+        return {
+          tipo: incidenciaTIPO[Number(id)],
+          descripcion: descripcion,
+          fecha: fecha,
+        };
+      });
 
     const doc = new PDFDocument({
       bufferPages: true,
@@ -440,7 +424,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       datas: [
         {
           nombre:
-          dataUsuario.data[0][0].nombre +
+            dataUsuario.data[0][0].nombre +
             " " +
             dataUsuario.data[0][0].ap_paterno +
             " " +
@@ -456,8 +440,8 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       title: "Asistencia del Trabajador",
       headers: [
         {
-          label:"Fecha",
-          property:"fecha",
+          label: "Fecha",
+          property: "fecha",
           headerAlign: "center",
           align: "center",
         },
@@ -482,7 +466,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       ],
       datas: horariodata.map((horario: any) => {
         return {
-          fecha:horario.fecha,
+          fecha: horario.fecha,
           horadeentrada: horario.hora_entrada,
           horasalida: horario.hora_salida,
           horatrabajadas: "8",
@@ -513,7 +497,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
         },
       ],
       datas: pagosData.map((pago: any) => {
-        console.log(pago)
+        console.log(pago);
         return {
           fecha: pago.fecha,
           montoP: pago.pago_total,
