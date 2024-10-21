@@ -3,23 +3,28 @@ import { handleHttp } from "../util/error.handler";
 import { _createTela, _desactivarTela, _UpdateTela } from "../service/telas";
 
 export const createTela = async (req: Request, res: Response) => {
-  const { tipo, metraje, articulo, empresa_compra, fecha_compra } = req.body;
+  const telasCreadas: any[] = [];
 
-  const tela: any = {
-    tipo,
-    metraje,
-    articulo,
-    empresa_compra,
-    fecha_compra,
-  };
+  for (const tela of req.body) {
+    const nuevaTela: any = {
+      tipo: tela.tipo,
+      metraje: tela.metraje,
+      articulo: tela.articulo,
+      empresa_compra: tela.empresa_compra,
+      fecha_compra: tela.fecha_compra,
+    };
 
-  try {
-    const response = await _createTela(tela);
-    res.status(response.status).json(response);
-  } catch (error) {
-    handleHttp(res, "error_createTela", 500);
+    try {
+      const response = await _createTela(nuevaTela);
+      telasCreadas.push(response);
+    } catch (error) {
+      return handleHttp(res, "error_createTela", 500);
+    }
   }
+
+  res.status(200).json(telasCreadas);
 };
+
 
 export const updateTela = async (req: Request, res: Response) => {
   const { tela_id } = req.params;

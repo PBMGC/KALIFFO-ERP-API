@@ -216,7 +216,7 @@ export const _getVenta = async (venta_id: number) => {
 
 export const _desactivarVenta = async (venta_id: number) => {
   const queryText =
-    "UPDATE venta SET estado = false WHERE venta_id = ? AND estado != false;";
+    "UPDATE venta SET estado = 0 WHERE venta_id = ? AND estado != 0;";
 
   try {
     const result = await query(queryText, [venta_id]);
