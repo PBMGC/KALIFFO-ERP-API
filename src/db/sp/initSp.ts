@@ -1,31 +1,29 @@
 import { eliminarProcedimiento } from "../../util/funcion_sp";
-import { initiProcedureUpdateCompra, initiProcedureUpdateCompraDetalle } from "./compras";
+import {
+  initiProcedureUpdateCompra,
+  initiProcedureUpdateCompraDetalle,
+} from "./compras";
 import { initiProcedureUpdateCorte } from "./cortes";
 import { initProcedureDeleteHorario } from "./horario";
-import {
-  initProcedureDeleteIncidencia,
-  initProcedureUpdateIncidencia,
-} from "./incidencia";
+
 import { initProcedureDeletePago } from "./pago";
 import {
   initiProcedureGetDetalleProducto,
   initProcedureColoresProductos,
   initProcedureGetColoresProductos,
 } from "./producto";
-import { initiProcedureUpdateTela } from "./telas";
+import { dropProcedureTela, initProcedureTela } from "./telas";
 import {
   initiProcedureGetLoseProductosTienda,
   initiProcedureGetProductoTienda,
   initiProcedureGetTienda,
   initiProcedureGetTiendas,
 } from "./tienda";
-import {
-  initiProcedureUpdateUsuario,
-  initProcedureGetReporteUsuario,
-  initProcedureGetUsuario,
-  initProcedureGetUsuarios,
-} from "./usuario";
+
 import dotenv from "dotenv";
+import { dropProcedureUsuario, initProcedureUsuario } from "./usuario";
+import { dropProcedureColor, initProcedureColor } from "./color";
+import { dropProcedureIncidencia, initProcedureIncidencia } from "./incidencia";
 
 dotenv.config();
 
@@ -33,14 +31,21 @@ export const initSp = async () => {
   try {
     await dropSp();
 
+    //usuario
+    await initProcedureUsuario();
+
+    //color
+    await initProcedureColor();
+
+    //incidencias
+    await initProcedureIncidencia();
+
+    //tela
+    await initProcedureTela();
+
     await initProcedureColoresProductos();
-    await initProcedureUpdateIncidencia();
-    await initProcedureDeleteIncidencia();
     await initProcedureDeleteHorario();
-    await initProcedureGetUsuarios();
-    await initProcedureGetUsuario();
-    await initiProcedureUpdateUsuario();
-    await initProcedureGetReporteUsuario();
+
     await initiProcedureGetTiendas();
     await initiProcedureGetTienda();
     await initProcedureDeletePago();
@@ -50,7 +55,6 @@ export const initSp = async () => {
     await initProcedureGetColoresProductos();
     await initiProcedureUpdateCompra();
     await initiProcedureUpdateCompraDetalle();
-    await initiProcedureUpdateTela();
     await initiProcedureUpdateCorte();
     console.log("Se crearon los sp");
   } catch (error) {
@@ -61,10 +65,16 @@ export const initSp = async () => {
 export const dropSp = async () => {
   try {
     //usuario
-    await eliminarProcedimiento("SP_ReporteUsuario");
-    await eliminarProcedimiento("SP_GetUsuarios");
-    await eliminarProcedimiento("SP_GetUsuario");
-    await eliminarProcedimiento("SP_UpdateUsuario");
+    await dropProcedureUsuario();
+
+    //color
+    await dropProcedureColor();
+
+    //incidencia
+    await dropProcedureIncidencia();
+
+    //tela
+    await dropProcedureTela();
 
     //tienda
     await eliminarProcedimiento("SP_GetLoseProductosTienda");
@@ -80,19 +90,12 @@ export const dropSp = async () => {
     //pago
     await eliminarProcedimiento("SP_DeletePago");
 
-    //incidencia
-    await eliminarProcedimiento("SP_DeleteIncidencia");
-    await eliminarProcedimiento("SP_UpdateIncidencia");
-
     //horario
     await eliminarProcedimiento("SP_DeleteHorario");
 
     //compras
     await eliminarProcedimiento("SP_UpdateCompra");
     await eliminarProcedimiento("SP_UpdateCompraDetalle");
-
-    //telas 
-    await eliminarProcedimiento("SP_UpdateTela");
 
     //cortes
     await eliminarProcedimiento("SP_UpdateCorte");

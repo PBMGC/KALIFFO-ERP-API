@@ -11,6 +11,8 @@ import { ValidateCreateTienda } from "../validation/tienda";
 
 const router = Router();
 
+//Rutas revisadas
+//Rutas sin revisar
 router.post("/create", ValidateCreateTienda, createTienda);
 router.get("/", getTiendas);
 router.get("/:tienda_id", getTienda);

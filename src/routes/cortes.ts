@@ -1,11 +1,19 @@
 import { Router } from "express";
-import { createCorte, updateCorte } from "../controller/cortes";
-
+import {
+  createCorte,
+  getCorte,
+  getCortes,
+  updateCorte,
+} from "../controller/cortes";
 
 const router = Router();
 
-router.post("/create",createCorte)
+//Rutas revisadas
+//Rutas sin revisar
+router.get("", getCortes);
+router.get("/:corte_id", getCorte);
 
-router.put("/update/:corte_id",updateCorte)
+router.post("/create", createCorte);
+router.put("/update/:corte_id", updateCorte);
 
 export { router };

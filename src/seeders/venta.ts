@@ -302,11 +302,3 @@ export const createVenta = async () => {
 
 //modelo de base datos
 //normalizo
-
-//acabados
-//Activar y desactivar productos
-//pagos
-//agregar cantidad y nombre de tienda a /venta
-//filtro venta boleta y factura
-//ventas fecha debe ser date Time
-//activar desactivar venta

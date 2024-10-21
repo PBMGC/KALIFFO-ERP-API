@@ -91,9 +91,7 @@ export const _UpdateCompra = async (updatecompra: any) => {
     ]);
 
     if (updatecompra.detalle.length > 0) {
-      const detalleResult = await _UpdateCompraDetalle(
-        updatecompra.detalle
-      );
+      const detalleResult = await _UpdateCompraDetalle(updatecompra.detalle);
 
       if (!detalleResult.success) {
         return {

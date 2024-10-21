@@ -3,8 +3,11 @@ import { createLote, updateLote } from "../controller/lotes";
 
 const router = Router();
 
-router.post("/create",createLote)
+//Rutas revisadas
+router.post("/create", createLote);
 
-router.put("/update/:lote_id",updateLote)
+router.put("/update/:lote_id", updateLote);
+
+//Rutas sin revisar
 
 export { router };

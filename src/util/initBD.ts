@@ -269,7 +269,6 @@ const lotes = `
   );
 `;
 
-
 //estado 0 = desactivado
 //estado 1 = inicio
 //estado 2 = proceso
@@ -281,7 +280,8 @@ CREATE TABLE IF NOT EXISTS cortes (
     taller_id INT NOT NULL,
     producto_id INT NOT NULL,
     estado INT DEFAULT 1,
-    cantidad INT NOT NULL,
+    cantidad_enviada INT NOT NULL,
+    cantidad_recibida INT default null,
     talla VARCHAR(20) NOT NULL,
     metraje_asignado DECIMAL(10, 2) NOT NULL,
     tipo_tela VARCHAR(20) NOT NULL,
@@ -292,7 +292,8 @@ CREATE TABLE IF NOT EXISTS cortes (
     INDEX I_lote_id (lote_id),
     INDEX I_taller_id (taller_id),
     INDEX I_producto_id(producto_id),
-    INDEX I_cantidad(cantidad)
+    INDEX I_cantidad_enviada(cantidad_enviada),
+    INDEX I_cantidad_recibida(cantidad_recibida)
 );
 `;
 
@@ -420,5 +421,3 @@ export const borrarBD = async () => {
     }
   }
 };
-//ventas
-//pagos

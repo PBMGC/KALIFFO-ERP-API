@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { check } from "express-validator";
 import { validateResult } from "../util/validation";
+import { query } from "../util/query";
 
 export const ValidateCreateUsuario: any = [
   check("nombre")
@@ -58,7 +59,23 @@ export const ValidateCreateUsuario: any = [
     .isEmpty()
     .withMessage("El campo 'contraseña' no debe ser vacio."),
 
-  check("rol").exists().withMessage("EL campo 'contraseña' es obligatorio."),
+  check("rol").exists().withMessage("EL campo 'rol' es obligatorio."),
+
+  check("tienda_id")
+    .optional()
+    .custom(async (value) => {
+      if (value) {
+        const result = (await query(
+          `SELECT * FROM tienda WHERE tienda_id = ?`,
+          [value]
+        )) as any;
+
+        if (result.data.length === 0) {
+          throw new Error("Esta tienda no existe.");
+        }
+      }
+      return true;
+    }),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResult(req, res, next);

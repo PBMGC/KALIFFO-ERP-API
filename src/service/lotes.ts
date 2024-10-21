@@ -55,6 +55,8 @@ export const _UpdateLote = async (
   try {
     let queryS;
 
+    //lote 1 a 2 quitar estado ,etapa
+
     if (etapa === "cortes") {
       queryS = `
             UPDATE cortes SET estado = ? WHERE lote_id = ?;

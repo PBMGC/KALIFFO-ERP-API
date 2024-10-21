@@ -1,7 +1,9 @@
 import { createColores } from "./color";
+import { createCortes } from "./corte";
 import { createProducto } from "./producto";
+import { createTelas } from "./tela";
 import { createTienda } from "./tienda";
-import { createPago, createUsuario } from "./usuario";
+import { createUsuario } from "./usuario";
 import { createVenta } from "./venta";
 
 export const initSeeders = async () => {
@@ -10,4 +12,6 @@ export const initSeeders = async () => {
   await createColores();
   await createProducto();
   await createVenta();
+  await createTelas();
+  // await createCortes();
 };

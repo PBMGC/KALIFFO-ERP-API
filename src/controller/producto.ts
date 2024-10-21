@@ -43,7 +43,6 @@ export const createProductoCompleto = async (req: Request, res: Response) => {
       detalles
     );
     res.status(response.status).json(response);
-    // res.status(200).json("dasd");
   } catch (error) {
     handleHttp(res, "error_createProductoCompleto", 500);
   }
@@ -115,10 +114,6 @@ export const getDetalleProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
   const tienda_id = req.query.tienda_id;
   const tipo = req.query.tipo as string;
-
-  console.log("producto_id => ", producto_id);
-  console.log("tienda_id => ", tienda_id);
-  console.log("tipo => ", tipo);
 
   try {
     const response = await _getDetalleProducto(
