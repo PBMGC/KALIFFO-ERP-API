@@ -305,34 +305,17 @@ const lavanderia = `
 CREATE TABLE IF NOT EXISTS lavanderia (
   lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,
-<<<<<<< HEAD
   cantidad_enviada INT NOT NULL,
   cantidad_recibida INT default null,
-  color VARCHAR(50) NOT NULL,
+  color_id INT NOT NULL,
   talla VARCHAR(20) NOT NULL,
   estado INT NOT NULL, 
-=======
-  color_id INT NOT NULL,
-  talla VARCHAR(15) NOT NULL,
-  cantidad INT NOT NULL,
-  estado INT DEFAULT 1, 
->>>>>>> 5173596ba2b8b30a2520d50ebdc1cb3707d2aec4
   precio_unidad DECIMAL(10, 2) NOT NULL,
   lavanderia_asignada VARCHAR(40) NOT NULL,
   fecha_envio DATE,  
   fecha_recepcion DATE,
-<<<<<<< HEAD
-  FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
-
-=======
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
-  FOREIGN KEY (color_id) REFERENCES color(color_id) ON DELETE CASCADE,
-  INDEX I_lote_id (lote_id),
-  INDEX I_color_id (color_id),
-  INDEX I_talla (talla),
-  INDEX I_estado(estado),
-  INDEX I_cantidad(cantidad)
->>>>>>> 5173596ba2b8b30a2520d50ebdc1cb3707d2aec4
+  FOREIGN KEY (color_id) REFERENCES color(color_id)
 );
 `;
 
@@ -368,8 +351,6 @@ CREATE TABLE almacen_productos (
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
 );
 `;
-
-
 
 export const initBD = async () => {
   const conn = await connection();

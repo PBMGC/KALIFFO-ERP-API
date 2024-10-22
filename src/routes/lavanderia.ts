@@ -1,9 +1,21 @@
 import { Router } from "express";
-import { createLavanderia } from "../controller/lavanderia";
+import {
+  createLavanderia,
+  deleteLavanderia,
+  getLavanderia,
+  getLavanderias,
+  updateLavanderia,
+} from "../controller/lavanderia";
 
 const router = Router();
 
-router.post("/create",createLavanderia)
+router.get("", getLavanderias);
+router.get("/:lavanderia_id", getLavanderia);
 
+router.post("/create", createLavanderia);
+
+router.put("/update/:lavanderia_id", updateLavanderia);
+
+router.delete("delete/:lavanderia_id", deleteLavanderia);
 
 export { router };

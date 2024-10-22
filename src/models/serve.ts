@@ -60,3 +60,8 @@ class Serve {
 }
 
 export default Serve;
+
+//lavanderia
+//crud basico
+//trigger lote cantidad
+//10 - 4 = 6

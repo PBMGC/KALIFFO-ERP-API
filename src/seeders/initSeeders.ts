@@ -1,5 +1,6 @@
 import { createColores } from "./color";
 import { createCortes } from "./corte";
+import { createLavanderia } from "./lavanderia";
 import { createLotes } from "./lote";
 import { createProducto } from "./producto";
 import { createTelas } from "./tela";
@@ -15,4 +16,5 @@ export const initSeeders = async () => {
   await createVenta();
   await createTelas();
   await createLotes();
+  await createLavanderia();
 };
