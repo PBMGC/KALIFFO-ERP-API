@@ -305,14 +305,17 @@ const lavanderia = `
 CREATE TABLE IF NOT EXISTS lavanderia (
   lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,
-  cantidad INT NOT NULL,
+  cantidad_enviada INT NOT NULL,
+  cantidad_recibida INT default null,
   color VARCHAR(50) NOT NULL,
   talla VARCHAR(20) NOT NULL,
   estado INT NOT NULL, 
   precio_unidad DECIMAL(10, 2) NOT NULL,
   lavanderia_asignada VARCHAR(255) NOT NULL,
   fecha_envio DATE,  
-  fecha_recepcion DATE
+  fecha_recepcion DATE,
+  FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
+
 );
 `;
 
@@ -370,7 +373,7 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS lotes");
       await conn.execute("DROP TABLE IF EXISTS cortes");
       await conn.execute("DROP TABLE IF EXISTS lavanderia");
-
+      await conn.execute("SET foreign_key_checks = 1;");
       console.log("Tablas borradas correctamente.");
     } catch (error) {
       console.error("Error al borrar las tablas:", error);

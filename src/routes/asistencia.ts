@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { validateToken } from "../middleware/validateToken";
 import { getAsistencias, horasTrabajadas } from "../controller/asistencia";
 // import {
 //   deleteAsistencia,

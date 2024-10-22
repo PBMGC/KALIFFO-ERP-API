@@ -1,4 +1,9 @@
-import { droptriggerInsertCorte, droptriggerUpdatecorte, triggerInsertCorte, triggerUpdatecorte } from "./cortes";
+import {
+  droptriggerInsertCorte,
+  droptriggerUpdatecorte,
+  triggerInsertCorte,
+  triggerUpdatecorte,
+} from "./cortes";
 import {
   dropTriggerInsertProductoDetalle,
   dropTriggerRestaStockProducto,

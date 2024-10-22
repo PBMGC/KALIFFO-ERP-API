@@ -287,6 +287,6 @@ export const createTelas = async () => {
       }
     }
   } catch (error) {
-    console.log("Error en createTienda:", error);
+    console.log("Error en createTela:", error);
   }
 };

@@ -66,7 +66,9 @@ export const getUsuario = async (req: Request, res: Response) => {
 
   try {
     const response = await _getUsuario(usuario_id);
-    res.status(response.status).json(response.items);
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
   } catch (error) {
     handleHttp(res, "Error getUsuario", 500);
   }

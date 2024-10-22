@@ -12,9 +12,6 @@ export const _createIncidencia = async (incidencia: any) => {
       incidencia.fecha_creacion,
     ]);
 
-    console.log("=========================");
-    console.log(result);
-
     return {
       message: "EXITO AL AÑADIR",
       success: true,

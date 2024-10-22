@@ -69,7 +69,9 @@ export const updateCorte = async (req: Request, res: Response) => {
 export const getCortes = async (req: Request, res: Response) => {
   try {
     const response = await _getCortes();
-    res.status(response.status).json(response);
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
   } catch (error) {
     handleHttp(res, "error_getCortes", 500);
   }
@@ -80,7 +82,7 @@ export const getCorte = async (req: Request, res: Response) => {
 
   try {
     const response = await _getCorte(Number(corte_id));
-    res.status(response.status).json(response);
+    res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getCorte", 500);
   }
