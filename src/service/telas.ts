@@ -88,7 +88,7 @@ export const _desactivarTela = async (tela_id: number) => {
 };
 
 export const _getTiposTelas = async () => {
-  const queryText = `select a_t.tipo from almacen_telas a_t group by a_t.tela_id;`;
+  const queryText = `select a_t.tipo from almacen_telas a_t group by a_t.tipo;`;
 
   try {
     const result = await query(queryText, []);
@@ -106,12 +106,31 @@ export const _getTiposTelas = async () => {
   }
 };
 
-export const _getTelas = async (tipo: string) => {
+export const _getTelas = async () => {
   try {
-    const result = await query("call SP_GetTelas(?)", [tipo]);
+    const result = await query("call SP_GetTelas()");
 
     return {
       items: result.data[0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      msg: error,
+      success: true,
+      status: 500,
+    };
+  }
+};
+
+export const _getTelaPorTipo = async (tipo_tela: string,estado:number) => {
+  try {
+    const result = await query("call SP_GetTelaPorTipo(?,?)", [tipo_tela,estado]);
+    return {
+      item: result.data[0],
       success: true,
       status: 200,
     };
@@ -124,18 +143,21 @@ export const _getTelas = async (tipo: string) => {
   }
 };
 
-export const _getTela = async (tela_id: number) => {
+
+export const _getEmpresas = async () => {
+  const queryText = `select a_t.empresa_compra from almacen_telas a_t group by a_t.empresa_compra;`;
+
   try {
-    const result = await query("call SP_GetTela(?)", [tela_id]);
+    const result = await query(queryText, []);
     return {
-      item: result.data[0][0],
+      items: result.data,
       success: true,
       status: 200,
     };
   } catch (error) {
     return {
-      msg: error,
-      success: true,
+      msg: "Error _getEmpresas",
+      success: false,
       status: 500,
     };
   }

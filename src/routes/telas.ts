@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
   createTela,
   desactivarTela,
-  getTela,
+  getEmpresas,
+  getTelaPorTipo,
   getTelas,
   getTipos,
   updateTela,
@@ -14,8 +15,9 @@ const router = Router();
 //Rutas sin revisar
 
 router.get("/tipo", getTipos);
+router.get("/empresas",getEmpresas)
 router.get("", getTelas);
-router.get("/:tela_id", getTela);
+router.get("/:tipo_tela", getTelaPorTipo);
 
 router.post("/create", createTela);
 

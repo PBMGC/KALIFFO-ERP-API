@@ -3,7 +3,8 @@ import { handleHttp } from "../util/error.handler";
 import {
   _createTela,
   _desactivarTela,
-  _getTela,
+  _getEmpresas,
+  _getTelaPorTipo,
   _getTelas,
   _getTiposTelas,
   _UpdateTela,
@@ -80,10 +81,8 @@ export const getTipos = async (req: Request, res: Response) => {
 };
 
 export const getTelas = async (req: Request, res: Response) => {
-  const tipo = req.query.tipo as string;
-
   try {
-    const response = await _getTelas(tipo);
+    const response = await _getTelas();
     res
       .status(response.status)
       .json(response.items ? response.items : response);
@@ -92,13 +91,27 @@ export const getTelas = async (req: Request, res: Response) => {
   }
 };
 
-export const getTela = async (req: Request, res: Response) => {
-  const { tela_id } = req.params;
+export const getTelaPorTipo = async (req: Request, res: Response) => {
+  const { tipo_tela } = req.params;
+  const estado = req.query.estado
+
+  console.log(tipo_tela,estado)
 
   try {
-    const response = await _getTela(Number(tela_id));
+    const response = await _getTelaPorTipo(tipo_tela,Number(estado));
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getTelas", 500);
+  }
+};
+
+export const getEmpresas= async (req: Request, res: Response) => {
+  try {
+    const response = await _getEmpresas();
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getEmpresas", 500);
   }
 };

@@ -10,7 +10,7 @@ const router = Router();
 
 //Rutas revisadas
 //Rutas sin revisar
-router.get("/", getCompras);
+router.get("", getCompras);
 router.get("/detalle", getComprasDetalle);
 
 router.put("/update/:compra_id", updateCompra);
