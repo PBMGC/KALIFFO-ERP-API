@@ -81,6 +81,35 @@ export const _getCortes = async () => {
   }
 };
 
+export const _getCortesPorLote = async (lote_id:number) => {
+  try {
+    const queryText = `SELECT * FROM cortes where lote_id = ?`;
+    const result = await query(queryText,[lote_id]);
+
+    if (result.data && result.data.length === 0) {
+      return {
+        message: "Cortes no encontrados.",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      items: result.data || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      message: "Error al obtener los cortes.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};
+
+
 export const _getCorte = async (corte_id: number) => {
   try {
     const queryText = `SELECT * FROM cortes WHERE corte_id = ?`;

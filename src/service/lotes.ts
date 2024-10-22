@@ -89,3 +89,22 @@ export const _UpdateLote = async (
     };
   }
 };
+
+export const _getLotes = async () => {
+  const queryText = `select * from lotes where estado !=0`;
+
+  try {
+    const result = await query(queryText, []);
+    return {
+      items: result.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      msg: "Error _getLotes",
+      success: false,
+      status: 500,
+    };
+  }
+};
