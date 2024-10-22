@@ -13,20 +13,19 @@ const queryUpdateTela = `
 `;
 
 const queryGetTelas = `
-    SELECT * FROM almacen_telas
-    WHERE (u_tipo IS NULL OR u_tipo = '' OR tipo = u_tipo);
+    select a_t.tipo,COUNT(a_t.tipo) as "STOCK" from almacen_telas a_t group by a_t.tipo;
 `;
 
-const queryGetTela = `
-  SELECT * FROM almacen_telas WHERE tela_id = u_tela_id;
+const queryGetTelaPorTipo = `
+  SELECT * FROM almacen_telas WHERE tipo = u_tipo AND estado = u_estado;
 `;
 
 const initProcedureGetTela = async () => {
-  await createSp("SP_GetTela", queryGetTela, "IN u_tela_id INT");
+  await createSp("SP_GetTelaPorTipo", queryGetTelaPorTipo, "IN u_tipo varchar(15), IN u_estado INT");
 };
 
 const initProcedureGetTelas = async () => {
-  await createSp("SP_GetTelas", queryGetTelas, "IN u_tipo VARCHAR(255)");
+  await createSp("SP_GetTelas", queryGetTelas);
 };
 
 const initiProcedureUpdateTela = async () => {
@@ -46,5 +45,6 @@ export const initProcedureTela = async () => {
 export const dropProcedureTela = async () => {
   await eliminarProcedimiento("SP_GetTelas");
   await eliminarProcedimiento("SP_GetTela");
+  await eliminarProcedimiento("SP_GetTelaPorTipo");
   await eliminarProcedimiento("SP_UpdateTela");
 };

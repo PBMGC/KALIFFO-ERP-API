@@ -5,6 +5,7 @@ import {
   _UpdateCorte,
   _getCortes,
   _getCorte,
+  _getCortesPorLote,
 } from "../service/cortes";
 
 export const createCorte = async (req: Request, res: Response) => {
@@ -66,12 +67,20 @@ export const updateCorte = async (req: Request, res: Response) => {
   }
 };
 
-export const getCortes = async (req: Request, res: Response) => {
+export const getCortesPorLote = async (req: Request, res: Response) => {
+  
+  const {lote_id} = req.params;
+  
   try {
+<<<<<<< HEAD
     const response = await _getCortes();
     res
       .status(response.status)
       .json(response.items ? response.items : response);
+=======
+    const response = await _getCortesPorLote(Number(lote_id));
+    res.status(response.status).json(response);
+>>>>>>> 5173596ba2b8b30a2520d50ebdc1cb3707d2aec4
   } catch (error) {
     handleHttp(res, "error_getCortes", 500);
   }
