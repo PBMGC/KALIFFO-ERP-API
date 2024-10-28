@@ -81,8 +81,14 @@ export const _getCortes = async () => {
 
 export const _getCortesPorLote = async (lote_id: number) => {
   try {
+<<<<<<< HEAD
     const queryText = `SELECT * FROM cortes where lote_id = ?`;
     const result = await query(queryText, [lote_id]);
+=======
+    const queryText = `SELECT usuario.nombre,producto.nombre,cortes.cantidad_enviada,cortes.cantidad_recibida,cortes.talla,cortes.metraje_asignado,cortes.tipo_tela FROM cortes inner JOIN
+usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id=?`;
+    const result = await query(queryText,[lote_id]);
+>>>>>>> 953c31bbb2a289917fc9f0ae15906ae7e8a3406d
 
     if (result.data && result.data.length === 0) {
       return {

@@ -74,7 +74,7 @@ export const getCortesPorLote = async (req: Request, res: Response) => {
   const { lote_id } = req.params;
 
   try {
-    const response = await _getCortes();
+    const response = await _getCortesPorLote(Number(lote_id));
     res
       .status(response.status)
       .json(response.items ? response.items : response);

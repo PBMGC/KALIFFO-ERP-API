@@ -144,18 +144,96 @@ export const _UpdateCompraDetalle = async (detalle: any) => {
   }
 };
 
+export const _eliminarCompra = async (compra_id: number) => {
+  const queryS = `DELETE FROM compras where compra_id=?`;
+
+  try {
+    const result = (await query(queryS, [compra_id])) as any;
+
+    if (result.affectedRows === 0) {
+      return {
+        msg: "No se encontró la compra",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      msg: "compra eliminada",
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error al eliminar la compra:", error);
+    return {
+      msg: "Error al eliminar la compra",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
 export const _getCompras = async (tienda_id: number | null) => {
   let queryText: string;
   let params: Array<number> = [];
 
   if (tienda_id) {
-    queryText = `SELECT * FROM compras WHERE tienda_id = ?`;
+    queryText = `SELECT compras.compra_id,tienda.tienda,compras.empresa_proveedor,
+    compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda on compras.tienda_id=tienda.tienda_id
+     WHERE tienda_id = ?`;
     params = [tienda_id];
   } else {
-    queryText = `SELECT * FROM compras`;
+    queryText = `SELECT compras.compra_id,
+    tienda.tienda,compras.empresa_proveedor,compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda on compras.tienda_id=tienda.tienda_id`;
   }
 
   const result = await query(queryText, params.length ? params : undefined);
+
+  const dataCompras = result.data.map((compra:any)=>({
+    ...compra,
+    fecha_compra:new Date(compra.fecha_compra).toISOString().split("T")[0]
+  }))
+
+
+  if (!result.success) {
+    return {
+      message: result.error,
+      success: false,
+      status: result.status || 500,
+    };
+  }
+
+  return {
+    items: dataCompras,
+    success: true,
+    status: 200,
+  };
+};
+
+export const _getEmpresas = async () => {
+  const queryText = `select compras.empresa_proveedor from compras group by compras.empresa_proveedor`;
+
+  const result = await query(queryText);
+
+  if (!result.success) {
+    return {
+      message: result.error,
+      success: false,
+      status: result.status || 500,
+    };
+  }
+
+  return {
+    items: result.data,
+    success: true,
+    status: 200,
+  };
+};
+
+export const _getProductos = async () => {
+  const queryText = `select compras_detalle.producto from compras_detalle GROUP BY compras_detalle.producto`;
+
+  const result = await query(queryText);
 
   if (!result.success) {
     return {
@@ -174,7 +252,8 @@ export const _getCompras = async (tienda_id: number | null) => {
 
 export const _getComprasDetalle = async (compra_id: number) => {
   const queryCompra = `
-      SELECT * FROM compras WHERE compras.compra_id=?;
+     SELECT compras.compra_id,tienda.tienda,compras.empresa_proveedor,compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda 
+     on compras.tienda_id=tienda.tienda_id where compras.compra_id=?
     `;
 
   const queryDetalle = `
@@ -196,8 +275,16 @@ export const _getComprasDetalle = async (compra_id: number) => {
       };
     }
 
-    const compraConDetalle = {
+    const compraFixed = {
       ...compraResult.data[0],
+      fecha_compra: new Date(compraResult.data[0].fecha_compra).toISOString().split("T")[0],
+    }
+
+
+    
+
+    const compraConDetalle = {
+      ...compraFixed,
       detalle: detalleResult.data,
     };
 

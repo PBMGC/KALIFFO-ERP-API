@@ -1,8 +1,11 @@
 import { Router } from "express";
 import {
   createCompra,
+  eliminarCompra,
   getCompras,
   getComprasDetalle,
+  getEmpresas,
+  getProductos,
   updateCompra,
 } from "../controller/compras";
 
@@ -11,9 +14,13 @@ const router = Router();
 //Rutas revisadas
 //Rutas sin revisar
 router.get("", getCompras);
-router.get("/detalle", getComprasDetalle);
+router.get("/detalle/:compra_id", getComprasDetalle);
+router.get("/empresas",getEmpresas);
+router.get("/productos",getProductos)
 
 router.put("/update/:compra_id", updateCompra);
+
+router.delete("/delete/:compra_id",eliminarCompra)
 
 router.post("/create", createCompra);
 

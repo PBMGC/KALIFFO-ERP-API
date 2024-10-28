@@ -15,6 +15,7 @@ export const createTela = async (req: Request, res: Response) => {
   const telasCreadas: any[] = [];
 
   for (const tela of req.body) {
+    console.log(tela)
     const nuevaTela: any = {
       tipo: tela.tipo,
       metraje: tela.metraje,
