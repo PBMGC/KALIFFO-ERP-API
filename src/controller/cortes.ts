@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
 import {
   _createCorte,
@@ -6,6 +6,9 @@ import {
   _getCortes,
   _getCorte,
   _getCortesPorLote,
+  _sgtEstadoCorte,
+  _activarCorte,
+  _desactivarCorte,
 } from "../service/cortes";
 
 export const createCorte = async (req: Request, res: Response) => {
@@ -13,7 +16,7 @@ export const createCorte = async (req: Request, res: Response) => {
     lote_id,
     taller_id,
     producto_id,
-    cantidad,
+    cantidad_enviada,
     talla,
     metraje_asignado,
     tipo_tela,
@@ -23,7 +26,7 @@ export const createCorte = async (req: Request, res: Response) => {
     lote_id,
     taller_id,
     producto_id,
-    cantidad,
+    cantidad_enviada,
     talla,
     metraje_asignado,
     tipo_tela,
@@ -88,5 +91,37 @@ export const getCorte = async (req: Request, res: Response) => {
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getCorte", 500);
+  }
+};
+
+export const sgteEstdoCorte = async (req: Request, res: Response) => {
+  const { corte_id } = req.params;
+  const { cantidad_recibida } = req.body;
+
+  try {
+    const response = await _sgtEstadoCorte(Number(corte_id), cantidad_recibida);
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_sgteEstadoCorte", 500);
+  }
+};
+
+export const activarCorte = async (req: Request, res: Response) => {
+  const { corte_id } = req.params;
+  try {
+    const response = await _activarCorte(Number(corte_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_activarCorte", 500);
+  }
+};
+
+export const desactivarCorte = async (req: Request, res: Response) => {
+  const { corte_id } = req.params;
+  try {
+    const response = await _desactivarCorte(Number(corte_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_desactivarCorte", 500);
   }
 };

@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { createLote, getLotes, updateLote } from "../controller/lotes";
+import { createLote, getLotes, sgtEstadoLote } from "../controller/lotes";
 
 const router = Router();
 
 //Rutas revisadas
 router.post("/create", createLote);
 
-router.put("/update/:lote_id", updateLote);
+router.get("/sgte/:lote_id", sgtEstadoLote);
 
 //Rutas sin revisar
-router.get("",getLotes)
+router.get("", getLotes);
 
 export { router };

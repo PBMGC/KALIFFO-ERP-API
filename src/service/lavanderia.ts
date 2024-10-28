@@ -195,3 +195,135 @@ export const _deleteLavanderia = async (lavanderia_id: number) => {
     };
   }
 };
+
+export const _desactivarCorte = async (corte_id: number) => {
+  const queryText =
+    "UPDATE cortes SET estado = 0 WHERE corte_id = ? AND estado != 0;";
+
+  try {
+    const result = await query(queryText, [corte_id]);
+
+    if (result.success && result.affectedRows > 0) {
+      return {
+        message: `El corte con ID ${corte_id} ha sido desactivada correctamente.`,
+        success: true,
+        status: 200,
+      };
+    } else {
+      return {
+        message: `No se encontró corte con ID ${corte_id} o ya estaba desactivada.`,
+        success: false,
+        status: 400,
+      };
+    }
+  } catch (error: any) {
+    console.error("Error al desactivar corte:", error);
+    return {
+      message: error.message || "Error desconocido al desactivar corte.",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _sgteEstadoLavanderia = async (
+  lavanderia_id: number,
+  cantidad_recibida?: number
+) => {
+  try {
+    const result = await query(
+      "SELECT * FROM lavanderia WHERE lavanderia_id = ?",
+      [lavanderia_id]
+    );
+
+    const lavanderia = result.data[0] as any;
+
+    if (!lavanderia) {
+      return {
+        message: "No se encontró la lavanderia",
+        success: false,
+        status: 404,
+      };
+    }
+
+    switch (lavanderia.estado) {
+      case 0:
+        return {
+          message: "Esta lavanderia esta desactivado",
+          success: false,
+          status: 404,
+        };
+      case 1:
+        const updateLavanderia1 = await query(
+          "UPDATE lavanderia SET estado = 2 WHERE lavanderia = ?",
+          [lavanderia_id]
+        );
+        if (updateLavanderia1.affectedRows > 0) {
+          return {
+            message: "La lavanderia ha pasado al estado 2 (en proceso)",
+            success: true,
+            status: 200,
+          };
+        } else {
+          return {
+            message: "No se pudo actualizar el estado de lavanderia",
+            success: false,
+            status: 500,
+          };
+        }
+      case 2:
+        if (cantidad_recibida === undefined) {
+          return {
+            message: "Campo 'cantidad_recibida' obligatorio.",
+            success: false,
+            status: 500,
+          };
+        }
+
+        const updateLavanderia2 = await query(
+          "UPDATE lavanderia SET estado = 3, cantidad_recibida = ? WHERE lavanderia_id = ?",
+          [cantidad_recibida, lavanderia_id]
+        );
+
+        const updateLote = await query(
+          "update lotes set estado = 2, cantidad_total = ? where lote_id = ?",
+          [cantidad_recibida, lavanderia.lote_id]
+        );
+
+        if (updateLavanderia2.affectedRows > 0 && updateLote.affectedRows > 0) {
+          return {
+            message: "La lavanderia ha pasado al estado 3 (finalizado)",
+            nuevoEstado: 3,
+            success: true,
+            status: 200,
+          };
+        } else {
+          return {
+            message:
+              "No se pudo actualizar el estado de la lavanderia a 3 o lote",
+            success: false,
+            status: 500,
+          };
+        }
+      case 3:
+        return {
+          message: "Esta lavanderia está finalizado",
+          success: false,
+          status: 400,
+        };
+      default:
+        return {
+          message: "Estado de la lavanderia no reconocido",
+          success: false,
+          status: 400,
+        };
+    }
+  } catch (error: any) {
+    return {
+      msg: "Error en _sgtEstadoLavanderia",
+      error: error.message,
+      success: false,
+      status: 500,
+    };
+  }
+};
