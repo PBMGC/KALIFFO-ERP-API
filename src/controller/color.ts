@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { _createColor, _getColores } from "../service/color";
 import { handleHttp } from "../util/error.handler";
+import { Color } from "../interface/color";
 
 export const createColor = async (req: Request, res: Response) => {
   const { nombre, codigo } = req.body;
-  const color: any = {
+  const color: Color = {
     nombre,
     codigo,
   };

@@ -10,6 +10,7 @@ import {
   _activarCorte,
   _desactivarCorte,
 } from "../service/cortes";
+import { Corte } from "../interface/corte";
 
 export const createCorte = async (req: Request, res: Response) => {
   const {
@@ -22,7 +23,7 @@ export const createCorte = async (req: Request, res: Response) => {
     tipo_tela,
   } = req.body;
 
-  const corte: any = {
+  const corte: Corte = {
     lote_id,
     taller_id,
     producto_id,

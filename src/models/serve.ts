@@ -60,4 +60,4 @@ class Serve {
 
 export default Serve;
 
-//Lotes => cantidad Total
+//Taller

@@ -3,7 +3,7 @@ export interface Corte {
   lote_id: number;
   taller_id: number;
   producto_id: number;
-  estado: number;
+  estado?: number;
   cantidad_enviada: number;
   cantidad_recibida?: number | null;
   talla: string;

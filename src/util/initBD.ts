@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS tienda (
     INDEX I_tienda (tienda),
     INDEX I_telefono (telefono),
     INDEX I_estado (estado)
-);
-`;
+);`;
 
 const usuario = `
 CREATE TABLE IF NOT EXISTS usuario (
@@ -147,9 +146,7 @@ CREATE TABLE IF NOT EXISTS venta (
   tipoComprobante => 
     1 => boleta
     2 => factura
-
 */
-
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
     venta_id INT NOT NULL,
@@ -164,9 +161,6 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
     INDEX I_ventaid (venta_id),
     INDEX I_productoDetalleid (productoDetalle_id)
 );`;
-
-// producto_id => 120
-//productoDetalle_id => 42
 
 const movimientoMercaderia = `
 CREATE TABLE IF NOT EXISTS movimientoMercaderia (
@@ -184,8 +178,7 @@ CREATE TABLE IF NOT EXISTS movimientoMercaderia (
     INDEX I_tienda_destino (tienda_destino_id),
     INDEX I_productoDetalle_id (productoDetalle_id),
     INDEX I_fecha (fecha)
-);
-`;
+);`;
 
 const compras = `
   CREATE TABLE IF NOT EXISTS compras (
@@ -198,8 +191,7 @@ const compras = `
     FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id),
     INDEX I_fecha_compra (fecha_compra),
     INDEX I_empresa_proveedor (empresa_proveedor)
-);
-`;
+);`;
 
 const compras_detalle = `
 CREATE TABLE IF NOT EXISTS compras_detalle (
@@ -210,8 +202,7 @@ CREATE TABLE IF NOT EXISTS compras_detalle (
     total DECIMAL(10, 2) NOT NULL,                 
     FOREIGN KEY (compra_id) REFERENCES compras(compra_id) ON DELETE CASCADE,
     INDEX I_producto (producto)
-);
-`;
+);`;
 
 const Envios = `
   CREATE TABLE IF NOT EXISTS envios (
@@ -224,8 +215,7 @@ const Envios = `
     FOREIGN KEY (pedido_id) REFERENCES pedido(pedido_id) ON DELETE CASCADE
     INDEX I_pedido_id(pedido_id),
     INDEX I_estado (estado)
-);
-`;
+);`;
 
 const Almacenes = `
 CREATE TABLE IF NOT EXISTS almacenes (
@@ -235,8 +225,7 @@ CREATE TABLE IF NOT EXISTS almacenes (
     estado INT NOT NULL,                 
     STOCK INT,               
     INDEX I_estado (estado)   
-);
-`;
+);`;
 
 const almacen_telas = `
   CREATE TABLE IF NOT EXISTS almacen_telas (
@@ -251,14 +240,13 @@ const almacen_telas = `
     INDEX I_articulo (articulo),
     INDEX I_empresa_compra (empresa_compra),
     INDEX I_estado (estado)
-);
-`;
+);`;
 
 //estado 0 = desactivado
 //estado 1 = corte
 //estado 2 = lavanderia
-// estado 3 = taller
-// estado 4 = almacen
+//estado 3 = taller
+//estado 4 = almacen
 const lotes = `
   CREATE TABLE IF NOT EXISTS lotes (
     lote_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -266,8 +254,7 @@ const lotes = `
     fecha_creacion DATE NOT NULL,
     cantidad_total INT DEFAULT 0,
     estado INT DEFAULT 1
-  );
-`;
+);`;
 
 //estado 0 = desactivado
 //estado 1 = inicio
@@ -294,8 +281,7 @@ CREATE TABLE IF NOT EXISTS cortes (
     INDEX I_producto_id(producto_id),
     INDEX I_cantidad_enviada(cantidad_enviada),
     INDEX I_cantidad_recibida(cantidad_recibida)
-);
-`;
+);`;
 
 //estado 0 = desactivado
 //estado 1 = inicio
@@ -309,23 +295,27 @@ CREATE TABLE IF NOT EXISTS lavanderia (
   cantidad_recibida INT default null,
   color_id INT NOT NULL,
   talla VARCHAR(20) NOT NULL,
-  estado INT NOT NULL, 
+  estado INT NOT NULL DEFAULT 1,  
   precio_unidad DECIMAL(10, 2) NOT NULL,
   lavanderia_asignada VARCHAR(40) NOT NULL,
   fecha_envio DATE,  
   fecha_recepcion DATE,
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
   FOREIGN KEY (color_id) REFERENCES color(color_id)
-);
-`;
+);`;
 
+//estado 0 = desactivado
+//estado 1 = inicio
+//estado 2 = proceso
+//estado 3 = finalizado
 const taller_acabados = `
 CREATE TABLE IF NOT EXISTS taller_acabados (
   acabado_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,                      
   color_id INT NOT NULL,                     
   talla VARCHAR(15) NOT NULL,               
-  cantidad INT NOT NULL,                   
+  cantidad_recibida INT NOT NULL DEFAULT 0,                  
+  cantidad_enviada INT NOT NULL,                   
   estado INT DEFAULT 1,
   fecha_inicio DATE,
   fecha_final DATE, 
@@ -335,9 +325,12 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
   INDEX I_color_id (color_id),
   INDEX I_talla (talla),
   INDEX I_estado (estado)
-);
-`;
+);`;
 
+//estado 0 = desactivado
+//estado 1 = inicio
+//estado 2 = proceso
+//estado 3 = finalizado
 const almacen_productos = `
 CREATE TABLE almacen_productos (
     almacen_id INT PRIMARY KEY,
@@ -349,8 +342,7 @@ CREATE TABLE almacen_productos (
     estado INT NOT NULL,
     FOREIGN KEY (producto_id) REFERENCES productos(producto_id) ON DELETE CASCADE,
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
-);
-`;
+);`;
 
 export const initBD = async () => {
   const conn = await connection();
@@ -365,14 +357,17 @@ export const initBD = async () => {
       await conn.execute(color);
       await conn.execute(productoDetalle);
       await conn.execute(productoTalla);
-      await conn.execute(movimientoMercaderia), await conn.execute(pago);
+      await conn.execute(movimientoMercaderia);
+      await conn.execute(pago);
       await conn.execute(venta);
       await conn.execute(detalleVenta);
-      await conn.execute(compras), await conn.execute(compras_detalle);
+      await conn.execute(compras);
+      await conn.execute(compras_detalle);
       await conn.execute(almacen_telas);
       await conn.execute(lotes);
       await conn.execute(cortes);
       await conn.execute(lavanderia);
+      await conn.execute(taller_acabados);
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -406,6 +401,7 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS lotes");
       await conn.execute("DROP TABLE IF EXISTS cortes");
       await conn.execute("DROP TABLE IF EXISTS lavanderia");
+      await conn.execute("DROP TABLE IF EXISTS taller_acabados");
       await conn.execute("SET foreign_key_checks = 1;");
       console.log("Tablas borradas correctamente.");
     } catch (error) {
