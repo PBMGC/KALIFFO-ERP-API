@@ -110,6 +110,28 @@ usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto
   }
 };
 
+
+export const _getTallas = async () => {
+  try {
+    const queryText = `SELECT cortes.talla from cortes group by cortes.talla`;
+    const result = await query(queryText);
+    return {
+      items: result.data || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    console.log(error)
+    return {
+      message: "Error al obtener las tallas.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};
+
+
 export const _getCorte = async (corte_id: number) => {
   try {
     const queryText = `SELECT * FROM cortes WHERE corte_id = ?`;

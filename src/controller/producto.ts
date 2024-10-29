@@ -11,6 +11,7 @@ import {
   _getProductos,
   _getProductosTienda,
   _getTallaProducto,
+  _imprimirCodigo,
   _loseProductos,
   _updateProducto,
 } from "../service/producto";
@@ -52,6 +53,7 @@ export const getProductos = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id;
   const loose_id = req.query.loose_id;
   try {
+    console.log(tienda_id)
     let response;
 
     if (tienda_id) {
@@ -156,6 +158,16 @@ export const activarProducto = async (req: Request, res: Response) => {
     const response = await _activarProducto(Number(producto_id));
     res.status(response.status).json(response);
   } catch (error) {
+    handleHttp(res, "error_desactivarProducto", 500);
+  }
+};
+
+export const Imprimir = async (req: Request, res: Response) => {
+  try {
+    const response = await _imprimirCodigo();
+    res.status(200).json("hola")
+  } catch (error) {
+    console.log(error)
     handleHttp(res, "error_desactivarProducto", 500);
   }
 };

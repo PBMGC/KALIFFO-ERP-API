@@ -6,6 +6,7 @@ import {
   _getCortes,
   _getCorte,
   _getCortesPorLote,
+  _getTallas,
   _sgtEstadoCorte,
   _activarCorte,
   _desactivarCorte,
@@ -124,5 +125,16 @@ export const desactivarCorte = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_desactivarCorte", 500);
+  }
+};
+
+export const getTallas = async (req: Request, res: Response) => {
+  try {
+    const response = await _getTallas();
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getTallas", 500);
   }
 };
