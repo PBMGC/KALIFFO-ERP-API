@@ -1,6 +1,7 @@
+import { Color } from "../interface/color";
 import { query } from "../util/query";
 
-export const _createColor = async (color: any) => {
+export const _createColor = async (color: Color) => {
   const { nombre, codigo } = color;
 
   const result = await query("call SP_CreateColor(?, ?)", [nombre, codigo]);

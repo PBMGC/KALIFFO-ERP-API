@@ -15,6 +15,6 @@ export const initSeeders = async () => {
   await createProducto();
   await createVenta();
   await createTelas();
-  await createLotes();
-  await createLavanderia();
+  // await createLotes();
+  // await createLavanderia();
 };

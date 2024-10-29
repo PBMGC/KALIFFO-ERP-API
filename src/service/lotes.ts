@@ -47,48 +47,92 @@ export const _createLote = async () => {
   }
 };
 
-export const _UpdateLote = async (
-  lote_id: number,
-  estado: number,
-  etapa: string
-) => {
+export const _sgtEstadoLote = async (lote_id: number) => {
   try {
-    let queryS;
+    const result = await query("SELECT * FROM lotes WHERE lote_id = ?", [
+      lote_id,
+    ]);
 
-    //lote 1 a 2 quitar estado ,etapa
+    const lote = result.data[0] as any;
 
-    if (etapa === "cortes") {
-      queryS = `
-            UPDATE cortes SET estado = ? WHERE lote_id = ?;
-        `;
-    } else if (etapa === "lavanderia") {
-      queryS = `
-            UPDATE lavanderia SET estado = ? WHERE lote_id = ?;
-        `;
+    if (lote.estado === 4 || lote.estado === 0) {
+      return {
+        message: "El lote ya está en el último estado o esta desactivado",
+        success: true,
+        status: 200,
+      };
+    }
+
+    const updateLote = await query(
+      "UPDATE lotes SET estado = ? WHERE lote_id = ?",
+      [lote.estado + 1, lote_id]
+    );
+
+    if (updateLote.affectedRows > 0) {
+      return {
+        message: "El estado del lote ha sido actualizado",
+        item: updateLote,
+        success: false,
+        status: 400,
+      };
     } else {
       return {
-        message: "Etapa no válida.",
+        message: "No se pudo actualizar el estado del lote",
         success: false,
         status: 400,
       };
     }
-
-    await query(queryS, [estado, lote_id]);
-
+  } catch (error) {
     return {
-      message: "Lote actualizado con éxito.",
-      success: true,
-      status: 200,
-    };
-  } catch (error: any) {
-    return {
-      message: "Error al actualizar el lote.",
+      msg: "Error en _sgtEstadoLote",
       success: false,
-      error: error.message || error,
       status: 500,
     };
   }
 };
+
+// export const _UpdateLote = async (
+//   lote_id: number,
+//   estado: number,
+//   etapa: string
+// ) => {
+//   try {
+//     let queryS;
+
+//     //lote 1 a 2 quitar estado ,etapa
+
+//     if (etapa === "cortes") {
+//       queryS = `
+//             UPDATE cortes SET estado = ? WHERE lote_id = ?;
+//         `;
+//     } else if (etapa === "lavanderia") {
+//       queryS = `
+//             UPDATE lavanderia SET estado = ? WHERE lote_id = ?;
+//         `;
+//     } else {
+//       return {
+//         message: "Etapa no válida.",
+//         success: false,
+//         status: 400,
+//       };
+//     }
+
+//     await query(queryS, [estado, lote_id]);
+
+//     return {
+//       message: "Lote actualizado con éxito.",
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error: any) {
+//     return {
+//       message: "Error al actualizar el lote.",
+//       success: false,
+//       error: error.message || error,
+//       status: 500,
+//     };
+//   }
+// };
 
 export const _getLotes = async () => {
   const queryText = `select * from lotes where estado !=0`;
