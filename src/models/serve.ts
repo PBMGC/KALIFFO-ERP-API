@@ -27,7 +27,8 @@ class Serve {
 
   listen() {
     this.app.listen(this.PORT, () => {
-      console.log(`Ejecutandose en el puerto ${this.PORT}`);
+      console.log(`Ejecutándose en el puerto ${this.PORT}`);
+      this.showDancingCat();
     });
   }
 
@@ -56,8 +57,22 @@ class Serve {
       console.log(error);
     }
   }
+
+  showDancingCat() {
+    const catFrames = [
+      ` /\\_/\\\n( o.o )\n > ^ <`,
+      ` /\\_/\\\n( o.o )\n   v ^ >`,
+      ` /\\_/\\\n( o.o )\n < ^ v`,
+    ];
+
+    let i = 0;
+    setInterval(() => {
+      console.clear();
+      console.log("Gato bailando en el servidor 🕺:");
+      console.log(catFrames[i]);
+      i = (i + 1) % catFrames.length;
+    }, 300);
+  }
 }
 
 export default Serve;
-
-//Taller

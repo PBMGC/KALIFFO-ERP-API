@@ -21,11 +21,6 @@ export const _createVenta = async (venta: any) => {
 
   const codigo = await createCodigoVenta(tipoComprobante, tienda_id);
 
-  // return {
-  //   message: `codigo creado ${codigo}`,
-  //   success: false,
-  //   status: 400,
-  // };
   const ventaExistente = (await query(`SELECT * FROM venta WHERE codigo = ?`, [
     codigo,
   ])) as any;
