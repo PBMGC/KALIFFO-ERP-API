@@ -60,15 +60,22 @@ class Serve {
 
   showDancingCat() {
     const catFrames = [
-      ` /\\_/\\\n( o.o )\n > ^ <`,
-      ` /\\_/\\\n( o.o )\n   v ^ >`,
-      ` /\\_/\\\n( o.o )\n < ^ v`,
+      ` /\\_/\\  \n( o.o ) \n > ^ < `,
+      ` /\\_/\\  \n( o.o ) \n   > ^ >`,
+      ` /\\_/\\  \n( o.o ) \n   < ^ <`,
+      ` /\\_/\\  \n( o.o ) \n > ^ < `,
+      ` /\\_/\\  \n( o.o ) \n   v ^ >`,
+      ` /\\_/\\  \n( o.o ) \n  < ^ v `,
+      ` /\\_/\\  \n( o.o ) \n  > ^ < `,
+      ` /\\_/\\  \n( o.o ) \n  ^ > ^`,
+      ` /\\_/\\  \n( o.o ) \n  ^ < ^`,
+      ` /\\_/\\  \n( o.o ) \n   ^ ^  `,
     ];
 
     let i = 0;
     setInterval(() => {
       console.clear();
-      console.log("Gato bailando en el servidor 🕺:");
+      console.log("🐱 Gato bailando en el servidor 🕺:");
       console.log(catFrames[i]);
       i = (i + 1) % catFrames.length;
     }, 300);
