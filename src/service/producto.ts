@@ -511,14 +511,59 @@ export const _activarProducto = async (producto_id: number) => {
 };
 
 
+export const _imprimirCodigo = async (res: any) => {
+  try {
+    const JsBarcode = require("jsbarcode");
+    const { createCanvas } = require("canvas");
+    const PDFDocument = require("pdfkit-table");
 
-export const _imprimirCodigo = async () => {
-  const escpos = require("escpos");
-  escpos.USB = require("escpos-usb");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');
 
-  const dispositivo = new escpos.USB(0x416, 0x5001); // IDs en hexadecimal
-  console.log(dispositivo)
+    const doc = new PDFDocument({
+      size: [100 * 2.83, 150 * 2.83], // tamaño en puntos
+      margin: 0,
+    });
+
+    doc.pipe(res);
+
+    // Posición inicial para el primer código de barras
+    let posX = 0; // posición horizontal
+    const posY = 5; // posición vertical (espacio desde la parte superior)
+    const barcodeWidth = 140; // ancho del código de barras
+    const barcodeHeight = 60; // alto del código de barras estaba en 40
+    const spaceBetween =8; // espacio entre los códigos de barras
+
+    for (let i = 0; i < 2; i++) { // Generar dos códigos de barras
+      const barcodeValue = `C${i + 1}`; // Formato válido para el código
+
+      // Crear un canvas para el código de barras
+      const canvas = createCanvas(barcodeWidth, barcodeHeight);
+      JsBarcode(canvas, barcodeValue, {
+        format: "CODE128",
+        width: 2,
+        fontOptios:"bold",
+        fontSize:20,
+        height: 100,
+      });
+
+      // Dibuja el código de barras en el PDF
+      const imgData = canvas.toBuffer("image/png");
+      doc.image(imgData, posX, posY, { width: barcodeWidth, height: barcodeHeight });
+
+      // Mover la posición horizontal para el próximo código de barras
+      posX += barcodeWidth + spaceBetween; // Actualiza la posición X para el siguiente código
+    }
+
+    doc.end();
+  } catch (error) {
+    console.error(error); // Muestra el error en la consola
+    res.status(500).send("Error al generar el PDF"); // Envía un error 500 al cliente
+  }
 };
+
+
+
 
 
 
