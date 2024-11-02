@@ -12,8 +12,9 @@ import {
 const router = Router();
 
 //Rutas revisadas
-router.get("/:usuario_id", getUsuario);
+
 router.get("/", getUsuarios);
+router.get("/:usuario_id", getUsuario);
 
 router.post("/create", ValidateCreateUsuario, createUsuario);
 

@@ -81,7 +81,7 @@ export const getCortesPorLote = async (req: Request, res: Response) => {
       .status(response.status)
       .json(response.items ? response.items : response);
   } catch (error) {
-    handleHttp(res, "error_getCortes", 500);
+    handleHttp(res, "error_getCortesPorLote", 500);
   }
 };
 

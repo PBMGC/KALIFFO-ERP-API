@@ -14,10 +14,9 @@ const router = Router();
 
 //Rutas revisadas
 //Rutas sin revisar
-router.get("/tallas",getTallas)
-router.get("/:lote_id", getCortesPorLote);
+router.get("/tallas", getTallas);
+router.get("/lote/:lote_id", getCortesPorLote);
 router.get("/:corte_id", getCorte);
-
 
 router.post("/create", createCorte);
 
@@ -27,4 +26,3 @@ router.put("/activar/:corte_id", activarCorte);
 router.put("/desactivar/:corte_id", desactivarCorte);
 
 export { router };
- 

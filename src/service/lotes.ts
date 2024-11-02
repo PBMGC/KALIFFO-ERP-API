@@ -47,49 +47,49 @@ export const _createLote = async () => {
   }
 };
 
-export const _sgtEstadoLote = async (lote_id: number) => {
-  try {
-    const result = await query("SELECT * FROM lotes WHERE lote_id = ?", [
-      lote_id,
-    ]);
+// export const _sgtEstadoLote = async (lote_id: number) => {
+//   try {
+//     const result = await query("SELECT * FROM lotes WHERE lote_id = ?", [
+//       lote_id,
+//     ]);
 
-    const lote = result.data[0] as any;
+//     const lote = result.data[0] as any;
 
-    if (lote.estado === 4 || lote.estado === 0) {
-      return {
-        message: "El lote ya está en el último estado o esta desactivado",
-        success: true,
-        status: 200,
-      };
-    }
+//     if (lote.estado === 4 || lote.estado === 0) {
+//       return {
+//         message: "El lote ya está en el último estado o esta desactivado",
+//         success: true,
+//         status: 200,
+//       };
+//     }
 
-    const updateLote = await query(
-      "UPDATE lotes SET estado = ? WHERE lote_id = ?",
-      [lote.estado + 1, lote_id]
-    );
+//     const updateLote = await query(
+//       "UPDATE lotes SET estado = ? WHERE lote_id = ?",
+//       [lote.estado + 1, lote_id]
+//     );
 
-    if (updateLote.affectedRows > 0) {
-      return {
-        message: "El estado del lote ha sido actualizado",
-        item: updateLote,
-        success: false,
-        status: 400,
-      };
-    } else {
-      return {
-        message: "No se pudo actualizar el estado del lote",
-        success: false,
-        status: 400,
-      };
-    }
-  } catch (error) {
-    return {
-      msg: "Error en _sgtEstadoLote",
-      success: false,
-      status: 500,
-    };
-  }
-};
+//     if (updateLote.affectedRows > 0) {
+//       return {
+//         message: "El estado del lote ha sido actualizado",
+//         item: updateLote,
+//         success: false,
+//         status: 400,
+//       };
+//     } else {
+//       return {
+//         message: "No se pudo actualizar el estado del lote",
+//         success: false,
+//         status: 400,
+//       };
+//     }
+//   } catch (error) {
+//     return {
+//       msg: "Error en _sgtEstadoLote",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
 
 // export const _UpdateLote = async (
 //   lote_id: number,
