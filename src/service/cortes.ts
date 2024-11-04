@@ -133,7 +133,6 @@ export const _getCorte = async (corte_id: number) => {
   try {
     const queryText = `SELECT * FROM cortes WHERE corte_id = ?`;
     const result = await query(queryText, [corte_id]);
-    console.log(result);
 
     return {
       item: result.data,
@@ -145,107 +144,6 @@ export const _getCorte = async (corte_id: number) => {
       message: "Error al obtener el corte.",
       success: false,
       error: error.message || error,
-      status: 500,
-    };
-  }
-};
-
-export const _sgtEstadoCorte = async (
-  corte_id: number,
-  cantidad_recibida?: number
-) => {
-  try {
-    const result = await query("SELECT * FROM cortes WHERE corte_id = ?", [
-      corte_id,
-    ]);
-
-    const corte = result.data[0] as any;
-
-    if (!corte) {
-      return {
-        message: "No se encontró el corte",
-        success: false,
-        status: 404,
-      };
-    }
-
-    switch (corte.estado) {
-      case 0:
-        return {
-          message: "Este corte está desactivado",
-          success: false,
-          status: 404,
-        };
-      case 1:
-        const updateCorte1 = await query(
-          "UPDATE cortes SET estado = 2 WHERE corte_id = ?",
-          [corte_id]
-        );
-        if (updateCorte1.affectedRows > 0) {
-          return {
-            message: "El corte ha pasado al estado 2 (en proceso)",
-            nuevoEstado: 2,
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message: "No se pudo actualizar el estado del corte a 2",
-            success: false,
-            status: 500,
-          };
-        }
-      case 2:
-        if (cantidad_recibida === undefined) {
-          return {
-            message: "Campo 'cantidad_recibida' obligatorio.",
-            success: false,
-            status: 500,
-          };
-        }
-
-        const updateCorte2 = await query(
-          "UPDATE cortes SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
-          [cantidad_recibida, corte_id]
-        );
-
-        const updateLote = await query(
-          "update lotes set estado = 2, cantidad_total = ? where lote_id = ?",
-          [cantidad_recibida, corte.lote_id]
-        );
-
-        if (updateCorte2.affectedRows > 0 && updateLote.affectedRows > 0) {
-          return {
-            message: "El corte ha pasado al estado 3 (finalizado)",
-            nuevoEstado: 3,
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message: "No se pudo actualizar el estado del corte a 3 o lote",
-            success: false,
-            status: 500,
-          };
-        }
-      case 3:
-        return {
-          message: "Este corte está finalizado",
-          success: false,
-          status: 400,
-        };
-      default:
-        return {
-          message: "Estado del corte no reconocido",
-          success: false,
-          status: 400,
-        };
-    }
-  } catch (error: any) {
-    return {
-      msg: "Error en _sgtEstadoCorte",
-      error: error.message,
-      success: false,
       status: 500,
     };
   }
@@ -305,6 +203,146 @@ export const _activarCorte = async (corte_id: number) => {
     console.error("Error al activar corte:", error);
     return {
       message: error.message || "Error desconocido al activar corte.",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _sgteEstadoCortesPorLote = async (
+  lote_id: number,
+  detalles: { corte_id: number; cantidad_recibida: number }[]
+) => {
+  try {
+    const result = await query("SELECT * FROM cortes WHERE lote_id = ?", [
+      lote_id,
+    ]);
+    const cortes = result.data;
+
+    if (!cortes || cortes.length === 0) {
+      return {
+        message: "No se encontraron cortes asociados al lote",
+        success: false,
+        status: 404,
+      };
+    }
+
+    const resultados = [];
+
+    for (const detalle of detalles) {
+      const corte = cortes.find((c: any) => c.corte_id === detalle.corte_id);
+
+      if (!corte) {
+        resultados.push({
+          corte_id: detalle.corte_id,
+          message: "Corte no encontrado en la base de datos",
+          success: false,
+          status: 404,
+        });
+        continue;
+      }
+
+      switch (corte.estado) {
+        case 0:
+          resultados.push({
+            corte_id: detalle.corte_id,
+            message: "Este corte está desactivado",
+            success: false,
+            status: 400,
+          });
+          break;
+
+        case 1:
+          const updateCorte1 = await query(
+            "UPDATE cortes SET estado = 2 WHERE corte_id = ?",
+            [detalle.corte_id]
+          );
+          if (updateCorte1.affectedRows > 0) {
+            resultados.push({
+              corte_id: detalle.corte_id,
+              message: "El corte ha pasado al estado 2 (en proceso)",
+              nuevoEstado: 2,
+              success: true,
+              status: 200,
+            });
+          } else {
+            resultados.push({
+              corte_id: detalle.corte_id,
+              message: "No se pudo actualizar el estado del corte a 2",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 2:
+          if (detalle.cantidad_recibida === undefined) {
+            return {
+              corte_id: detalle.corte_id,
+              message: "Campo 'cantidad_recibida' obligatorio.",
+              success: false,
+              status: 400,
+            };
+          }
+
+          const updateCorte2 = await query(
+            "UPDATE cortes SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
+            [detalle.cantidad_recibida, detalle.corte_id]
+          );
+
+          const updateLote = await query(
+            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
+            [lote_id]
+          );
+
+          if (updateCorte2.affectedRows > 0 && updateLote.affectedRows > 0) {
+            resultados.push({
+              corte_id: detalle.corte_id,
+              message: "El corte ha pasado al estado 3 (finalizado)",
+              nuevoEstado: 3,
+              success: true,
+              status: 200,
+            });
+          } else {
+            resultados.push({
+              corte_id: detalle.corte_id,
+              message: "No se pudo actualizar el estado del corte a 3 o lote",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 3:
+          resultados.push({
+            corte_id: detalle.corte_id,
+            message: "Este corte está finalizado",
+            success: false,
+            status: 400,
+          });
+          break;
+
+        default:
+          resultados.push({
+            corte_id: detalle.corte_id,
+            message: "Estado del corte no reconocido",
+            success: false,
+            status: 400,
+          });
+          break;
+      }
+    }
+
+    return {
+      message: "Proceso completado para todos los cortes del lote",
+      resultados,
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      msg: "Error en _sgteEstadoCortesPorLote",
+      error: error.message,
       success: false,
       status: 500,
     };

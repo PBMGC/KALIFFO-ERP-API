@@ -4,7 +4,7 @@ import {
   deleteLavanderia,
   getLavanderia,
   getLavanderias,
-  sgteEstdoLavanderia,
+  sgteEstdoLoteLavanderia,
   updateLavanderia,
 } from "../controller/lavanderia";
 
@@ -16,8 +16,8 @@ router.get("/:lavanderia_id", getLavanderia);
 router.post("/create", createLavanderia);
 
 router.put("/update/:lavanderia_id", updateLavanderia);
-router.put("/sgte/:lavanderia_id", sgteEstdoLavanderia);
+router.put("/sgte/lote/:lote_id", sgteEstdoLoteLavanderia);
 
-router.delete("delete/:lavanderia_id", deleteLavanderia);
+router.delete("/delete/:lavanderia_id", deleteLavanderia);
 
 export { router };

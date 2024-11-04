@@ -7,9 +7,9 @@ import {
   _getCorte,
   _getCortesPorLote,
   _getTallas,
-  _sgtEstadoCorte,
   _activarCorte,
   _desactivarCorte,
+  _sgteEstadoCortesPorLote,
 } from "../service/cortes";
 import { Corte } from "../interface/corte";
 
@@ -96,12 +96,12 @@ export const getCorte = async (req: Request, res: Response) => {
   }
 };
 
-export const sgteEstdoCorte = async (req: Request, res: Response) => {
-  const { corte_id } = req.params;
-  const { cantidad_recibida } = req.body;
+export const sgteEstdoLoteCorte = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  const { detalles } = req.body;
 
   try {
-    const response = await _sgtEstadoCorte(Number(corte_id), cantidad_recibida);
+    const response = await _sgteEstadoCortesPorLote(Number(lote_id), detalles);
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_sgteEstadoCorte", 500);

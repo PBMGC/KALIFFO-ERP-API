@@ -6,9 +6,10 @@ import {
   getCorte,
   getCortesPorLote,
   getTallas,
-  sgteEstdoCorte,
+  sgteEstdoLoteCorte,
   updateCorte,
 } from "../controller/cortes";
+import { _sgteEstadoCortesPorLote } from "../service/cortes";
 
 const router = Router();
 
@@ -20,9 +21,9 @@ router.get("/:corte_id", getCorte);
 
 router.post("/create", createCorte);
 
-router.put("/update/:corte_id", updateCorte);
-router.put("/sgte/:corte_id", sgteEstdoCorte);
+router.put("/sgte/lote/:lote_id", sgteEstdoLoteCorte);
 router.put("/activar/:corte_id", activarCorte);
 router.put("/desactivar/:corte_id", desactivarCorte);
+router.put("/update/:corte_id", updateCorte);
 
 export { router };

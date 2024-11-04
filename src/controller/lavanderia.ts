@@ -5,7 +5,7 @@ import {
   _deleteLavanderia,
   _getLavanderia,
   _getLavanderias,
-  _sgteEstadoLavanderia,
+  _sgteEstadoLavanderiasPorLote,
   _updateLavanderia,
 } from "../service/lavanderia";
 
@@ -107,17 +107,17 @@ export const deleteLavanderia = async (req: Request, res: Response) => {
   }
 };
 
-export const sgteEstdoLavanderia = async (req: Request, res: Response) => {
-  const { lavanderia_id } = req.params;
-  const { cantidad_recibida } = req.body;
+export const sgteEstdoLoteLavanderia = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  const { detalles } = req.body;
 
   try {
-    const response = await _sgteEstadoLavanderia(
-      Number(lavanderia_id),
-      cantidad_recibida
+    const response = await _sgteEstadoLavanderiasPorLote(
+      Number(lote_id),
+      detalles
     );
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_sgteEstadoLavanderia", 500);
+    handleHttp(res, "error_sgteEstadoCorte", 500);
   }
 };
