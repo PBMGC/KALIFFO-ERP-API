@@ -46,3 +46,15 @@ export const initCronJobs = async () => {
     await sendEmail(productos);
   });
 };
+
+/* 7am y 8pm */
+
+/* 
+
+
+Reporte
+
+tabla por tienda por talla lo que esta poco menos de 30
+
+
+*/
