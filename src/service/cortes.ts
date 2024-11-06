@@ -94,7 +94,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
     cortes.metraje_asignado,
     cortes.tipo_tela 
 FROM cortes 
-inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id=1 and cortes.estado = 1`;
+inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado = 1`;
     const result = await query(queryText, [lote_id]);
     if (result.data && result.data.length === 0) {
       return {
