@@ -162,10 +162,10 @@ export const activarProducto = async (req: Request, res: Response) => {
   }
 };
 
+
 export const Imprimir = async (req: Request, res: Response) => {
   try {
-    const response = await _imprimirCodigo();
-    res.status(200).json("hola")
+    const response = await _imprimirCodigo(res);
   } catch (error) {
     console.log(error)
     handleHttp(res, "error_desactivarProducto", 500);
