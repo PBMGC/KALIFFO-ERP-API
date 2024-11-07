@@ -8,7 +8,7 @@ import morgan from "morgan";
 import { initSeeders } from "../seeders/initSeeders";
 import { initTriggers } from "../db/triggers/initTrigger";
 import { initSp } from "../db/sp/initSp";
-import { exec } from "child_process"; // Importa el módulo child_process
+import { exec } from "child_process";
 
 class Serve {
   app: express.Application;
@@ -109,6 +109,9 @@ class Serve {
 
 export default Serve;
 
-//Login
-//Limpiar rutas
-//Validaciones de post
+//mejorar la conclucion
+//invocacion de los anexos
+//validaciones en las post
+//terminar de cambiar la bd
+//correo
+//interface
