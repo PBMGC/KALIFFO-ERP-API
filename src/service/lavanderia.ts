@@ -194,101 +194,168 @@ export const _deleteLavanderia = async (lavanderia_id: number) => {
   }
 };
 
-export const _sgteEstadoLavanderia = async (
-  lavanderia_id: number,
-  cantidad_recibida?: number
+export const _sgteEstadoLavanderiasPorLote = async (
+  lote_id: number,
+  detalles: { lavanderia_id: number; cantidad_recibida: number }[]
 ) => {
   try {
-    const result = await query(
-      "SELECT * FROM lavanderia WHERE lavanderia_id = ?",
-      [lavanderia_id]
-    );
+    const result = await query("SELECT * FROM lavanderia WHERE lote_id = ?", [
+      lote_id,
+    ]);
+    const lavanderias = result.data;
 
-    const lavanderia = result.data[0] as any;
-
-    if (!lavanderia) {
+    if (!lavanderias || lavanderias.length === 0) {
       return {
-        message: "No se encontró la lavanderia",
+        message: "No se encontraron registros de lavandería asociados al lote",
         success: false,
         status: 404,
       };
     }
 
-    switch (lavanderia.estado) {
-      case 0:
-        return {
-          message: "Esta lavanderia esta desactivado",
+    const resultados = [];
+
+    for (const detalle of detalles) {
+      const lavanderia = lavanderias.find(
+        (l: any) => l.lavanderia_id === detalle.lavanderia_id
+      );
+
+      if (!lavanderia) {
+        resultados.push({
+          lavanderia_id: detalle.lavanderia_id,
+          message: "Lavandería no encontrada en la base de datos",
           success: false,
           status: 404,
-        };
-      case 1:
-        const updateLavanderia1 = await query(
-          "UPDATE lavanderia SET estado = 2 WHERE lavanderia_id = ?",
-          [lavanderia_id]
-        );
-        if (updateLavanderia1.affectedRows > 0) {
-          return {
-            message: "La lavanderia ha pasado al estado 2 (en proceso)",
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message: "No se pudo actualizar el estado de lavanderia",
-            success: false,
-            status: 500,
-          };
-        }
-      case 2:
-        if (cantidad_recibida === undefined) {
-          return {
-            message: "Campo 'cantidad_recibida' obligatorio.",
-            success: false,
-            status: 500,
-          };
-        }
+        });
+        continue;
+      }
 
-        const updateLavanderia2 = await query(
-          "UPDATE lavanderia SET estado = 3, cantidad_enviada = ? WHERE lavanderia_id = ?",
-          [cantidad_recibida, lavanderia_id]
-        );
-
-        const updateLote = await query(
-          "update lotes set estado = 2, cantidad_total = ? where lote_id = ?",
-          [cantidad_recibida, lavanderia.lote_id]
-        );
-
-        if (updateLavanderia2.affectedRows > 0 && updateLote.affectedRows > 0) {
-          return {
-            message: "La lavanderia ha pasado al estado 3 (finalizado)",
-            nuevoEstado: 3,
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message:
-              "No se pudo actualizar el estado de la lavanderia a 3 o lote",
+      switch (lavanderia.estado) {
+        case 0:
+          resultados.push({
+            lavanderia_id: detalle.lavanderia_id,
+            message: "Esta lavandería está desactivada",
             success: false,
-            status: 500,
-          };
-        }
-      case 3:
-        return {
-          message: "Esta lavanderia está finalizado",
-          success: false,
-          status: 400,
-        };
-      default:
-        return {
-          message: "Estado de la lavanderia no reconocido",
-          success: false,
-          status: 400,
-        };
+            status: 400,
+          });
+          break;
+
+        case 1:
+          const updateLavanderia1 = await query(
+            "UPDATE lavanderia SET estado = 2 WHERE lavanderia_id = ?",
+            [detalle.lavanderia_id]
+          );
+          if (updateLavanderia1.affectedRows > 0) {
+            resultados.push({
+              lavanderia_id: detalle.lavanderia_id,
+              message: "La lavandería ha pasado al estado 2 (en proceso)",
+              nuevoEstado: 2,
+              success: true,
+              status: 200,
+            });
+          } else {
+            resultados.push({
+              lavanderia_id: detalle.lavanderia_id,
+              message: "No se pudo actualizar el estado de la lavandería a 2",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 2:
+          if (detalle.cantidad_recibida === undefined) {
+            return {
+              lavanderia_id: detalle.lavanderia_id,
+              message: "Campo 'cantidad_recibida' obligatorio.",
+              success: false,
+              status: 400,
+            };
+          }
+
+          const updateLavanderia2 = await query(
+            "UPDATE lavanderia SET estado = 3, cantidad_enviada = ? WHERE lavanderia_id = ?",
+            [detalle.cantidad_recibida, detalle.lavanderia_id]
+          );
+
+          const updateLote = await query(
+            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
+            [lote_id]
+          );
+
+          if (
+            updateLavanderia2.affectedRows > 0 &&
+            updateLote.affectedRows > 0
+          ) {
+            // Insertar un nuevo registro en la tabla taller_acabados
+            const insertAcabado = await query(
+              "INSERT INTO taller_acabados (lote_id, color_id, talla, cantidad_recibida, cantidad_enviada, estado, fecha_inicio, fecha_final) VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())",
+              [
+                lote_id,
+                lavanderia.color_id,
+                lavanderia.talla,
+                detalle.cantidad_recibida,
+                lavanderia.cantidad_enviada,
+              ]
+            );
+
+            if (insertAcabado.affectedRows > 0) {
+              resultados.push({
+                lavanderia_id: detalle.lavanderia_id,
+                message:
+                  "La lavandería ha pasado al estado 3 (finalizado) y se creó un registro en taller_acabados",
+                nuevoEstado: 3,
+                success: true,
+                status: 200,
+              });
+            } else {
+              resultados.push({
+                lavanderia_id: detalle.lavanderia_id,
+                message: "No se pudo crear el registro en taller_acabados",
+                success: false,
+                status: 500,
+              });
+            }
+          } else {
+            resultados.push({
+              lavanderia_id: detalle.lavanderia_id,
+              message:
+                "No se pudo actualizar el estado de la lavandería a 3 o lote",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 3:
+          resultados.push({
+            lavanderia_id: detalle.lavanderia_id,
+            message: "Esta lavandería está finalizada",
+            success: false,
+            status: 400,
+          });
+          break;
+
+        default:
+          resultados.push({
+            lavanderia_id: detalle.lavanderia_id,
+            message: "Estado de la lavandería no reconocido",
+            success: false,
+            status: 400,
+          });
+          break;
+      }
     }
+
+    return {
+      message:
+        "Proceso completado para todos los registros de lavandería del lote",
+      resultados,
+      success: true,
+      status: 200,
+    };
   } catch (error: any) {
     return {
-      msg: "Error en _sgtEstadoLavanderia",
+      msg: "Error en _sgteEstadoLavanderiasPorLote",
       error: error.message,
       success: false,
       status: 500,

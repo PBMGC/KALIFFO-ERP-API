@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
-import { _createLote, _getLotes } from "../service/lotes";
+import { _createLote, _getLote, _getLotes } from "../service/lotes";
 
 export const createLote = async (req: Request, res: Response) => {
   try {
@@ -17,6 +17,16 @@ export const getLotes = async (req: Request, res: Response) => {
     res
       .status(response.status)
       .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getLotes", 500);
+  }
+};
+
+export const getLote = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  try {
+    const response = await _getLote(Number(lote_id));
+    res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getLotes", 500);
   }
