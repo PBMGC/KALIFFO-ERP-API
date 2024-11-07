@@ -510,15 +510,62 @@ export const _activarProducto = async (producto_id: number) => {
   }
 };
 
+export const _imprimirCodigo = async (res: any) => {
+  try {
+    const JsBarcode = require("jsbarcode");
+    const { createCanvas } = require("canvas");
+    const PDFDocument = require("pdfkit-table");
 
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');
 
-export const _imprimirCodigo = async () => {
-  const escpos = require("escpos");
-  escpos.USB = require("escpos-usb");
+    const doc = new PDFDocument({
+      size: [100 * 2.83, 140 * 2.83],
+      margin: 0,
+    });
 
-  const dispositivo = new escpos.USB(0x416, 0x5001); // IDs en hexadecimal
-  console.log(dispositivo)
+    doc.pipe(res);
+
+    let posX = 0;
+    let posY = 5;
+    const spaceX = 4;
+    const spaceY = 20;
+    const barcodeWidth = 140;
+    const barcodeHeight = 60;
+    const maxCodesPerPage = 10;
+
+    for (let i = 0; i < 10; i++) { 
+      if (i > 0 && i % maxCodesPerPage === 0) {
+        doc.addPage();
+        posX = 0;
+        posY = 5;
+      }
+
+      const barcodeValue = `C${i + 1}PT01sgf`;
+      const canvas = createCanvas(barcodeWidth, barcodeHeight);
+      JsBarcode(canvas, barcodeValue, {
+        format: "CODE128",
+        width: 2,
+        fontOptions: "bold",
+        fontSize: 20,
+        height: 100,
+      });
+
+      const imgData = canvas.toBuffer("image/png");
+      doc.image(imgData, posX, posY, { width: barcodeWidth, height: barcodeHeight });
+
+      posX = (i + 1) % 2 === 0 ? 0 : posX + barcodeWidth + spaceX;
+      posY += (i + 1) % 2 === 0 ? barcodeHeight + spaceY : 0;
+    }
+
+    doc.end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al generar el PDF");
+  }
 };
+
+
 
 
 
