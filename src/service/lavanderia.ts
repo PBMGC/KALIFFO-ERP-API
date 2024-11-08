@@ -364,22 +364,20 @@ export const _sgteEstadoLavanderiasPorLote = async (
 };
 
 export const _getLavanderiaPorLote = async (lote_id: number) => {
+  console.log("ada");
+
   try {
-    //     const queryText = `SELECT
-    // 	cortes.estado,
-    //     cortes.corte_id,
-    //     usuario.nombre,
-    //     producto.nombre,
-    //     cortes.cantidad_enviada,
-    //     cortes.cantidad_recibida,
-    //     cortes.talla,
-    //     cortes.metraje_asignado,
-    //     cortes.tipo_tela
-    // FROM cortes
-    // inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado != 0`;
-    const queryText = "select * from lavanderia where lote_id = 1";
+    const queryText = `
+    select 
+      l.*,
+        c.nombre,
+        c.codigo
+    from lavanderia l
+    inner join color c on c.color_id = l.color_id
+    where lote_id = 1 and estado != 0`;
 
     const result = await query(queryText, [lote_id]);
+
     if (result.data && result.data.length === 0) {
       return {
         message: "lavanderia no encontrados.",

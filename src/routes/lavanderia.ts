@@ -12,8 +12,8 @@ import {
 const router = Router();
 
 router.get("", getLavanderias);
-router.get("/lote/:lote_id", getLavanderia);
-router.get("/:lavanderia_id", getLavanderiaPorLote);
+router.get("/lote/:lote_id", getLavanderiaPorLote);
+router.get("/:lavanderia_id", getLavanderia);
 
 router.post("/create", createLavanderia);
 
