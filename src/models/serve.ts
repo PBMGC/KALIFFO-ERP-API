@@ -60,3 +60,8 @@ class Serve {
 }
 
 export default Serve;
+
+//reporte usuario
+//reporte producto
+//report tienda
+//report venta

@@ -15,6 +15,7 @@ const router = Router();
 //Rutas revisadas
 
 router.get("/", getUsuarios);
+router.get("/reporte/:usuario_id", generateReporte);
 router.get("/:usuario_id", getUsuario);
 
 router.post("/create", ValidateCreateUsuario, createUsuario);
@@ -25,6 +26,5 @@ router.delete("/delete/:usuario_id", deleteUsuario);
 
 //Rutas sin revisar
 router.post("/login", ValidateLogin, loginUsuario);
-router.get("/reporte/:usuario_id", generateReporte);
 
 export { router };
