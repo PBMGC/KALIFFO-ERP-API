@@ -362,3 +362,43 @@ export const _sgteEstadoLavanderiasPorLote = async (
     };
   }
 };
+
+export const _getLavanderiaPorLote = async (lote_id: number) => {
+  try {
+    //     const queryText = `SELECT
+    // 	cortes.estado,
+    //     cortes.corte_id,
+    //     usuario.nombre,
+    //     producto.nombre,
+    //     cortes.cantidad_enviada,
+    //     cortes.cantidad_recibida,
+    //     cortes.talla,
+    //     cortes.metraje_asignado,
+    //     cortes.tipo_tela
+    // FROM cortes
+    // inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado != 0`;
+    const queryText = "select * from lavanderia where lote_id = 1";
+
+    const result = await query(queryText, [lote_id]);
+    if (result.data && result.data.length === 0) {
+      return {
+        message: "lavanderia no encontrados.",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      items: result.data || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      message: "Error al obtener los lavanderia.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};

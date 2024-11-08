@@ -1,6 +1,36 @@
-import { body } from "express-validator";
+import { body, check } from "express-validator";
 import { NextFunction, Request, Response } from "express";
 import { validateResult } from "../util/validation";
+
+export const ValidateCreateProducto: any = [
+  check("nombre")
+    .exists()
+    .withMessage("EL campo 'nombre' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'nombre' no debe ser vacio."),
+  check("stockTotal")
+    .exists()
+    .withMessage("EL campo 'stockTotal' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'stockTotal' no debe ser vacio."),
+  check("precioBase")
+    .exists()
+    .withMessage("EL campo 'precioBase' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'precioBase' no debe ser vacio."),
+  check("descuento")
+    .exists()
+    .withMessage("EL campo 'descuento' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'descuento' no debe ser vacio."),
+  (req: Request, res: Response, next: NextFunction) => {
+    validateResult(req, res, next);
+  },
+];
 
 export const ValidateCreateProductoCompleto: any = [
   body("*.producto_id")

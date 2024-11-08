@@ -334,15 +334,15 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
 //estado 2 = proceso
 //estado 3 = finalizado
 const almacen_productos = `
-CREATE TABLE almacen_productos (
+CREATE TABLE IF NOT EXISTS almacen_productos (
     almacen_id INT PRIMARY KEY,
     producto_id INT,
     lote_id INT,
     cantidad INT NOT NULL,
-    fecha_ingreso TIMESTAMP ,
-    fecha_salida TIMESTAMP,
-    estado INT NOT NULL,
-    FOREIGN KEY (producto_id) REFERENCES productos(producto_id) ON DELETE CASCADE,
+    fecha_ingreso DATE ,
+    fecha_salida DATE,
+    estado INT NOT NULL default 1,
+    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
 );`;
 
@@ -370,6 +370,9 @@ export const initBD = async () => {
       await conn.execute(cortes);
       await conn.execute(lavanderia);
       await conn.execute(taller_acabados);
+      await conn.execute(almacen_productos);
+
+      console.log("Base de datos inicializada con éxito.");
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -384,31 +387,32 @@ export const borrarBD = async () => {
   if (conn) {
     try {
       await conn.execute("SET foreign_key_checks = 0;");
-      await conn.execute("DROP TABLE IF EXISTS detalleVenta");
-      await conn.execute("DROP TABLE IF EXISTS venta");
-      await conn.execute("DROP TABLE IF EXISTS pago");
-      await conn.execute("DROP TABLE IF EXISTS compras_detalle");
-      await conn.execute("DROP TABLE IF EXISTS compras");
-      await conn.execute("DROP TABLE IF EXISTS envios");
-      await conn.execute("DROP TABLE IF EXISTS productoTalla");
-      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia");
-      await conn.execute("DROP TABLE IF EXISTS productoDetalle");
-      await conn.execute("DROP TABLE IF EXISTS producto");
-      await conn.execute("DROP TABLE IF EXISTS color");
-      await conn.execute("DROP TABLE IF EXISTS incidencia");
-      await conn.execute("DROP TABLE IF EXISTS horario");
-      await conn.execute("DROP TABLE IF EXISTS usuario");
-      await conn.execute("DROP TABLE IF EXISTS tienda");
-      await conn.execute("DROP TABLE IF EXISTS almacen_telas");
-      await conn.execute("DROP TABLE IF EXISTS lotes");
-      await conn.execute("DROP TABLE IF EXISTS cortes");
-      await conn.execute("DROP TABLE IF EXISTS lavanderia");
-      await conn.execute("DROP TABLE IF EXISTS taller_acabados");
-      await conn.execute("SET foreign_key_checks = 1;");
-      console.log("Tablas borradas correctamente.");
+      await conn.execute("DROP TABLE IF EXISTS almacen_productos;");
+      await conn.execute("DROP TABLE IF EXISTS taller_acabados;");
+      await conn.execute("DROP TABLE IF EXISTS lavanderia;");
+      await conn.execute("DROP TABLE IF EXISTS cortes;");
+      await conn.execute("DROP TABLE IF EXISTS lotes;");
+      await conn.execute("DROP TABLE IF EXISTS almacen_telas;");
+      await conn.execute("DROP TABLE IF EXISTS compras_detalle;");
+      await conn.execute("DROP TABLE IF EXISTS compras;");
+      await conn.execute("DROP TABLE IF EXISTS detalleVenta;");
+      await conn.execute("DROP TABLE IF EXISTS venta;");
+      await conn.execute("DROP TABLE IF EXISTS pago;");
+      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia;");
+      await conn.execute("DROP TABLE IF EXISTS productoTalla;");
+      await conn.execute("DROP TABLE IF EXISTS productoDetalle;");
+      await conn.execute("DROP TABLE IF EXISTS color;");
+      await conn.execute("DROP TABLE IF EXISTS producto;");
+      await conn.execute("DROP TABLE IF EXISTS incidencia;");
+      await conn.execute("DROP TABLE IF EXISTS horario;");
+      await conn.execute("DROP TABLE IF EXISTS usuario;");
+      await conn.execute("DROP TABLE IF EXISTS tienda;");
+
+      console.log("Base de datos eliminada con éxito.");
     } catch (error) {
-      console.error("Error al borrar las tablas:", error);
+      console.error("Error al eliminar las tablas:", error);
     } finally {
+      await conn.execute("SET foreign_key_checks = 1;");
       await conn.end();
     }
   }

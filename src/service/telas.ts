@@ -88,10 +88,11 @@ export const _desactivarTela = async (tela_id: number) => {
 };
 
 export const _getTiposTelas = async () => {
-  const queryText = `select a_t.tipo from almacen_telas a_t group by a_t.tipo;`;
-
   try {
-    const result = await query(queryText, []);
+    const result = await query(
+      "select a_t.tipo from almacen_telas a_t group by a_t.tipo",
+      []
+    );
     return {
       items: result.data,
       success: true,
@@ -126,9 +127,12 @@ export const _getTelas = async () => {
   }
 };
 
-export const _getTelaPorTipo = async (tipo_tela: string,estado:number) => {
+export const _getTelaPorTipo = async (tipo_tela: string, estado: number) => {
   try {
-    const result = await query("call SP_GetTelaPorTipo(?,?)", [tipo_tela,estado]);
+    const result = await query("call SP_GetTelaPorTipo(?,?)", [
+      tipo_tela,
+      estado,
+    ]);
     return {
       item: result.data[0],
       success: true,
@@ -142,7 +146,6 @@ export const _getTelaPorTipo = async (tipo_tela: string,estado:number) => {
     };
   }
 };
-
 
 export const _getEmpresas = async () => {
   const queryText = `select a_t.empresa_compra from almacen_telas a_t group by a_t.empresa_compra;`;
