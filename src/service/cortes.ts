@@ -86,8 +86,8 @@ export const _getCortesPorLote = async (lote_id: number) => {
     const queryText = `SELECT 
 	cortes.estado, 
     cortes.corte_id, 
-    usuario.nombre,
-    producto.nombre,
+    usuario.nombre as taller,
+    producto.nombre ,
     cortes.cantidad_enviada,
     cortes.cantidad_recibida,
     cortes.talla,

@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS venta (
     tipoVenta INT NOT NULL,
     tipoComprobante INT NOT NULL,
     fecha DATETIME NOT NULL,
+    cantidad_total INT NOT NULL,
     totalBruto DECIMAL(10, 2) NOT NULL,
     totalIgv DECIMAL(10, 2) NOT NULL,
     totalNeto DECIMAL(10, 2) NOT NULL,
