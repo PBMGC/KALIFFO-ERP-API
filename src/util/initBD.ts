@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS pago (
     FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
 );`;
 
+//se necesita un campo de cantidad total
 const venta = `
 CREATE TABLE IF NOT EXISTS venta (
     venta_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -125,6 +126,7 @@ CREATE TABLE IF NOT EXISTS venta (
     tipoVenta INT NOT NULL,
     tipoComprobante INT NOT NULL,
     fecha DATETIME NOT NULL,
+    cantidad_total INT NOT NULL,
     totalBruto DECIMAL(10, 2) NOT NULL,
     totalIgv DECIMAL(10, 2) NOT NULL,
     totalNeto DECIMAL(10, 2) NOT NULL,
