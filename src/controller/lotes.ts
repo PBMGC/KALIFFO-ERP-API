@@ -1,10 +1,17 @@
 import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
 import { _createLote, _getLote, _getLotes } from "../service/lotes";
+import { Lote } from "../interface/lote";
 
 export const createLote = async (req: Request, res: Response) => {
+  const { tipo_tela, metraje } = req.body;
+  const lote: Partial<Lote> = {
+    tipo_tela,
+    metraje,
+  };
+
   try {
-    const response = await _createLote();
+    const response = await _createLote(lote);
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createLote", 500);

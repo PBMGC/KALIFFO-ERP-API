@@ -6,7 +6,7 @@ import {
   _getLavanderia,
   _getLavanderiaPorLote,
   _getLavanderias,
-  _sgteEstadoLavanderiasPorLote,
+  _sgteEstadoLavanderiaPorLote,
   _updateLavanderia,
 } from "../service/lavanderia";
 
@@ -113,7 +113,7 @@ export const sgteEstdoLoteLavanderia = async (req: Request, res: Response) => {
   const { detalles } = req.body;
 
   try {
-    const response = await _sgteEstadoLavanderiasPorLote(
+    const response = await _sgteEstadoLavanderiaPorLote(
       Number(lote_id),
       detalles
     );

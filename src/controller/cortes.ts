@@ -14,15 +14,7 @@ import {
 import { Corte } from "../interface/corte";
 
 export const createCorte = async (req: Request, res: Response) => {
-  const {
-    lote_id,
-    taller_id,
-    producto_id,
-    cantidad_enviada,
-    talla,
-    metraje_asignado,
-    tipo_tela,
-  } = req.body;
+  const { lote_id, taller_id, producto_id, cantidad_enviada, talla } = req.body;
 
   const corte: Corte = {
     lote_id,
@@ -30,8 +22,6 @@ export const createCorte = async (req: Request, res: Response) => {
     producto_id,
     cantidad_enviada,
     talla,
-    metraje_asignado,
-    tipo_tela,
   };
 
   try {

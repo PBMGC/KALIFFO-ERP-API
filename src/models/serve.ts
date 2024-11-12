@@ -65,3 +65,5 @@ export default Serve;
 //reporte producto
 //report tienda
 //report venta
+//tesis precios
+//arreglar rutas

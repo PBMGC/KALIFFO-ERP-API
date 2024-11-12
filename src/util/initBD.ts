@@ -255,6 +255,8 @@ const lotes = `
     lote_id INT AUTO_INCREMENT PRIMARY KEY,
     codigo_lote VARCHAR(50) UNIQUE,
     fecha_creacion DATE NOT NULL,
+    tipo_tela VARCHAR(20) NOT NULL,
+    metraje DECIMAL(10,2) NOT NULL,
     cantidad_total INT DEFAULT 0,
     estado INT DEFAULT 1
 );`;
@@ -267,14 +269,12 @@ const cortes = `
 CREATE TABLE IF NOT EXISTS cortes (
     corte_id INT AUTO_INCREMENT PRIMARY KEY,
     lote_id INT NOT NULL,
-    taller_id INT NOT NULL,
+    taller_id INT,
     producto_id INT NOT NULL,
     estado INT DEFAULT 1,
     cantidad_enviada INT NOT NULL,
     cantidad_recibida INT default null,
     talla VARCHAR(20) NOT NULL,
-    metraje_asignado DECIMAL(10, 2) NOT NULL,
-    tipo_tela VARCHAR(20) NOT NULL,
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
     FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
@@ -340,7 +340,7 @@ CREATE TABLE IF NOT EXISTS almacen_productos (
     producto_id INT,
     lote_id INT,
     cantidad INT NOT NULL,
-    fecha_ingreso DATE ,
+    fecha_ingreso DATE,
     fecha_salida DATE,
     estado INT NOT NULL default 1,
     FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,

@@ -3,35 +3,42 @@ import { query } from "../util/query";
 import { _createLavanderia } from "./lavanderia";
 
 export const _createCorte = async (corte: Corte) => {
-  const {
-    lote_id,
-    taller_id,
-    producto_id,
-    cantidad_enviada,
-    talla,
-    metraje_asignado,
-    tipo_tela,
-  } = corte;
+  const { lote_id, taller_id, producto_id, cantidad_enviada, talla } = corte;
 
   const queryText = `
-        INSERT INTO cortes (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla ,metraje_asignado ,tipo_tela) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        INSERT INTO cortes (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
+        VALUES (?, ?, ?, ?, ?)`;
 
-  const result = await query(queryText, [
-    lote_id,
-    taller_id,
-    producto_id,
-    cantidad_enviada,
-    talla,
-    metraje_asignado,
-    tipo_tela,
-  ]);
+  try {
+    await query(queryText, [
+      lote_id,
+      taller_id,
+      producto_id,
+      cantidad_enviada,
+      talla,
+    ]);
 
-  return {
-    message: "corte creada con éxito.",
-    success: true,
-    status: 201,
-  };
+    await query(
+      `
+      UPDATE lotes 
+      SET cantidad_total = cantidad_total + ?
+      WHERE lote_id = ?;
+    `,
+      [cantidad_enviada, lote_id]
+    );
+
+    return {
+      message: "corte creada con éxito.",
+      success: true,
+      status: 201,
+    };
+  } catch (error) {
+    return {
+      message: "Error al crear corte.",
+      success: false,
+      status: 500,
+    };
+  }
 };
 
 export const _UpdateCorte = async (updateCorte: any) => {
@@ -83,18 +90,18 @@ export const _getCortes = async () => {
 
 export const _getCortesPorLote = async (lote_id: number) => {
   try {
-    const queryText = `SELECT 
-	cortes.estado, 
-    cortes.corte_id, 
-    usuario.nombre as taller,
-    producto.nombre ,
-    cortes.cantidad_enviada,
-    cortes.cantidad_recibida,
-    cortes.talla,
-    cortes.metraje_asignado,
-    cortes.tipo_tela 
-FROM cortes 
-inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado != 0`;
+    const queryText = `
+    SELECT 
+      cortes.estado, 
+      cortes.corte_id, 
+      usuario.nombre as taller,
+      producto.nombre ,
+      cortes.cantidad_enviada,
+      cortes.cantidad_recibida,
+      cortes.talla
+    FROM cortes 
+    inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado != 0
+    `;
     const result = await query(queryText, [lote_id]);
 
     return {
@@ -122,7 +129,6 @@ export const _getTallas = async () => {
       status: 200,
     };
   } catch (error: any) {
-    console.log(error);
     return {
       message: "Error al obtener las tallas.",
       success: false,
@@ -231,6 +237,7 @@ export const _sgteEstadoCortesPorLote = async (
     }
 
     const resultados = [];
+    let cantidadTotal = 0;
 
     for (const detalle of detalles) {
       const corte = cortes.find((c: any) => c.corte_id === detalle.corte_id);
@@ -279,7 +286,10 @@ export const _sgteEstadoCortesPorLote = async (
           break;
 
         case 2:
-          if (detalle.cantidad_recibida === undefined) {
+          if (
+            detalle.cantidad_recibida === undefined ||
+            detalle.cantidad_recibida === null
+          ) {
             return {
               corte_id: detalle.corte_id,
               message: "Campo 'cantidad_recibida' obligatorio.",
@@ -287,6 +297,8 @@ export const _sgteEstadoCortesPorLote = async (
               status: 400,
             };
           }
+
+          cantidadTotal += detalle.cantidad_recibida;
 
           const updateCorte2 = await query(
             "UPDATE cortes SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
@@ -333,6 +345,12 @@ export const _sgteEstadoCortesPorLote = async (
             status: 400,
           });
           break;
+      }
+      if (corte.estado == 2) {
+        await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+          cantidadTotal,
+          lote_id,
+        ]);
       }
     }
 
