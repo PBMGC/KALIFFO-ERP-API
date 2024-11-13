@@ -40,18 +40,18 @@ const lotes: any = [
   },
 ];
 
-export const createLotes = async () => {
-  try {
-    for (const lote of lotes) {
-      const result = await query("select * from lotes where codigo_lote = ?", [
-        lote.codigo_lote,
-      ]);
-      if (result.data.length === 0) {
-        await _createLote();
-      }
-    }
-    await createCortes();
-  } catch (error) {
-    console.log("Error en createLote:", error);
-  }
-};
+// export const createLotes = async () => {
+//   try {
+//     for (const lote of lotes) {
+//       const result = await query("select * from lotes where codigo_lote = ?", [
+//         lote.codigo_lote,
+//       ]);
+//       if (result.data.length === 0) {
+//         await _createLote();
+//       }
+//     }
+//     await createCortes();
+//   } catch (error) {
+//     console.log("Error en createLote:", error);
+//   }
+// };

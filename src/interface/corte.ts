@@ -7,6 +7,4 @@ export interface Corte {
   cantidad_enviada: number;
   cantidad_recibida?: number | null;
   talla: string;
-  metraje_asignado: number;
-  tipo_tela: string;
 }

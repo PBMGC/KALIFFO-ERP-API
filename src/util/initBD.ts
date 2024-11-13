@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS movimientos_tienda_tienda (
     tienda_origen_id INT NOT NULL,
     tienda_destino_id INT NOT NULL,
     productoDetalle_id INT NOT NULL,
-    talla VARCHAR(20) NOT NULL,
+    talla INT NOT NULL,
     cantidad INT NOT NULL,
     fecha DATE NOT NULL,
     FOREIGN KEY (tienda_origen_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE,  
@@ -246,6 +246,8 @@ const lotes = `
     lote_id INT AUTO_INCREMENT PRIMARY KEY,
     codigo_lote VARCHAR(50) UNIQUE,
     fecha_creacion DATE NOT NULL,
+    tipo_tela VARCHAR(20) NOT NULL,
+    metraje DECIMAL(10,2) NOT NULL,
     cantidad_total INT DEFAULT 0,
     estado INT DEFAULT 1
 );`;
@@ -258,14 +260,12 @@ const cortes = `
 CREATE TABLE IF NOT EXISTS cortes (
     corte_id INT AUTO_INCREMENT PRIMARY KEY,
     lote_id INT NOT NULL,
-    taller_id INT NOT NULL,
+    taller_id INT,
     producto_id INT NOT NULL,
     estado INT DEFAULT 1,
     cantidad_enviada INT NOT NULL,
     cantidad_recibida INT default null,
     talla VARCHAR(20) NOT NULL,
-    metraje_asignado DECIMAL(10, 2) NOT NULL,
-    tipo_tela VARCHAR(20) NOT NULL,
     FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
     FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
@@ -334,10 +334,12 @@ CREATE TABLE IF NOT EXISTS almacen_productos (
   INDEX I_estado (estado)
 );`;
 
+
+//001-N123123
 const movimientos_almacen_tienda = `
 CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda (
   movimiento_id INT PRIMARY KEY,
-  codigo VARCHAR(20) NOT NULL UNIQUE,
+  codigo VARCHAR(20) NOT NULL UNIQUE, 
   almacen_origen INT NOT NULL,
   tienda_destino INT NOT NULL, 
   transporte VARCHAR(30) NOT NULL,
@@ -367,7 +369,7 @@ CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda_detalle (
   INDEX I_talla(talla),
   INDEX I_cantidad(cantidad)
 );`;
- 
+
 export const initBD = async () => {
   const conn = await connection();
 

@@ -33,10 +33,6 @@ SET @consulta = '
         u.usuario_id = ?
 ';
 
-IF fecha_r IS NOT NULL AND fecha_r != '' THEN
-    SET @consulta = CONCAT(@consulta, ' AND h.fecha = "', fecha_r, '" AND i.fecha_creacion = "', fecha_r, '" AND pg.fecha = "', fecha_r, '"');
-END IF;
-
 SET @consulta = CONCAT(@consulta, ' ORDER BY u.usuario_id;');
 
 PREPARE stmt FROM @consulta;
@@ -161,11 +157,7 @@ const initProcedureDeleteUsuario = async () => {
 };
 
 const initProcedureGetReporteUsuario = async () => {
-  await createSp(
-    "SP_ReporteUsuario",
-    queryGetReporteUsuario,
-    "IN u_id INT,IN fecha_r DATE"
-  );
+  await createSp("SP_ReporteUsuario", queryGetReporteUsuario, "IN u_id INT");
 };
 
 const initProcedureGetUsuarios = async () => {

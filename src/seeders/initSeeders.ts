@@ -1,7 +1,7 @@
 import { createColores } from "./color";
 import { createCortes } from "./corte";
 import { createLavanderia } from "./lavanderia";
-import { createLotes } from "./lote";
+// import { createLotes } from "./lote";
 import { createProducto } from "./producto";
 import { createTelas } from "./tela";
 import { createTienda } from "./tienda";

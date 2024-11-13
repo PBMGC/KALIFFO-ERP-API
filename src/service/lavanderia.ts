@@ -34,7 +34,6 @@ export const _createLavanderia = async (lavanderia: any) => {
       status: 201,
     };
   } catch (error: any) {
-    console.error("Error al crear lavandería:", error);
     return {
       message: "Error al crear lavandería.",
       success: false,
@@ -194,7 +193,7 @@ export const _deleteLavanderia = async (lavanderia_id: number) => {
   }
 };
 
-export const _sgteEstadoLavanderiasPorLote = async (
+export const _sgteEstadoLavanderiaPorLote = async (
   lote_id: number,
   detalles: { lavanderia_id: number; cantidad_recibida: number }[]
 ) => {
@@ -206,23 +205,24 @@ export const _sgteEstadoLavanderiasPorLote = async (
 
     if (!lavanderias || lavanderias.length === 0) {
       return {
-        message: "No se encontraron registros de lavandería asociados al lote",
+        message: "No se encontraron lavanderias asociados al lote",
         success: false,
         status: 404,
       };
     }
 
     const resultados = [];
+    let cantidadTotal = 0;
 
     for (const detalle of detalles) {
       const lavanderia = lavanderias.find(
-        (l: any) => l.lavanderia_id === detalle.lavanderia_id
+        (c: any) => c.lavanderia_id === detalle.lavanderia_id
       );
 
       if (!lavanderia) {
         resultados.push({
-          lavanderia_id: detalle.lavanderia_id,
-          message: "Lavandería no encontrada en la base de datos",
+          corte_id: detalle.lavanderia_id,
+          message: "Lavanderia no encontrado en la base de datos",
           success: false,
           status: 404,
         });
@@ -232,8 +232,8 @@ export const _sgteEstadoLavanderiasPorLote = async (
       switch (lavanderia.estado) {
         case 0:
           resultados.push({
-            lavanderia_id: detalle.lavanderia_id,
-            message: "Esta lavandería está desactivada",
+            corte_id: detalle.lavanderia_id,
+            message: "Esta lavanderia está desactivado",
             success: false,
             status: 400,
           });
@@ -247,7 +247,7 @@ export const _sgteEstadoLavanderiasPorLote = async (
           if (updateLavanderia1.affectedRows > 0) {
             resultados.push({
               lavanderia_id: detalle.lavanderia_id,
-              message: "La lavandería ha pasado al estado 2 (en proceso)",
+              message: "La lavanderia ha pasado al estado 2 (en proceso)",
               nuevoEstado: 2,
               success: true,
               status: 200,
@@ -255,7 +255,7 @@ export const _sgteEstadoLavanderiasPorLote = async (
           } else {
             resultados.push({
               lavanderia_id: detalle.lavanderia_id,
-              message: "No se pudo actualizar el estado de la lavandería a 2",
+              message: "No se pudo actualizar el estado del corte a 2",
               success: false,
               status: 500,
             });
@@ -263,7 +263,10 @@ export const _sgteEstadoLavanderiasPorLote = async (
           break;
 
         case 2:
-          if (detalle.cantidad_recibida === undefined) {
+          if (
+            detalle.cantidad_recibida === undefined ||
+            detalle.cantidad_recibida === null
+          ) {
             return {
               lavanderia_id: detalle.lavanderia_id,
               message: "Campo 'cantidad_recibida' obligatorio.",
@@ -272,13 +275,15 @@ export const _sgteEstadoLavanderiasPorLote = async (
             };
           }
 
+          cantidadTotal += detalle.cantidad_recibida;
+
           const updateLavanderia2 = await query(
-            "UPDATE lavanderia SET estado = 3, cantidad_enviada = ? WHERE lavanderia_id = ?",
+            "UPDATE lavanderia SET estado = 3, cantidad_recibida = ? WHERE lavanderia_id = ?",
             [detalle.cantidad_recibida, detalle.lavanderia_id]
           );
 
           const updateLote = await query(
-            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
+            "UPDATE lotes SET estado = 3 WHERE lote_id = ?",
             [lote_id]
           );
 
@@ -286,7 +291,6 @@ export const _sgteEstadoLavanderiasPorLote = async (
             updateLavanderia2.affectedRows > 0 &&
             updateLote.affectedRows > 0
           ) {
-            // Insertar un nuevo registro en la tabla taller_acabados
             const insertAcabado = await query(
               "INSERT INTO taller_acabados (lote_id, color_id, talla, cantidad_recibida, cantidad_enviada, estado, fecha_inicio, fecha_final) VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())",
               [
@@ -319,7 +323,7 @@ export const _sgteEstadoLavanderiasPorLote = async (
             resultados.push({
               lavanderia_id: detalle.lavanderia_id,
               message:
-                "No se pudo actualizar el estado de la lavandería a 3 o lote",
+                "No se pudo actualizar el estado de la lavanderia a 3 o lote",
               success: false,
               status: 500,
             });
@@ -329,7 +333,7 @@ export const _sgteEstadoLavanderiasPorLote = async (
         case 3:
           resultados.push({
             lavanderia_id: detalle.lavanderia_id,
-            message: "Esta lavandería está finalizada",
+            message: "Esta lavanderia está finalizado",
             success: false,
             status: 400,
           });
@@ -338,24 +342,29 @@ export const _sgteEstadoLavanderiasPorLote = async (
         default:
           resultados.push({
             lavanderia_id: detalle.lavanderia_id,
-            message: "Estado de la lavandería no reconocido",
+            message: "Estado de la lavanderia no reconocido",
             success: false,
             status: 400,
           });
           break;
       }
+      if (lavanderia.estado == 2) {
+        await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+          cantidadTotal,
+          lote_id,
+        ]);
+      }
     }
 
     return {
-      message:
-        "Proceso completado para todos los registros de lavandería del lote",
+      message: "Proceso completado para todas las lavanderias del lote",
       resultados,
       success: true,
       status: 200,
     };
   } catch (error: any) {
     return {
-      msg: "Error en _sgteEstadoLavanderiasPorLote",
+      msg: "Error en _sgteEstadoLavanderiaPorLote",
       error: error.message,
       success: false,
       status: 500,
@@ -364,8 +373,6 @@ export const _sgteEstadoLavanderiasPorLote = async (
 };
 
 export const _getLavanderiaPorLote = async (lote_id: number) => {
-  console.log("ada");
-
   try {
     const queryText = `
     select 

@@ -1,6 +1,7 @@
+import { Lote } from "../interface/lote";
 import { query } from "../util/query";
 
-export const _createLote = async () => {
+export const _createLote = async (lote: Partial<Lote>) => {
   const queryText = `SELECT codigo_lote FROM lotes ORDER BY lote_id DESC LIMIT 1`;
 
   try {
@@ -19,10 +20,15 @@ export const _createLote = async () => {
     const fechaHoy = new Date().toISOString().slice(0, 10);
 
     const queryInsert = `
-        INSERT INTO lotes (codigo_lote, fecha_creacion) 
-        VALUES (?, ?)`;
+        INSERT INTO lotes (codigo_lote, fecha_creacion, tipo_tela, metraje) 
+        VALUES (?, ?, ?, ?);`;
 
-    const resultInsert = await query(queryInsert, [codigo, fechaHoy]);
+    const resultInsert = await query(queryInsert, [
+      codigo,
+      fechaHoy,
+      lote.tipo_tela,
+      lote.metraje,
+    ]);
 
     if (!resultInsert.success) {
       console.error("Error al crear el lote:", resultInsert.error);
