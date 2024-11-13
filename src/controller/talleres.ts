@@ -6,7 +6,6 @@ import {
   _getAcabado,
   _activarAcabado,
   _desactivarAcabado,
-  _sgteEstadoTallerAcabados,
 } from "../service/talleres";
 
 export const createAcabado = async (req: Request, res: Response) => {
@@ -80,20 +79,20 @@ export const getAcabado = async (req: Request, res: Response) => {
   }
 };
 
-export const sgteEstadoAcabado = async (req: Request, res: Response) => {
-  const { acabado_id } = req.params;
-  const { cantidad_recibida } = req.body;
+// export const sgteEstadoAcabado = async (req: Request, res: Response) => {
+//   const { acabado_id } = req.params;
+//   const { cantidad_recibida } = req.body;
 
-  try {
-    const response = await _sgteEstadoTallerAcabados(
-      Number(acabado_id),
-      cantidad_recibida
-    );
-    res.status(response.status).json(response);
-  } catch (error) {
-    handleHttp(res, "error_sgteEstadoAcabado", 500);
-  }
-};
+//   try {
+//     const response = await _sgteEstadoTallerAcabados(
+//       Number(acabado_id),
+//       cantidad_recibida
+//     );
+//     res.status(response.status).json(response);
+//   } catch (error) {
+//     handleHttp(res, "error_sgteEstadoAcabado", 500);
+//   }
+// };
 
 export const activarAcabado = async (req: Request, res: Response) => {
   const { acabado_id } = req.params;

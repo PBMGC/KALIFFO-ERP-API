@@ -10,13 +10,13 @@ import {
   _UpdateTela,
 } from "../service/telas";
 import { _getTiendas } from "../service/tienda";
+import { AlmacenTela } from "../interface/almacenTela";
 
 export const createTela = async (req: Request, res: Response) => {
   const telasCreadas: any[] = [];
 
   for (const tela of req.body) {
-    console.log(tela)
-    const nuevaTela: any = {
+    const nuevaTela: AlmacenTela = {
       tipo: tela.tipo,
       metraje: tela.metraje,
       articulo: tela.articulo,
@@ -34,7 +34,6 @@ export const createTela = async (req: Request, res: Response) => {
 
   res.status(200).json(telasCreadas);
 };
-
 
 export const updateTela = async (req: Request, res: Response) => {
   const { tela_id } = req.params;
@@ -94,19 +93,19 @@ export const getTelas = async (req: Request, res: Response) => {
 
 export const getTelaPorTipo = async (req: Request, res: Response) => {
   const { tipo_tela } = req.params;
-  const estado = req.query.estado
+  const estado = req.query.estado;
 
-  console.log(tipo_tela,estado)
+  console.log(tipo_tela, estado);
 
   try {
-    const response = await _getTelaPorTipo(tipo_tela,Number(estado));
+    const response = await _getTelaPorTipo(tipo_tela, Number(estado));
     res.status(response.status).json(response.item ? response.item : response);
   } catch (error) {
     handleHttp(res, "error_getTelas", 500);
   }
 };
 
-export const getEmpresas= async (req: Request, res: Response) => {
+export const getEmpresas = async (req: Request, res: Response) => {
   try {
     const response = await _getEmpresas();
     res

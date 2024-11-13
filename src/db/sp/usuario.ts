@@ -19,16 +19,16 @@ SET @consulta = '
         tienda t ON u.tienda_id = t.tienda_id
     LEFT JOIN
         (SELECT usuario_id, GROUP_CONCAT(CONCAT("(", fecha, ", " , hora_entrada, ", ", hora_salida, ")") ORDER BY fecha DESC SEPARATOR ", ") AS horarios
-         FROM horario
-         GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id
+        FROM horario
+        GROUP BY usuario_id) h ON u.usuario_id = h.usuario_id
     LEFT JOIN
         (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ", ", fecha_creacion, ")") ORDER BY tipo SEPARATOR "; ") AS incidencias
-         FROM incidencia
-         GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id
+        FROM incidencia
+        GROUP BY usuario_id) i ON u.usuario_id = i.usuario_id
     LEFT JOIN
         (SELECT usuario_id, GROUP_CONCAT(DISTINCT CONCAT("(", fecha, ", " , montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
-         FROM pago
-         GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id
+        FROM pago
+        GROUP BY usuario_id) pg ON u.usuario_id = pg.usuario_id
     WHERE
         u.usuario_id = ?
 ';

@@ -4,6 +4,6 @@ export interface AlmacenTela {
   metraje: number;
   articulo: number;
   empresa_compra: string;
-  estado: number;
+  estado?: number;
   fecha_compra?: string;
 }

@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+
 import { query } from "../util/query";
 
 dotenv.config();
@@ -148,153 +150,6 @@ export const _updateUsuario = async (usuario: any) => {
     };
   }
 };
-
-// export const _login = async (dni: string, contraseña: string) => {
-//   try {
-//     const usuario = await Usuario.findOne({
-//       where: { dni: dni },
-//     });
-
-//     if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
-//       return {
-//         message: "DNI o contraseña incorrectos",
-//         success: false,
-//         status: 400,
-//       };
-//     }
-
-//     const token = jwt.sign(
-//       {
-//         usuario_id: usuario.usuario_id,
-//         nombre: usuario.nombre,
-//         dni: usuario.dni,
-//       },
-//       process.env.SECRET_KEY || "default_secret_key"
-//     );
-
-//     return {
-//       message: `Bienvenido ${usuario.nombre}`,
-//       token,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _login",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _horaEntrada = async (usuario_id: number) => {
-//   try {
-//     const now = new Date();
-//     const fecha = now.toLocaleDateString("en-CA");
-//     const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
-
-//     const asistenciaExistente = await Horario.findOne({
-//       where: { fecha: fecha, usuario_id: usuario_id, hora_salida: null },
-//     });
-
-//     if (asistenciaExistente) {
-//       return {
-//         message: "Asistencia ya registrada para hoy",
-//         success: false,
-//         status: 400,
-//       };
-//     }
-
-//     const newHorario = await Horario.create({
-//       hora_entrada: horaEntrada,
-//       hora_salida: null,
-//       fecha: fecha,
-//       usuario_id,
-//     });
-
-//     return {
-//       message: newHorario,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _horaEntrada",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _horaSalida = async (usuario_id: number) => {
-//   try {
-//     const now = new Date();
-//     const fecha = now.toLocaleDateString("en-CA");
-//     const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
-
-//     const asistencia = await Horario.findOne({
-//       where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
-//     });
-
-//     if (!asistencia) {
-//       return {
-//         message: "Primero debes registrar la hora de entrada",
-//         success: false,
-//         status: 400,
-//       };
-//     }
-
-//     asistencia.hora_salida = horaSalida;
-//     await asistencia.save();
-
-//     return {
-//       message: asistencia,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _ horaSalida",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// export const _horasTrabajadas = async (usuario_id: number) => {
-//   try {
-//     const items = await Horario.findAll({
-//       attributes: [
-//         "horario_id",
-//         "hora_entrada",
-//         "hora_salida",
-//         "fecha",
-//         "usuario_id",
-//         [
-//           sequelize.literal(
-//             "FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60)"
-//           ),
-//           "min_trabajados",
-//         ],
-//       ],
-//       where: { usuario_id },
-//     });
-
-//     return {
-//       items,
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error) {
-//     return {
-//       message: "error _horasTrabajadas",
-//       success: false,
-//       status: 500,
-//     };
-//   }
-// };
-
-// //Sql puro
 
 export const _deleteAsistencia = async (horario_id: number) => {
   try {
@@ -601,3 +456,157 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
     };
   }
 };
+
+export const _login = async (dni: string, contraseña: string) => {
+  try {
+    const resultUsuario = (await query("select * from usuario where dni = ?", [
+      dni,
+    ])) as any;
+
+    const usuario = resultUsuario.data[0];
+
+    if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
+      return {
+        message: "DNI o contraseña incorrectos",
+        success: false,
+        status: 400,
+      };
+    }
+
+    const token = jwt.sign(
+      {
+        usuario_id: usuario.usuario_id,
+        dni: usuario.dni,
+      },
+      process.env.SECRET_KEY || "contraseña_default"
+    );
+
+    return {
+      message: `Bienvenido ${usuario.nombre}`,
+      token,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: "error _login",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const signUp = () => {
+  try {
+  } catch (error) {}
+};
+
+// export const _horaEntrada = async (usuario_id: number) => {
+//   try {
+//     const now = new Date();
+//     const fecha = now.toLocaleDateString("en-CA");
+//     const horaEntrada = now.toLocaleTimeString("en-US", { hour12: false });
+
+//     const asistenciaExistente = await Horario.findOne({
+//       where: { fecha: fecha, usuario_id: usuario_id, hora_salida: null },
+//     });
+
+//     if (asistenciaExistente) {
+//       return {
+//         message: "Asistencia ya registrada para hoy",
+//         success: false,
+//         status: 400,
+//       };
+//     }
+
+//     const newHorario = await Horario.create({
+//       hora_entrada: horaEntrada,
+//       hora_salida: null,
+//       fecha: fecha,
+//       usuario_id,
+//     });
+
+//     return {
+//       message: newHorario,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _horaEntrada",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// export const _horaSalida = async (usuario_id: number) => {
+//   try {
+//     const now = new Date();
+//     const fecha = now.toLocaleDateString("en-CA");
+//     const horaSalida = now.toLocaleTimeString("en-US", { hour12: false });
+
+//     const asistencia = await Horario.findOne({
+//       where: { usuario_id: usuario_id, fecha: fecha, hora_salida: null },
+//     });
+
+//     if (!asistencia) {
+//       return {
+//         message: "Primero debes registrar la hora de entrada",
+//         success: false,
+//         status: 400,
+//       };
+//     }
+
+//     asistencia.hora_salida = horaSalida;
+//     await asistencia.save();
+
+//     return {
+//       message: asistencia,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _ horaSalida",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// export const _horasTrabajadas = async (usuario_id: number) => {
+//   try {
+//     const items = await Horario.findAll({
+//       attributes: [
+//         "horario_id",
+//         "hora_entrada",
+//         "hora_salida",
+//         "fecha",
+//         "usuario_id",
+//         [
+//           sequelize.literal(
+//             "FLOOR(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)) / 60)"
+//           ),
+//           "min_trabajados",
+//         ],
+//       ],
+//       where: { usuario_id },
+//     });
+
+//     return {
+//       items,
+//       success: true,
+//       status: 200,
+//     };
+//   } catch (error) {
+//     return {
+//       message: "error _horasTrabajadas",
+//       success: false,
+//       status: 500,
+//     };
+//   }
+// };
+
+// //Sql puro

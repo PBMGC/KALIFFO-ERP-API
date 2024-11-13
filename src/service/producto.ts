@@ -1,8 +1,6 @@
-import { buffer } from "stream/consumers";
 import redisClient from "../redis/redisClient";
 import { createCodigoProductoTalla } from "../util/createCodigos";
 import { query } from "../util/query";
-var Printer = require('node-printer');
 
 export const _createProducto = async (producto: any) => {
   const { nombre, stockTotal, precioBase, descuento, estado } = producto;
@@ -534,7 +532,7 @@ export const _imprimirCodigo = async (res: any) => {
     const barcodeHeight = 60;
     const maxCodesPerPage = 10;
 
-    for (let i = 0; i < 10; i++) { 
+    for (let i = 0; i < 10; i++) {
       if (i > 0 && i % maxCodesPerPage === 0) {
         doc.addPage();
         posX = 0;
@@ -552,7 +550,10 @@ export const _imprimirCodigo = async (res: any) => {
       });
 
       const imgData = canvas.toBuffer("image/png");
-      doc.image(imgData, posX, posY, { width: barcodeWidth, height: barcodeHeight });
+      doc.image(imgData, posX, posY, {
+        width: barcodeWidth,
+        height: barcodeHeight,
+      });
 
       posX = (i + 1) % 2 === 0 ? 0 : posX + barcodeWidth + spaceX;
       posY += (i + 1) % 2 === 0 ? barcodeHeight + spaceY : 0;
@@ -564,9 +565,3 @@ export const _imprimirCodigo = async (res: any) => {
     res.status(500).send("Error al generar el PDF");
   }
 };
-
-
-
-
-
-

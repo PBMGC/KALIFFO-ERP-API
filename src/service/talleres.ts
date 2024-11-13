@@ -72,7 +72,7 @@ export const _createAcabado = async (acabado: any) => {
 
 export const _getAcabados = async () => {
   try {
-    const queryText = `SELECT * FROM taller_acabados`;
+    const queryText = `SELECT * FROM taller_acabados where estado != 0`;
     const result = await query(queryText);
 
     return {
@@ -92,7 +92,7 @@ export const _getAcabados = async () => {
 
 export const _getAcabado = async (acabado_id: number) => {
   try {
-    const queryText = `SELECT * FROM taller_acabados WHERE acabado_id = ?`;
+    const queryText = `SELECT * FROM taller_acabados WHERE acabado_id = ? and estado != 0`;
     const result = await query(queryText, [acabado_id]);
 
     if (result.data && result.data.length === 0) {
@@ -178,100 +178,143 @@ export const _desactivarAcabado = async (acabado_id: number) => {
   }
 };
 
-export const _sgteEstadoTallerAcabados = async (
-  acabado_id: number,
-  cantidad_recibida?: number
+export const _sgteEstadoAcabadosPorLote = async (
+  lote_id: number,
+  detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {
     const result = await query(
-      "SELECT * FROM taller_acabados WHERE acabado_id = ?",
-      [acabado_id]
+      "SELECT * FROM taller_acabados WHERE lote_id = ?",
+      [lote_id]
     );
+    const acabados = result.data;
 
-    const acabado = result.data[0] as any;
-
-    if (!acabado) {
+    if (!acabados || acabados.length === 0) {
       return {
-        message: "No se encontró el acabado",
+        message: "No se encontraron acabados asociados al lote",
         success: false,
         status: 404,
       };
     }
 
-    switch (acabado.estado) {
-      case 0:
-        return {
-          message: "Este acabado está desactivado",
+    const resultados = [];
+
+    for (const detalle of detalles) {
+      const acabado = acabados.find(
+        (a: any) => a.acabado_id === detalle.acabado_id
+      );
+
+      if (!acabado) {
+        resultados.push({
+          acabado_id: detalle.acabado_id,
+          message: "Acabado no encontrado en la base de datos",
           success: false,
           status: 404,
-        };
-      case 1:
-        const updateAcabado1 = await query(
-          "UPDATE taller_acabados SET estado = 2 WHERE acabado_id = ?",
-          [acabado_id]
-        );
-        if (updateAcabado1.affectedRows > 0) {
-          return {
-            message: "El acabado ha pasado al estado 2 (en proceso)",
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message: "No se pudo actualizar el estado del acabado",
-            success: false,
-            status: 500,
-          };
-        }
-      case 2:
-        if (cantidad_recibida === undefined) {
-          return {
-            message: "Campo 'cantidad_recibida' obligatorio.",
-            success: false,
-            status: 500,
-          };
-        }
+        });
+        continue;
+      }
 
-        const updateAcabado2 = await query(
-          "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ? WHERE acabado_id = ?",
-          [cantidad_recibida, acabado_id]
-        );
-
-        const updateLote = await query(
-          "UPDATE lotes SET estado = 4, cantidad_total = ? WHERE lote_id = ?",
-          [cantidad_recibida, acabado.lote_id]
-        );
-
-        if (updateAcabado2.affectedRows > 0 && updateLote.affectedRows > 0) {
-          return {
-            message: "El acabado ha pasado al estado 3 (finalizado)",
-            nuevoEstado: 3,
-            success: true,
-            status: 200,
-          };
-        } else {
-          return {
-            message: "No se pudo actualizar el estado del acabado a 3 o lote",
+      switch (acabado.estado) {
+        case 0:
+          resultados.push({
+            acabado_id: detalle.acabado_id,
+            message: "Este acabado está desactivado",
             success: false,
-            status: 500,
-          };
-        }
-      case 3:
-        return {
-          message: "Este acabado está finalizado",
-          success: false,
-          status: 400,
-        };
-      default:
-        return {
-          message: "Estado del acabado no reconocido",
-          success: false,
-          status: 400,
-        };
+            status: 400,
+          });
+          break;
+
+        case 1:
+          const updateAcabado1 = await query(
+            "UPDATE taller_acabados SET estado = 2 WHERE acabado_id = ?",
+            [detalle.acabado_id]
+          );
+          if (updateAcabado1.affectedRows > 0) {
+            resultados.push({
+              acabado_id: detalle.acabado_id,
+              message: "El acabado ha pasado al estado 2 (en proceso)",
+              nuevoEstado: 2,
+              success: true,
+              status: 200,
+            });
+          } else {
+            resultados.push({
+              acabado_id: detalle.acabado_id,
+              message: "No se pudo actualizar el estado del acabado a 2",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 2:
+          if (detalle.cantidad_recibida === undefined) {
+            return {
+              acabado_id: detalle.acabado_id,
+              message: "Campo 'cantidad_recibida' obligatorio.",
+              success: false,
+              status: 400,
+            };
+          }
+
+          const updateAcabado2 = await query(
+            "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ? WHERE acabado_id = ?",
+            [detalle.cantidad_recibida, detalle.acabado_id]
+          );
+
+          const updateLote = await query(
+            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
+            [lote_id]
+          );
+
+          if (updateAcabado2.affectedRows > 0 && updateLote.affectedRows > 0) {
+            resultados.push({
+              acabado_id: detalle.acabado_id,
+              message: "El acabado ha pasado al estado 3 (finalizado)",
+              nuevoEstado: 3,
+              success: true,
+              status: 200,
+            });
+          } else {
+            resultados.push({
+              acabado_id: detalle.acabado_id,
+              message:
+                "No se pudo actualizar el estado del acabado a 3 o del lote",
+              success: false,
+              status: 500,
+            });
+          }
+          break;
+
+        case 3:
+          resultados.push({
+            acabado_id: detalle.acabado_id,
+            message: "Este acabado está finalizado",
+            success: false,
+            status: 400,
+          });
+          break;
+
+        default:
+          resultados.push({
+            acabado_id: detalle.acabado_id,
+            message: "Estado del acabado no reconocido",
+            success: false,
+            status: 400,
+          });
+          break;
+      }
     }
+
+    return {
+      message: "Proceso completado para todos los acabados del lote",
+      resultados,
+      success: true,
+      status: 200,
+    };
   } catch (error: any) {
     return {
-      msg: "Error en _sgteEstadoTallerAcabados",
+      msg: "Error en _sgteEstadoAcabadosPorLote",
       error: error.message,
       success: false,
       status: 500,

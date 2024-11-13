@@ -5,6 +5,7 @@ import {
   _generarReporte,
   _getUsuario,
   _getUsuarios,
+  _login,
   _updateUsuario,
 } from "../service/usuario";
 import { handleHttp } from "../util/error.handler";
@@ -120,23 +121,27 @@ export const updateUsuario = async (req: Request, res: Response) => {
   }
 };
 
-// export const loginUsuario = async (req: Request, res: Response) => {
-//   const { dni, contraseña } = req.body;
+export const loginUsuario = async (req: Request, res: Response) => {
+  const { dni, contraseña } = req.body;
 
-//   try {
-//     const response = await _login(dni, contraseña);
-//     res.cookie("token", response.token, {
-//       maxAge: 1000 * 60 * 60,
-//       httpOnly: true,
-//       sameSite: "lax",
-//     });
+  try {
+    const response = await _login(dni, contraseña);
+    res.cookie("token", response.token, {
+      maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    delete response.token;
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_loginUsusrio", 500);
+  }
+};
 
-//     delete response.token;
-//     res.status(response.status).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_loginUsusrio", 500);
-//   }
-// };
+export const signUp = async (req: Request, res: Response) => {
+  try {
+  } catch (error) {}
+};
 
 export const generateReporte = async (req: Request, res: Response) => {
   const { usuario_id } = req.params;

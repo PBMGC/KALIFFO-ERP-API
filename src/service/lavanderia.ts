@@ -362,3 +362,41 @@ export const _sgteEstadoLavanderiasPorLote = async (
     };
   }
 };
+
+export const _getLavanderiaPorLote = async (lote_id: number) => {
+  console.log("ada");
+
+  try {
+    const queryText = `
+    select 
+      l.*,
+        c.nombre,
+        c.codigo
+    from lavanderia l
+    inner join color c on c.color_id = l.color_id
+    where lote_id = 1 and estado != 0`;
+
+    const result = await query(queryText, [lote_id]);
+
+    if (result.data && result.data.length === 0) {
+      return {
+        message: "lavanderia no encontrados.",
+        success: false,
+        status: 404,
+      };
+    }
+
+    return {
+      items: result.data || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      message: "Error al obtener los lavanderia.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};

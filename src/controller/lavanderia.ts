@@ -4,6 +4,7 @@ import {
   _createLavanderia,
   _deleteLavanderia,
   _getLavanderia,
+  _getLavanderiaPorLote,
   _getLavanderias,
   _sgteEstadoLavanderiasPorLote,
   _updateLavanderia,
@@ -119,5 +120,18 @@ export const sgteEstdoLoteLavanderia = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_sgteEstadoCorte", 500);
+  }
+};
+
+export const getLavanderiaPorLote = async (req: Request, res: Response) => {
+  const { lote_id } = req.body;
+
+  try {
+    const response = await _getLavanderiaPorLote(Number(lote_id));
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
+  } catch (error) {
+    handleHttp(res, "error_getLavanderiaPorLote", 500);
   }
 };

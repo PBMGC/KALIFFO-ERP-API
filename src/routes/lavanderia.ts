@@ -3,6 +3,7 @@ import {
   createLavanderia,
   deleteLavanderia,
   getLavanderia,
+  getLavanderiaPorLote,
   getLavanderias,
   sgteEstdoLoteLavanderia,
   updateLavanderia,
@@ -11,6 +12,7 @@ import {
 const router = Router();
 
 router.get("", getLavanderias);
+router.get("/lote/:lote_id", getLavanderiaPorLote);
 router.get("/:lavanderia_id", getLavanderia);
 
 router.post("/create", createLavanderia);

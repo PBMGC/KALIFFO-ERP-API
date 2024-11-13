@@ -12,10 +12,10 @@ import {
 const router = Router();
 
 //Rutas revisadas
-//Rutas sin revisar
 
+//Rutas sin revisar
 router.get("/tipo", getTipos);
-router.get("/empresas",getEmpresas)
+router.get("/empresas", getEmpresas);
 router.get("", getTelas);
 router.get("/:tipo_tela", getTelaPorTipo);
 

@@ -166,8 +166,8 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
     INDEX I_productoDetalleid (productoDetalle_id)
 );`;
 
-const movimientoMercaderia = `
-CREATE TABLE IF NOT EXISTS movimientoMercaderia (
+const movimientos_tienda_tienda = `
+CREATE TABLE IF NOT EXISTS movimientos_tienda_tienda (
     movimiento_ID INT AUTO_INCREMENT PRIMARY KEY,
     tienda_origen_id INT NOT NULL,
     tienda_destino_id INT NOT NULL,
@@ -219,16 +219,6 @@ const Envios = `
     FOREIGN KEY (pedido_id) REFERENCES pedido(pedido_id) ON DELETE CASCADE
     INDEX I_pedido_id(pedido_id),
     INDEX I_estado (estado)
-);`;
-
-const Almacenes = `
-CREATE TABLE IF NOT EXISTS almacenes (
-    almacen_id INT AUTO_INCREMENT PRIMARY KEY,    
-    nombre VARCHAR(255) NOT NULL UNIQUE,  
-    direccion VARCHAR(255) NOT NULL,              
-    estado INT NOT NULL,                 
-    STOCK INT,               
-    INDEX I_estado (estado)   
 );`;
 
 const almacen_telas = `
@@ -332,22 +322,52 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
 );`;
 
 //estado 0 = desactivado
-//estado 1 = inicio
-//estado 2 = proceso
-//estado 3 = finalizado
+//estado 1 = activo
 const almacen_productos = `
-CREATE TABLE almacen_productos (
-    almacen_id INT PRIMARY KEY,
-    producto_id INT,
-    lote_id INT,
-    cantidad INT NOT NULL,
-    fecha_ingreso TIMESTAMP ,
-    fecha_salida TIMESTAMP,
-    estado INT NOT NULL,
-    FOREIGN KEY (producto_id) REFERENCES productos(producto_id) ON DELETE CASCADE,
-    FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS almacen_productos (
+  almacen_id INT PRIMARY KEY,
+  nombre_almacen varchar(30) NOT NULL,
+  direccion varchar(40) NOT NULL,
+  stock_total INT,
+  estado INT NOT NULL default 1,
+  INDEX I_stock (stock_total),
+  INDEX I_estado (estado)
 );`;
 
+const movimientos_almacen_tienda = `
+CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda (
+  movimiento_id INT PRIMARY KEY,
+  codigo VARCHAR(20) NOT NULL UNIQUE,
+  almacen_origen INT NOT NULL,
+  tienda_destino INT NOT NULL, 
+  transporte VARCHAR(30) NOT NULL,
+  fecha_envio DATE NOT NULL,
+  fecha_inicio_envio DATE NOT NULL,
+  estado INT NOT NULL DEFAULT 1,
+  FOREIGN KEY (almacen_origen) REFERENCES almacen_productos(almacen_id) ON DELETE CASCADE,
+  FOREIGN KEY (tienda_destino) REFERENCES tienda(tienda_id) ON DELETE CASCADE,
+  INDEX I_codigo (codigo),
+  INDEX I_fecha_envio (fecha_envio),
+  INDEX I_estado (estado)
+);`;
+
+const movimientos_almacen_tienda_detalle = `
+CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda_detalle (
+  movimiento_id INT NOT NULL,
+  producto_id INT NOT NULL,
+  color_id INT NOT NULL,
+  talla INT NOT NULL,
+  cantidad INT NOT NULL,
+  FOREIGN KEY (movimiento_id) REFERENCES movimientos_almacen_tienda(movimiento_id) ON DELETE CASCADE,
+  FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
+  FOREIGN KEY (color_id) REFERENCES color(color_id) ON DELETE CASCADE,
+  INDEX I_movimiento_id(movimiento_id),
+  INDEX I_producto_id(producto_id),
+  INDEX I_color_id(color_id),
+  INDEX I_talla(talla),
+  INDEX I_cantidad(cantidad)
+);`;
+ 
 export const initBD = async () => {
   const conn = await connection();
 
@@ -361,7 +381,7 @@ export const initBD = async () => {
       await conn.execute(color);
       await conn.execute(productoDetalle);
       await conn.execute(productoTalla);
-      await conn.execute(movimientoMercaderia);
+      await conn.execute(movimientos_tienda_tienda);
       await conn.execute(pago);
       await conn.execute(venta);
       await conn.execute(detalleVenta);
@@ -372,6 +392,10 @@ export const initBD = async () => {
       await conn.execute(cortes);
       await conn.execute(lavanderia);
       await conn.execute(taller_acabados);
+      await conn.execute(almacen_productos);
+      await conn.execute(movimientos_almacen_tienda);
+      await conn.execute(movimientos_almacen_tienda_detalle);
+      console.log("Base de datos inicializada con éxito.");
     } catch (error) {
       console.error("Error al crear las tablas:", error);
     } finally {
@@ -379,38 +403,41 @@ export const initBD = async () => {
     }
   }
 };
-
+ 
 export const borrarBD = async () => {
   const conn = await connection();
 
   if (conn) {
     try {
       await conn.execute("SET foreign_key_checks = 0;");
-      await conn.execute("DROP TABLE IF EXISTS detalleVenta");
-      await conn.execute("DROP TABLE IF EXISTS venta");
-      await conn.execute("DROP TABLE IF EXISTS pago");
-      await conn.execute("DROP TABLE IF EXISTS compras_detalle");
-      await conn.execute("DROP TABLE IF EXISTS compras");
-      await conn.execute("DROP TABLE IF EXISTS envios");
-      await conn.execute("DROP TABLE IF EXISTS productoTalla");
-      await conn.execute("DROP TABLE IF EXISTS movimientoMercaderia");
-      await conn.execute("DROP TABLE IF EXISTS productoDetalle");
-      await conn.execute("DROP TABLE IF EXISTS producto");
-      await conn.execute("DROP TABLE IF EXISTS color");
-      await conn.execute("DROP TABLE IF EXISTS incidencia");
-      await conn.execute("DROP TABLE IF EXISTS horario");
-      await conn.execute("DROP TABLE IF EXISTS usuario");
-      await conn.execute("DROP TABLE IF EXISTS tienda");
-      await conn.execute("DROP TABLE IF EXISTS almacen_telas");
-      await conn.execute("DROP TABLE IF EXISTS lotes");
-      await conn.execute("DROP TABLE IF EXISTS cortes");
-      await conn.execute("DROP TABLE IF EXISTS lavanderia");
-      await conn.execute("DROP TABLE IF EXISTS taller_acabados");
-      await conn.execute("SET foreign_key_checks = 1;");
-      console.log("Tablas borradas correctamente.");
+      await conn.execute("DROP TABLE IF EXISTS almacen_productos;");
+      await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda;");
+      await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;");
+      await conn.execute("DROP TABLE IF EXISTS taller_acabados;");
+      await conn.execute("DROP TABLE IF EXISTS lavanderia;");
+      await conn.execute("DROP TABLE IF EXISTS cortes;");
+      await conn.execute("DROP TABLE IF EXISTS lotes;");
+      await conn.execute("DROP TABLE IF EXISTS almacen_telas;");
+      await conn.execute("DROP TABLE IF EXISTS compras_detalle;");
+      await conn.execute("DROP TABLE IF EXISTS compras;");
+      await conn.execute("DROP TABLE IF EXISTS detalleVenta;");
+      await conn.execute("DROP TABLE IF EXISTS venta;");
+      await conn.execute("DROP TABLE IF EXISTS pago;");
+      await conn.execute("DROP TABLE IF EXISTS movimientos_tienda_tienda;");
+      await conn.execute("DROP TABLE IF EXISTS productoTalla;");
+      await conn.execute("DROP TABLE IF EXISTS productoDetalle;");
+      await conn.execute("DROP TABLE IF EXISTS color;");
+      await conn.execute("DROP TABLE IF EXISTS producto;");
+      await conn.execute("DROP TABLE IF EXISTS incidencia;");
+      await conn.execute("DROP TABLE IF EXISTS horario;");
+      await conn.execute("DROP TABLE IF EXISTS usuario;");
+      await conn.execute("DROP TABLE IF EXISTS tienda;");
+
+      console.log("Base de datos eliminada con éxito.");
     } catch (error) {
-      console.error("Error al borrar las tablas:", error);
+      console.error("Error al eliminar las tablas:", error);
     } finally {
+      await conn.execute("SET foreign_key_checks = 1;");
       await conn.end();
     }
   }
