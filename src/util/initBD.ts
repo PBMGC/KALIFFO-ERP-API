@@ -142,13 +142,13 @@ CREATE TABLE IF NOT EXISTS venta (
 );`;
 
 /*
-  tipoVenta => 
-    1 => por menor
-    2 => por mayor
+tipoVenta => 
+  1 => por menor
+  2 => por mayor
 
-  tipoComprobante => 
-    1 => boleta
-    2 => factura
+tipoComprobante => 
+  1 => boleta
+  2 => factura
 */
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
@@ -267,23 +267,23 @@ const lotes = `
 //estado 3 = finalizado
 const cortes = `
 CREATE TABLE IF NOT EXISTS cortes (
-    corte_id INT AUTO_INCREMENT PRIMARY KEY,
-    lote_id INT NOT NULL,
-    taller_id INT,
-    producto_id INT NOT NULL,
-    estado INT DEFAULT 1,
-    cantidad_enviada INT NOT NULL,
-    cantidad_recibida INT default null,
-    talla VARCHAR(20) NOT NULL,
-    FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
-    FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
-    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
-    INDEX I_estado (estado),
-    INDEX I_lote_id (lote_id),
-    INDEX I_taller_id (taller_id),
-    INDEX I_producto_id(producto_id),
-    INDEX I_cantidad_enviada(cantidad_enviada),
-    INDEX I_cantidad_recibida(cantidad_recibida)
+  corte_id INT AUTO_INCREMENT PRIMARY KEY,
+  lote_id INT NOT NULL,
+  taller_id INT,
+  producto_id INT NOT NULL,
+  estado INT DEFAULT 1,
+  cantidad_enviada INT NOT NULL,
+  cantidad_recibida INT default null,
+  talla VARCHAR(20) NOT NULL,
+  FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
+  FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
+  FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
+  INDEX I_estado (estado),
+  INDEX I_lote_id (lote_id),
+  INDEX I_taller_id (taller_id),
+  INDEX I_producto_id(producto_id),
+  INDEX I_cantidad_enviada(cantidad_enviada),
+  INDEX I_cantidad_recibida(cantidad_recibida)
 );`;
 
 //estado 0 = desactivado

@@ -61,9 +61,12 @@ class Serve {
 
 export default Serve;
 
-//reporte usuario
-//reporte producto
-//report tienda
-//report venta
-//tesis precios
-//arreglar rutas
+//Tesis capitulo 7
+//ppt 7 8 9 10 11 12
+//sedders de almacen_producto
+//lotes finalizado se ponga en almacen producto
+//ventas validaciones
+//movimiento_almacen_tienda movimiento_tienda_tienda
+//001-N121212
+
+//producto => lote => Almacen => tienda => Venta
