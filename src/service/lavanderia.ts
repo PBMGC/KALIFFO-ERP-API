@@ -1,5 +1,6 @@
 import { query } from "../util/query";
 
+//pullear y checar
 export const _createLavanderia = async (lavanderia: any) => {
   const {
     lote_id,
@@ -42,7 +43,7 @@ export const _createLavanderia = async (lavanderia: any) => {
     };
   }
 };
-
+ 
 export const _getLavanderia = async (lavanderia_id: number) => {
   const queryText = `SELECT * FROM lavanderia WHERE lavanderia_id = ?`;
 
@@ -384,14 +385,6 @@ export const _getLavanderiaPorLote = async (lote_id: number) => {
     where lote_id = 1 and estado != 0`;
 
     const result = await query(queryText, [lote_id]);
-
-    if (result.data && result.data.length === 0) {
-      return {
-        message: "lavanderia no encontrados.",
-        success: false,
-        status: 404,
-      };
-    }
 
     return {
       items: result.data || [],

@@ -276,6 +276,11 @@ CREATE TABLE IF NOT EXISTS cortes (
     INDEX I_cantidad_recibida(cantidad_recibida)
 );`;
 
+//campo nuevo en el select
+// local = 28->10
+// 1envio = 28->9
+// 2envio= 28->9
+
 //estado 0 = desactivado
 //estado 1 = inicio
 //estado 2 = proceso
@@ -286,8 +291,8 @@ CREATE TABLE IF NOT EXISTS lavanderia (
   lote_id INT NOT NULL,
   cantidad_enviada INT NOT NULL,
   cantidad_recibida INT default null,
-  color_id INT NOT NULL,
   talla VARCHAR(20) NOT NULL,
+  color_id INT NOT NULL,
   estado INT NOT NULL DEFAULT 1,  
   precio_unidad DECIMAL(10, 2) NOT NULL,
   lavanderia_asignada VARCHAR(40) NOT NULL,
@@ -324,10 +329,10 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
 //estado 1 = activo
 const almacen_productos = `
 CREATE TABLE IF NOT EXISTS almacen_productos (
-  almacen_id INT PRIMARY KEY,
+  almacen_id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_almacen varchar(30) NOT NULL,
   direccion varchar(40) NOT NULL,
-  stock_total INT,
+  stock_total INT default 0,
   estado INT NOT NULL default 1,
   INDEX I_stock (stock_total),
   INDEX I_estado (estado)

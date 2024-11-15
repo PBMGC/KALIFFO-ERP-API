@@ -247,6 +247,7 @@ export const _sgteEstadoAcabadosPorLote = async (
           }
           break;
 
+          //pasar al almacen
         case 2:
           if (detalle.cantidad_recibida === undefined) {
             return {
