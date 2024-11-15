@@ -45,6 +45,7 @@ export const createUsuario = async (req: Request, res: Response) => {
   }
 };
 
+
 export const getUsuarios = async (req: Request, res: Response) => {
   const rol = req.query.rol;
   const tienda_id = req.query.tienda_id;

@@ -133,8 +133,7 @@ CREATE TABLE IF NOT EXISTS venta (
     tipoPago INT NOT NULL,
     dni VARCHAR(8) NULL,  
     ruc VARCHAR(11) NULL, 
-    direccion VARCHAR(50) NOT NULL, 
-    telefono VARCHAR(50) NOT NULL, 
+    direccion VARCHAR(50), 
     nombre VARCHAR(50) NOT NULL,
     tienda_id INT NOT NULL,
     INDEX I_fecha (fecha),
@@ -278,6 +277,11 @@ CREATE TABLE IF NOT EXISTS cortes (
   INDEX I_cantidad_recibida(cantidad_recibida)
 );`;
 
+//campo nuevo en el select
+// local = 28->10
+// 1envio = 28->9
+// 2envio= 28->9
+
 //estado 0 = desactivado
 //estado 1 = inicio
 //estado 2 = proceso
@@ -286,16 +290,18 @@ const lavanderia = `
 CREATE TABLE IF NOT EXISTS lavanderia (
   lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,
+  corte_id INT NOT NULL,
   cantidad_enviada INT NOT NULL,
   cantidad_recibida INT default null,
-  color_id INT NOT NULL,
   talla VARCHAR(20) NOT NULL,
+  color_id INT NOT NULL,
   estado INT NOT NULL DEFAULT 1,  
   precio_unidad DECIMAL(10, 2) NOT NULL,
   lavanderia_asignada VARCHAR(40) NOT NULL,
   fecha_envio DATE,  
   fecha_recepcion DATE,
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
+  FOREIGN KEY (corte_id) REFERENCES cortes(corte_id) ON DELETE CASCADE,
   FOREIGN KEY (color_id) REFERENCES color(color_id)
 );`;
 
@@ -307,6 +313,7 @@ const taller_acabados = `
 CREATE TABLE IF NOT EXISTS taller_acabados (
   acabado_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,                      
+  lavanderia_id INT NOT NULL,
   color_id INT NOT NULL,                     
   talla VARCHAR(15) NOT NULL,               
   cantidad_recibida INT NOT NULL DEFAULT 0,                  
@@ -316,6 +323,7 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
   fecha_final DATE, 
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
   FOREIGN KEY (color_id) REFERENCES color(color_id) ON DELETE CASCADE,
+  FOREIGN KEY (lavanderia_id) REFERENCES lavanderia(lavanderia_id) ON DELETE CASCADE,
   INDEX I_lote_id (lote_id),
   INDEX I_color_id (color_id),
   INDEX I_talla (talla),
@@ -326,10 +334,10 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
 //estado 1 = activo
 const almacen_productos = `
 CREATE TABLE IF NOT EXISTS almacen_productos (
-  almacen_id INT PRIMARY KEY,
+  almacen_id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_almacen varchar(30) NOT NULL,
   direccion varchar(40) NOT NULL,
-  stock_total INT,
+  stock_total INT default 0,
   estado INT NOT NULL default 1,
   INDEX I_stock (stock_total),
   INDEX I_estado (estado)

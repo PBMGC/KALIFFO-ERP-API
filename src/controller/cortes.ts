@@ -25,6 +25,7 @@ export const createCorte = async (req: Request, res: Response) => {
     talla,
   };
 
+
   try {
     const response = await _createCorte(corte);
     res.status(response.status).json(response);
