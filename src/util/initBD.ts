@@ -248,6 +248,7 @@ const lotes = `
     fecha_creacion DATE NOT NULL,
     tipo_tela VARCHAR(20) NOT NULL,
     metraje DECIMAL(10,2) NOT NULL,
+    productos VARCHAR(150) NOT NULL,
     cantidad_total INT DEFAULT 0,
     estado INT DEFAULT 1
 );`;
@@ -334,7 +335,6 @@ CREATE TABLE IF NOT EXISTS almacen_productos (
   INDEX I_estado (estado)
 );`;
 
-
 //001-N123123
 const movimientos_almacen_tienda = `
 CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda (
@@ -405,16 +405,19 @@ export const initBD = async () => {
     }
   }
 };
- 
+
 export const borrarBD = async () => {
   const conn = await connection();
 
   if (conn) {
     try {
       await conn.execute("SET foreign_key_checks = 0;");
+
       await conn.execute("DROP TABLE IF EXISTS almacen_productos;");
       await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda;");
-      await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;");
+      await conn.execute(
+        "DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;"
+      );
       await conn.execute("DROP TABLE IF EXISTS taller_acabados;");
       await conn.execute("DROP TABLE IF EXISTS lavanderia;");
       await conn.execute("DROP TABLE IF EXISTS cortes;");

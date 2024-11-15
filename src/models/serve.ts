@@ -64,9 +64,13 @@ export default Serve;
 //Tesis capitulo 7
 //ppt 7 8 9 10 11 12
 //sedders de almacen_producto
+//sedders productos arreglar
 //lotes finalizado se ponga en almacen producto
 //ventas validaciones
-//movimiento_almacen_tienda movimiento_tienda_tienda
-//001-N121212
+
+//movimiento_almacen_tienda movimiento_tienda_tienda => pablo
+//001-N121212 => pablo
 
 //producto => lote => Almacen => tienda => Venta
+
+//Crear cortes con array lote_id => params
