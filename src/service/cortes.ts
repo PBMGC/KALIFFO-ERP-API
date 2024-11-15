@@ -5,18 +5,13 @@ import { _createLavanderia } from "./lavanderia";
 export const _createCorte = async (corte: Corte) => {
   const { lote_id, taller_id, producto_id, cantidad_enviada, talla } = corte;
 
-  const queryText = `
-        INSERT INTO cortes (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
-        VALUES (?, ?, ?, ?, ?)`;
-
   try {
-    await query(queryText, [
-      lote_id,
-      taller_id,
-      producto_id,
-      cantidad_enviada,
-      talla,
-    ]);
+    await query(
+      `
+        INSERT INTO cortes (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
+        VALUES (?, ?, ?, ?, ?)`,
+      [lote_id, taller_id, producto_id, cantidad_enviada, talla]
+    );
 
     await query(
       `
@@ -37,6 +32,70 @@ export const _createCorte = async (corte: Corte) => {
       message: "Error al crear corte.",
       success: false,
       status: 500,
+    };
+  }
+};
+
+export const _createCorteArray = async (corte: any, lote_id: number) => {
+  const { detalles, producto_id } = corte;
+  const errors: any[] = [];
+  const successDetails: any[] = [];
+
+  for (const detalle of detalles) {
+    const { taller_id, cantidad_enviada, talla } = detalle;
+
+    try {
+      await query(
+        `
+        INSERT INTO cortes (lote_id, taller_id, producto_id, cantidad_enviada, talla) 
+        VALUES (?, ?, ?, ?, ?)`,
+        [lote_id, taller_id, producto_id, cantidad_enviada, talla]
+      );
+
+      await query(
+        `
+        UPDATE lotes 
+        SET cantidad_total = cantidad_total + ?
+        WHERE lote_id = ?;
+        `,
+        [cantidad_enviada, lote_id]
+      );
+
+      successDetails.push({
+        lote_id,
+        taller_id,
+        producto_id,
+        cantidad_enviada,
+        talla,
+      });
+    } catch (error: any) {
+      errors.push({
+        error: error.message,
+        detalle: {
+          lote_id,
+          taller_id,
+          producto_id,
+          cantidad_enviada,
+          talla,
+        },
+      });
+    }
+  }
+
+  if (errors.length === 0) {
+    return {
+      message: "Todos los cortes se crearon con éxito.",
+      success: true,
+      status: 201,
+      data: successDetails,
+    };
+  } else {
+    return {
+      message: "Algunos cortes no se pudieron crear.",
+      success: false,
+      status: 207,
+      errors: errors,
+      successfulDetails: successDetails,
     };
   }
 };
@@ -91,16 +150,27 @@ export const _getCortes = async () => {
 export const _getCortesPorLote = async (lote_id: number) => {
   try {
     const queryText = `
-    SELECT 
-      cortes.estado, 
-      cortes.corte_id, 
-      usuario.nombre as taller,
-      producto.nombre ,
-      cortes.cantidad_enviada,
-      cortes.cantidad_recibida,
-      cortes.talla
-    FROM cortes 
-    inner JOIN usuario on cortes.taller_id = usuario.usuario_id INNER JOIN producto on producto.producto_id = cortes.producto_id where cortes.lote_id= ? and cortes.estado != 0
+      SELECT 
+        cortes.estado, 
+        cortes.corte_id, 
+        usuario.nombre AS taller,
+        producto.nombre AS producto, 
+        cortes.cantidad_enviada,
+        cortes.cantidad_recibida,
+        cortes.talla,
+        (cortes.cantidad_recibida - 
+           COALESCE((SELECT SUM(cantidad_enviada) 
+                     FROM lavanderia 
+                     WHERE lavanderia.corte_id = cortes.corte_id), 0)) AS cantidad_restante
+      FROM 
+        cortes
+      INNER JOIN 
+        usuario ON cortes.taller_id = usuario.usuario_id
+      INNER JOIN 
+        producto ON producto.producto_id = cortes.producto_id
+      WHERE 
+        cortes.lote_id = ? 
+        AND cortes.estado != 0;
     `;
     const result = await query(queryText, [lote_id]);
 
@@ -220,7 +290,7 @@ export const _activarCorte = async (corte_id: number) => {
 
 export const _sgteEstadoCortesPorLote = async (
   lote_id: number,
-  detalles: { corte_id: number; cantidad_recibida: number }[]
+  detalles: { corte_id: number; cantidad_recibida: number; taller_id: number }[]
 ) => {
   try {
     const result = await query("SELECT * FROM cortes WHERE lote_id = ?", [
@@ -263,9 +333,19 @@ export const _sgteEstadoCortesPorLote = async (
           break;
 
         case 1:
+          if (detalle.taller_id === undefined || detalle.taller_id === null) {
+            return {
+              corte_id: detalle.corte_id,
+              message: "Campo 'taller_id' obligatorio.",
+              success: false,
+              status: 400,
+            };
+          }
+          console.log(detalle.taller_id);
+
           const updateCorte1 = await query(
-            "UPDATE cortes SET estado = 2 WHERE corte_id = ?",
-            [detalle.corte_id]
+            "UPDATE cortes SET estado = 2, taller_id = ? WHERE corte_id = ?",
+            [detalle.taller_id, detalle.corte_id]
           );
           if (updateCorte1.affectedRows > 0) {
             resultados.push({
@@ -346,6 +426,7 @@ export const _sgteEstadoCortesPorLote = async (
           });
           break;
       }
+
       if (corte.estado == 2) {
         await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
           cantidadTotal,
@@ -361,6 +442,8 @@ export const _sgteEstadoCortesPorLote = async (
       status: 200,
     };
   } catch (error: any) {
+    console.log(error);
+
     return {
       msg: "Error en _sgteEstadoCortesPorLote",
       error: error.message,

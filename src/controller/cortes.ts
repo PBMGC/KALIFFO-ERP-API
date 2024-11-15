@@ -10,6 +10,7 @@ import {
   _activarCorte,
   _desactivarCorte,
   _sgteEstadoCortesPorLote,
+  _createCorteArray,
 } from "../service/cortes";
 import { Corte } from "../interface/corte";
 
@@ -30,6 +31,19 @@ export const createCorte = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createCorte", 500);
+  }
+};
+
+export const createCorteArray = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  const { detalles, producto_id } = req.body;
+  const corte = { detalles, producto_id };
+
+  try {
+    const response = await _createCorteArray(corte, Number(lote_id));
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_createCorteArArray", 500);
   }
 };
 

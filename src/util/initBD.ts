@@ -142,13 +142,13 @@ CREATE TABLE IF NOT EXISTS venta (
 );`;
 
 /*
-  tipoVenta => 
-    1 => por menor
-    2 => por mayor
+tipoVenta => 
+  1 => por menor
+  2 => por mayor
 
-  tipoComprobante => 
-    1 => boleta
-    2 => factura
+tipoComprobante => 
+  1 => boleta
+  2 => factura
 */
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
@@ -247,6 +247,7 @@ const lotes = `
     fecha_creacion DATE NOT NULL,
     tipo_tela VARCHAR(20) NOT NULL,
     metraje DECIMAL(10,2) NOT NULL,
+    productos VARCHAR(150) NOT NULL,
     cantidad_total INT DEFAULT 0,
     estado INT DEFAULT 1
 );`;
@@ -257,23 +258,23 @@ const lotes = `
 //estado 3 = finalizado
 const cortes = `
 CREATE TABLE IF NOT EXISTS cortes (
-    corte_id INT AUTO_INCREMENT PRIMARY KEY,
-    lote_id INT NOT NULL,
-    taller_id INT,
-    producto_id INT NOT NULL,
-    estado INT DEFAULT 1,
-    cantidad_enviada INT NOT NULL,
-    cantidad_recibida INT default null,
-    talla VARCHAR(20) NOT NULL,
-    FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
-    FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
-    FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
-    INDEX I_estado (estado),
-    INDEX I_lote_id (lote_id),
-    INDEX I_taller_id (taller_id),
-    INDEX I_producto_id(producto_id),
-    INDEX I_cantidad_enviada(cantidad_enviada),
-    INDEX I_cantidad_recibida(cantidad_recibida)
+  corte_id INT AUTO_INCREMENT PRIMARY KEY,
+  lote_id INT NOT NULL,
+  taller_id INT,
+  producto_id INT NOT NULL,
+  estado INT DEFAULT 1,
+  cantidad_enviada INT NOT NULL,
+  cantidad_recibida INT default null,
+  talla VARCHAR(20) NOT NULL,
+  FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
+  FOREIGN KEY (taller_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE,
+  FOREIGN KEY (producto_id) REFERENCES producto(producto_id) ON DELETE CASCADE,
+  INDEX I_estado (estado),
+  INDEX I_lote_id (lote_id),
+  INDEX I_taller_id (taller_id),
+  INDEX I_producto_id(producto_id),
+  INDEX I_cantidad_enviada(cantidad_enviada),
+  INDEX I_cantidad_recibida(cantidad_recibida)
 );`;
 
 //campo nuevo en el select
@@ -289,6 +290,7 @@ const lavanderia = `
 CREATE TABLE IF NOT EXISTS lavanderia (
   lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,
+  corte_id INT NOT NULL,
   cantidad_enviada INT NOT NULL,
   cantidad_recibida INT default null,
   talla VARCHAR(20) NOT NULL,
@@ -299,6 +301,7 @@ CREATE TABLE IF NOT EXISTS lavanderia (
   fecha_envio DATE,  
   fecha_recepcion DATE,
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
+  FOREIGN KEY (corte_id) REFERENCES cortes(corte_id) ON DELETE CASCADE,
   FOREIGN KEY (color_id) REFERENCES color(color_id)
 );`;
 
@@ -310,6 +313,7 @@ const taller_acabados = `
 CREATE TABLE IF NOT EXISTS taller_acabados (
   acabado_id INT AUTO_INCREMENT PRIMARY KEY,
   lote_id INT NOT NULL,                      
+  lavanderia_id INT NOT NULL,
   color_id INT NOT NULL,                     
   talla VARCHAR(15) NOT NULL,               
   cantidad_recibida INT NOT NULL DEFAULT 0,                  
@@ -319,6 +323,7 @@ CREATE TABLE IF NOT EXISTS taller_acabados (
   fecha_final DATE, 
   FOREIGN KEY (lote_id) REFERENCES lotes(lote_id) ON DELETE CASCADE,
   FOREIGN KEY (color_id) REFERENCES color(color_id) ON DELETE CASCADE,
+  FOREIGN KEY (lavanderia_id) REFERENCES lavanderia(lavanderia_id) ON DELETE CASCADE,
   INDEX I_lote_id (lote_id),
   INDEX I_color_id (color_id),
   INDEX I_talla (talla),
@@ -337,7 +342,6 @@ CREATE TABLE IF NOT EXISTS almacen_productos (
   INDEX I_stock (stock_total),
   INDEX I_estado (estado)
 );`;
-
 
 //001-N123123
 const movimientos_almacen_tienda = `
@@ -409,16 +413,19 @@ export const initBD = async () => {
     }
   }
 };
- 
+
 export const borrarBD = async () => {
   const conn = await connection();
 
   if (conn) {
     try {
       await conn.execute("SET foreign_key_checks = 0;");
+
       await conn.execute("DROP TABLE IF EXISTS almacen_productos;");
       await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda;");
-      await conn.execute("DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;");
+      await conn.execute(
+        "DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;"
+      );
       await conn.execute("DROP TABLE IF EXISTS taller_acabados;");
       await conn.execute("DROP TABLE IF EXISTS lavanderia;");
       await conn.execute("DROP TABLE IF EXISTS cortes;");
