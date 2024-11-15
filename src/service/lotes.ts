@@ -20,14 +20,15 @@ export const _createLote = async (lote: Partial<Lote>) => {
     const fechaHoy = new Date().toISOString().slice(0, 10);
 
     const queryInsert = `
-        INSERT INTO lotes (codigo_lote, fecha_creacion, tipo_tela, metraje) 
-        VALUES (?, ?, ?, ?);`;
+        INSERT INTO lotes (codigo_lote, fecha_creacion, tipo_tela, metraje, productos)
+        VALUES (?, ?, ?, ?, ?);`;
 
     const resultInsert = await query(queryInsert, [
       codigo,
       fechaHoy,
       lote.tipo_tela,
       lote.metraje,
+      lote.productos,
     ]);
 
     if (!resultInsert.success) {
@@ -85,6 +86,45 @@ export const _getLote = async (lote_id: number) => {
   } catch (error) {
     return {
       msg: "Error _getLotes",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const _getLoteProductos = async (lote_id: number) => {
+  try {
+    const resultLote = await query("SELECT * FROM lotes WHERE lote_id = ?", [
+      lote_id,
+    ]);
+    const lote = resultLote.data[0];
+
+    if (!lote || !lote.productos) {
+      return {
+        msg: "Lote no encontrado o no tiene productos",
+        success: false,
+        status: 404,
+      };
+    }
+
+    const productosArray = lote.productos.split(",").map(Number);
+
+    const productos = await query(
+      `SELECT * FROM producto WHERE producto_id IN (${productosArray
+        .map(() => "?")
+        .join(",")})`,
+      productosArray
+    );
+
+    return {
+      items: productos.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error en _getLoteProductos:", error);
+    return {
+      msg: "Error _getLoteProductos",
       success: false,
       status: 500,
     };
