@@ -63,7 +63,6 @@ export default Serve;
 
 //sedders de almacen_producto
 //sedders productos arreglar
-//lotes finalizado se ponga en almacen producto
 //ventas validaciones
 
 //movimiento_almacen_tienda movimiento_tienda_tienda => pablo
