@@ -150,27 +150,29 @@ export const _getCortes = async () => {
 export const _getCortesPorLote = async (lote_id: number) => {
   try {
     const queryText = `
-      SELECT 
-        cortes.estado, 
-        cortes.corte_id, 
-        usuario.nombre AS taller,
-        producto.nombre AS producto, 
-        cortes.cantidad_enviada,
-        cortes.cantidad_recibida,
-        cortes.talla,
-        (cortes.cantidad_recibida - 
-           COALESCE((SELECT SUM(cantidad_enviada) 
-                     FROM lavanderia 
-                     WHERE lavanderia.corte_id = cortes.corte_id), 0)) AS cantidad_restante
-      FROM 
-        cortes
-      INNER JOIN 
-        usuario ON cortes.taller_id = usuario.usuario_id
-      INNER JOIN 
-        producto ON producto.producto_id = cortes.producto_id
-      WHERE 
-        cortes.lote_id = ? 
-        AND cortes.estado != 0;
+        SELECT 
+            cortes.estado, 
+            cortes.corte_id, 
+            usuario.nombre AS taller,
+            producto.nombre AS producto, 
+            cortes.cantidad_enviada,
+            cortes.cantidad_recibida,
+            cortes.talla,
+            CAST(
+                (cortes.cantidad_recibida - 
+                 COALESCE((SELECT SUM(cantidad_enviada) 
+                           FROM lavanderia 
+                           WHERE lavanderia.corte_id = cortes.corte_id), 0)) 
+                AS SIGNED) AS cantidad_restante
+        FROM 
+            cortes
+        INNER JOIN 
+            usuario ON cortes.taller_id = usuario.usuario_id
+        INNER JOIN 
+            producto ON producto.producto_id = cortes.producto_id
+        WHERE 
+            cortes.lote_id = ? 
+            AND cortes.estado != 0;
     `;
     const result = await query(queryText, [lote_id]);
 
