@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
-import { _createAlmacen_Productos } from "../service/almacen_productos";
+import { _createAlmacen_Productos, _getAlmacen_productos } from "../service/almacen_productos";
 
 
 export const createAlmacen_Productos = async(req:Request,res:Response)=>{
@@ -17,7 +17,17 @@ export const createAlmacen_Productos = async(req:Request,res:Response)=>{
     } catch (error) {
         handleHttp(res,"error")
     }
+}
 
+export const getAlmacenProductos = async (req:Request,res:Response)=>{
+    try {
+        const response = await _getAlmacen_productos();
+        res
+        .status(response.status)
+        .json(response.items ? response.items : response);
+    } catch (error) {
+        handleHttp(res, "error_getAlmacen_productos", 500);
+    }
 }
 
 

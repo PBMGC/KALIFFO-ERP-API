@@ -48,3 +48,20 @@ export const _UpdateAlmacen_Productos = async(updateAlmacenProductos:any)=>{
           };
     }
 }
+
+export const _getAlmacen_productos = async() =>{
+    try{
+        const result = await query("SELECT * from almacen_productos")
+        return{
+            items:result.data||[],
+            success:true,
+            status:200
+        }
+    }catch(error){
+        return {
+            msg: "Error _getAlmacen_productos",
+            success: false,
+            status: 500,
+          };
+    }
+}
