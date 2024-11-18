@@ -158,6 +158,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
         cortes.cantidad_enviada,
         cortes.cantidad_recibida,
         cortes.talla,
+        cortes.taller_id,
         (cortes.cantidad_recibida - 
            COALESCE((SELECT SUM(cantidad_enviada) 
                      FROM lavanderia 
