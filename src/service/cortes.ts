@@ -343,7 +343,6 @@ export const _sgteEstadoCortesPorLote = async (
               status: 400,
             };
           }
-          console.log(detalle.taller_id);
 
           const updateCorte1 = await query(
             "UPDATE cortes SET estado = 2, taller_id = ? WHERE corte_id = ?",

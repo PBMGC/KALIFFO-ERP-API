@@ -1,6 +1,5 @@
 import { query } from "../util/query";
 
-//pullear y checar
 export const _createLavanderia = async (lavanderia: any) => {
   const {
     lote_id,
@@ -43,7 +42,82 @@ export const _createLavanderia = async (lavanderia: any) => {
     };
   }
 };
- 
+
+export const _createLavanderiaArray = async (
+  lote_id: string,
+  detalles: any
+) => {
+  const errors: any[] = [];
+  const successDetails: any[] = [];
+
+  for (const detalle of detalles) {
+    const { corte_id, talla, color_id, precio_unidad, lavanderia_asignada } =
+      detalle;
+
+    const resultCorte = await query("SELECT * FROM cortes WHERE corte_id = ?", [
+      color_id,
+    ]);
+    const corte = await resultCorte.data[0];
+
+    const now = new Date();
+    const fecha = now.toLocaleDateString("en-CA");
+
+    try {
+      await query(
+        `
+        INSERT INTO lavanderia (lote_id, corte_id, cantidad_enviada, talla, color_id, precio_unidad, lavanderia_asignada, fecha_envio) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          lote_id,
+          corte_id,
+          corte.cantidad_recibida,
+          talla,
+          color_id,
+          precio_unidad,
+          lavanderia_asignada,
+          fecha,
+        ]
+      );
+
+      successDetails.push({
+        corte_id,
+        talla,
+        color_id,
+        precio_unidad,
+        lavanderia_asignada,
+      });
+    } catch (error: any) {
+      errors.push({
+        error: error.message,
+        detalle: {
+          corte_id,
+          talla,
+          color_id,
+          precio_unidad,
+          lavanderia_asignada,
+        },
+      });
+    }
+  }
+
+  if (errors.length === 0) {
+    return {
+      message: "Todas las lavanderias se crearon con éxito.",
+      success: true,
+      status: 201,
+      data: successDetails,
+    };
+  } else {
+    return {
+      message: "Algunas lavanderias no se pudieron crear.",
+      success: false,
+      status: 207,
+      errors: errors,
+      successfulDetails: successDetails,
+    };
+  }
+};
+
 export const _getLavanderia = async (lavanderia_id: number) => {
   const queryText = `SELECT * FROM lavanderia WHERE lavanderia_id = ?`;
 
@@ -276,11 +350,13 @@ export const _sgteEstadoLavanderiaPorLote = async (
             };
           }
 
+          const now = new Date();
+          const fecha = now.toLocaleDateString("en-CA");
           cantidadTotal += detalle.cantidad_recibida;
 
           const updateLavanderia2 = await query(
-            "UPDATE lavanderia SET estado = 3, cantidad_recibida = ? WHERE lavanderia_id = ?",
-            [detalle.cantidad_recibida, detalle.lavanderia_id]
+            "UPDATE lavanderia SET estado = 3, cantidad_recibida = ?, fecha_recepcion = ? WHERE lavanderia_id = ?",
+            [detalle.cantidad_recibida, fecha, detalle.lavanderia_id]
           );
 
           const updateLote = await query(
@@ -292,14 +368,23 @@ export const _sgteEstadoLavanderiaPorLote = async (
             updateLavanderia2.affectedRows > 0 &&
             updateLote.affectedRows > 0
           ) {
+            const resultLavanderia = await query(
+              "SELECT * FROM lavanderia WHERE lavanderia_id = ?",
+              [detalle.lavanderia_id]
+            );
+            const lavanderia = resultLavanderia.data[0];
+
             const insertAcabado = await query(
-              "INSERT INTO taller_acabados (lote_id, color_id, talla, cantidad_recibida, cantidad_enviada, estado, fecha_inicio, fecha_final) VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())",
+              `INSERT INTO taller_acabados (lote_id, lavanderia_id, color_id, talla, cantidad_enviada, fecha_inicio)
+                VALUES (?, ?, ?, ?, ?, ?)
+              `,
               [
                 lote_id,
+                lavanderia.lavanderia_id,
                 lavanderia.color_id,
                 lavanderia.talla,
-                detalle.cantidad_recibida,
                 lavanderia.cantidad_enviada,
+                fecha,
               ]
             );
 
