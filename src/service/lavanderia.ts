@@ -51,13 +51,18 @@ export const _createLavanderiaArray = async (
   const successDetails: any[] = [];
 
   for (const detalle of detalles) {
-    const { corte_id, talla, color_id, precio_unidad, lavanderia_asignada } =
-      detalle;
+    const {
+      corte_id,
+      talla,
+      color_id,
+      precio_unidad,
+      lavanderia_asignada,
+      cantidad_enviada,
+    } = detalle;
 
     const resultCorte = await query("SELECT * FROM cortes WHERE corte_id = ?", [
       color_id,
     ]);
-    const corte = await resultCorte.data[0];
 
     const now = new Date();
     const fecha = now.toLocaleDateString("en-CA");
@@ -70,7 +75,7 @@ export const _createLavanderiaArray = async (
         [
           lote_id,
           corte_id,
-          corte.cantidad_recibida,
+          cantidad_enviada,
           talla,
           color_id,
           precio_unidad,
