@@ -33,7 +33,7 @@ export const _getColores = async () => {
   }
 
   return {
-    items: result.data,
+    items: result.data[0]||[],
     success: true,
     status: 200,
   };
