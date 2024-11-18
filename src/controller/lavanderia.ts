@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
 import {
   _createLavanderia,
+  _createLavanderiaArray,
   _deleteLavanderia,
   _getLavanderia,
   _getLavanderiaPorLote,
@@ -40,6 +41,18 @@ export const createLavanderia = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error__createLavanderia", 500);
+  }
+};
+
+export const createLavanderiaArray = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  const { detalles } = req.body;
+
+  try {
+    const response = await _createLavanderiaArray(lote_id, detalles);
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_createCorteArArray", 500);
   }
 };
 
