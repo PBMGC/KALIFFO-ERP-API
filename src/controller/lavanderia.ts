@@ -137,7 +137,7 @@ export const sgteEstdoLoteLavanderia = async (req: Request, res: Response) => {
 };
 
 export const getLavanderiaPorLote = async (req: Request, res: Response) => {
-  const { lote_id } = req.body;
+  const { lote_id } = req.params;
 
   try {
     const response = await _getLavanderiaPorLote(Number(lote_id));
