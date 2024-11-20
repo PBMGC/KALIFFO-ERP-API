@@ -153,6 +153,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
     SELECT 
                 cortes.estado, 
                 cortes.corte_id, 
+                cortes.taller_id,
                 usuario.nombre AS taller,
                 producto.nombre AS producto, 
                 cortes.cantidad_enviada,
