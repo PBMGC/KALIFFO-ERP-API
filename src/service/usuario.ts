@@ -182,22 +182,25 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       `CALL SP_ReporteUsuario(${usuario_id})`
     );
 
-    const horariodata: any = dataUsuario.data[0][0].horarios
-      .split("), (")
-      .map((item: string) => {
-        const [fecha, hora_entrada, hora_salida] = item
-          .replace(/\(|\)/g, "")
-          .trim()
-          .split(", ");
-        return {
-          fecha: fecha,
-          hora_entrada: hora_entrada,
-          hora_salida: hora_salida,
-        };
-      });
+    const horariodata: any = dataUsuario?.data?.[0]?.[0]?.horarios != null
+    ? dataUsuario.data[0][0].horarios
+        .split("), (")
+        .map((item: string) => {
+          const [fecha, hora_entrada, hora_salida] = item
+            .replace(/\(|\)/g, "")
+            .trim()
+            .split(", ");
+          return {
+            fecha: fecha,
+            hora_entrada: hora_entrada,
+            hora_salida: hora_salida,
+          };
+        })
+    : []; 
+  
 
-    const pagosData = dataUsuario.data[0][0].pagos
-      .split("), (")
+    const pagosData = dataUsuario.data[0][0].pagos!=null?
+    dataUsuario.data[0][0].pagos.split("), (")
       .map((item: string) => {
         const [fecha, pago_total, pago_faltante] = item
           .replace(/\(|\)/g, "")
@@ -208,11 +211,11 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
           pago_total: pago_total,
           pago_faltante: pago_faltante,
         };
-      });
+      }):[];
 
     const incidenciaTIPO: any = { 1: "Familiar", 2: "Laboral", 3: "Otros" };
-    const incidenciasData = dataUsuario.data[0][0].incidencias
-      .split("; ")
+    const incidenciasData = dataUsuario.data[0][0].incidencias!=null?
+      dataUsuario.data[0][0].incidencias.split("; ")
       .map((item: any) => {
         const [id, descripcion, fecha] = item
           .replace(/\(|\)/g, "")
@@ -223,7 +226,7 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
           descripcion: descripcion,
           fecha: fecha,
         };
-      });
+      }):[];
 
     const doc = new PDFDocument({
       bufferPages: true,
