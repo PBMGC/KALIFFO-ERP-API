@@ -167,7 +167,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
                     AS SIGNED) AS cantidad_restante
             FROM 
                 cortes
-            left JOIN 
+            LEFT JOIN 
                 usuario ON cortes.taller_id = usuario.usuario_id
             INNER JOIN 
                 producto ON producto.producto_id = cortes.producto_id

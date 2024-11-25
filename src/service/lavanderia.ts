@@ -466,6 +466,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
 export const _getLavanderiaPorLote = async (lote_id: number) => {
   try {
     const queryText = `
+<<<<<<< HEAD
     select 
       l.*,
       c.nombre,
@@ -473,6 +474,20 @@ export const _getLavanderiaPorLote = async (lote_id: number) => {
     from lavanderia l
     inner join color c on c.color_id = l.color_id
     where lote_id = 1 and estado != 0`;
+=======
+SELECT 
+    l.*, 
+    c.nombre, 
+    c.codigo, 
+    (SELECT p.nombre 
+     FROM producto p 
+     WHERE p.producto_id = co.producto_id) AS producto_nombre
+FROM lavanderia l
+INNER JOIN cortes co ON co.corte_id = l.corte_id
+INNER JOIN color c ON c.color_id = l.color_id
+WHERE l.lote_id = ? AND l.estado != 0;
+`;
+>>>>>>> 61f38ed26af568a464873dac0b42769322cc4229
 
     const result = await query(queryText, [lote_id]);
 
