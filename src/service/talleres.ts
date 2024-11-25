@@ -118,6 +118,28 @@ export const _getAcabado = async (acabado_id: number) => {
   }
 };
 
+export const _getAcabadoLote = async (lote_id: string) => {
+  try {
+    const result = await query(
+      "select * from taller_acabados where lote_id = ?",
+      [lote_id]
+    );
+
+    return {
+      items: result.data[0] || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      message: "Error al obtener el acabado.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};
+
 export const _activarAcabado = async (acabado_id: number) => {
   const queryText =
     "UPDATE taller_acabados SET estado = 1 WHERE acabado_id = ? AND estado != 1";
@@ -179,7 +201,7 @@ export const _desactivarAcabado = async (acabado_id: number) => {
 };
 
 export const _sgteEstadoAcabadosPorLote = async (
-  lote_id: number,
+  lote_id: string,
   detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {

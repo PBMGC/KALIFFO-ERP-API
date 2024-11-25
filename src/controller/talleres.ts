@@ -6,6 +6,8 @@ import {
   _getAcabado,
   _activarAcabado,
   _desactivarAcabado,
+  _getAcabadoLote,
+  _sgteEstadoAcabadosPorLote,
 } from "../service/talleres";
 
 export const createAcabado = async (req: Request, res: Response) => {
@@ -30,6 +32,19 @@ export const createAcabado = async (req: Request, res: Response) => {
   try {
     const response = await _createAcabado(acabado);
     res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_createAcabado", 500);
+  }
+};
+
+export const getAcabadoLote = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+
+  try {
+    const response = await _getAcabadoLote(lote_id);
+    res
+      .status(response.status)
+      .json(response.items ? response.items : response);
   } catch (error) {
     handleHttp(res, "error_createAcabado", 500);
   }
@@ -79,20 +94,17 @@ export const getAcabado = async (req: Request, res: Response) => {
   }
 };
 
-// export const sgteEstadoAcabado = async (req: Request, res: Response) => {
-//   const { acabado_id } = req.params;
-//   const { cantidad_recibida } = req.body;
+export const sgteEstadoAcabado = async (req: Request, res: Response) => {
+  const { lote_id } = req.params;
+  const { detalles } = req.body;
 
-//   try {
-//     const response = await _sgteEstadoTallerAcabados(
-//       Number(acabado_id),
-//       cantidad_recibida
-//     );
-//     res.status(response.status).json(response);
-//   } catch (error) {
-//     handleHttp(res, "error_sgteEstadoAcabado", 500);
-//   }
-// };
+  try {
+    const response = await _sgteEstadoAcabadosPorLote(lote_id, detalles);
+    res.status(response.status).json(response);
+  } catch (error) {
+    handleHttp(res, "error_sgteEstadoAcabado", 500);
+  }
+};
 
 export const activarAcabado = async (req: Request, res: Response) => {
   const { acabado_id } = req.params;

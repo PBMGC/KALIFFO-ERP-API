@@ -468,8 +468,8 @@ export const _getLavanderiaPorLote = async (lote_id: number) => {
     const queryText = `
     select 
       l.*,
-        c.nombre,
-        c.codigo
+      c.nombre,
+      c.codigo
     from lavanderia l
     inner join color c on c.color_id = l.color_id
     where lote_id = 1 and estado != 0`;
