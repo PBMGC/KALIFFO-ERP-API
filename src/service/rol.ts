@@ -69,6 +69,7 @@ export const _login = async (username: string, password: string) => {
     return {
       message: `Bienvenido ${rol.username}`,
       rol: rol.rol,
+      id_tipo:rol.id_tipo,
       token,
       success: true,
       status: 200,
