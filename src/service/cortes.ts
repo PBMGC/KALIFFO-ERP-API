@@ -336,78 +336,69 @@ export const _sgteEstadoCortesPorLote = async (
           break;
 
         case 1:
-          if (detalle.taller_id === undefined || detalle.taller_id === null) {
-            return {
+          if (!detalle.taller_id) {
+            resultados.push({
               corte_id: detalle.corte_id,
               message: "Campo 'taller_id' obligatorio.",
               success: false,
               status: 400,
-            };
+            });
+            break;
           }
 
           const updateCorte1 = await query(
             "UPDATE cortes SET estado = 2, taller_id = ? WHERE corte_id = ?",
             [detalle.taller_id, detalle.corte_id]
           );
-          if (updateCorte1.affectedRows > 0) {
-            resultados.push({
-              corte_id: detalle.corte_id,
-              message: "El corte ha pasado al estado 2 (en proceso)",
-              nuevoEstado: 2,
-              success: true,
-              status: 200,
-            });
-          } else {
-            resultados.push({
-              corte_id: detalle.corte_id,
-              message: "No se pudo actualizar el estado del corte a 2",
-              success: false,
-              status: 500,
-            });
-          }
+
+          resultados.push({
+            corte_id: detalle.corte_id,
+            message: updateCorte1.affectedRows
+              ? "El corte ha pasado al estado 2 (en proceso)"
+              : "No se pudo actualizar el estado del corte a 2",
+            nuevoEstado: 2,
+            success: updateCorte1.affectedRows > 0,
+            status: updateCorte1.affectedRows ? 200 : 500,
+          });
           break;
 
         case 2:
-          if (
-            detalle.cantidad_recibida === undefined ||
-            detalle.cantidad_recibida === null
-          ) {
-            return {
+          if (!detalle.cantidad_recibida) {
+            resultados.push({
               corte_id: detalle.corte_id,
               message: "Campo 'cantidad_recibida' obligatorio.",
               success: false,
               status: 400,
-            };
+            });
+            break;
           }
 
           cantidadTotal += detalle.cantidad_recibida;
+
+          if (detalle.cantidad_recibida > corte.cantidad_enviada) {
+            resultados.push({
+              corte_id: detalle.corte_id,
+              message: "La cantidad_recibida es mayor a la cantidad enviada",
+              success: false,
+              status: 400,
+            });
+            break;
+          }
 
           const updateCorte2 = await query(
             "UPDATE cortes SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
             [detalle.cantidad_recibida, detalle.corte_id]
           );
 
-          const updateLote = await query(
-            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
-            [lote_id]
-          );
-
-          if (updateCorte2.affectedRows > 0 && updateLote.affectedRows > 0) {
-            resultados.push({
-              corte_id: detalle.corte_id,
-              message: "El corte ha pasado al estado 3 (finalizado)",
-              nuevoEstado: 3,
-              success: true,
-              status: 200,
-            });
-          } else {
-            resultados.push({
-              corte_id: detalle.corte_id,
-              message: "No se pudo actualizar el estado del corte a 3 o lote",
-              success: false,
-              status: 500,
-            });
-          }
+          resultados.push({
+            corte_id: detalle.corte_id,
+            message: updateCorte2.affectedRows
+              ? "El corte ha pasado al estado 3 (finalizado)"
+              : "No se pudo actualizar el estado del corte a 3",
+            nuevoEstado: 3,
+            success: updateCorte2.affectedRows > 0,
+            status: updateCorte2.affectedRows ? 200 : 500,
+          });
           break;
 
         case 3:
@@ -428,14 +419,13 @@ export const _sgteEstadoCortesPorLote = async (
           });
           break;
       }
-
-      if (corte.estado == 2) {
-        await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
-          cantidadTotal,
-          lote_id,
-        ]);
-      }
     }
+
+    // Actualizar cantidad total del lote
+    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+      cantidadTotal,
+      lote_id,
+    ]);
 
     return {
       message: "Proceso completado para todos los cortes del lote",
@@ -444,7 +434,7 @@ export const _sgteEstadoCortesPorLote = async (
       status: 200,
     };
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
 
     return {
       msg: "Error en _sgteEstadoCortesPorLote",

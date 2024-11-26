@@ -2,10 +2,11 @@ import { Lote } from "../interface/lote";
 import { query } from "../util/query";
 
 export const _createLote = async (lote: Partial<Lote>) => {
-  const queryText = `SELECT codigo_lote FROM lotes ORDER BY lote_id DESC LIMIT 1`;
-
   try {
-    const result = await query(queryText);
+    const result = await query(
+      `SELECT codigo_lote FROM lotes ORDER BY lote_id DESC LIMIT 1`,
+      []
+    );
 
     let codigo;
 
@@ -19,17 +20,12 @@ export const _createLote = async (lote: Partial<Lote>) => {
 
     const fechaHoy = new Date().toISOString().slice(0, 10);
 
-    const queryInsert = `
+    const resultInsert = await query(
+      `
         INSERT INTO lotes (codigo_lote, fecha_creacion, tipo_tela, metraje, productos)
-        VALUES (?, ?, ?, ?, ?);`;
-
-    const resultInsert = await query(queryInsert, [
-      codigo,
-      fechaHoy,
-      lote.tipo_tela,
-      lote.metraje,
-      lote.productos,
-    ]);
+        VALUES (?, ?, ?, ?, ?);`,
+      [codigo, fechaHoy, lote.tipo_tela, lote.metraje, lote.productos]
+    );
 
     if (!resultInsert.success) {
       console.error("Error al crear el lote:", resultInsert.error);
@@ -55,10 +51,8 @@ export const _createLote = async (lote: Partial<Lote>) => {
 };
 
 export const _getLotes = async () => {
-  const queryText = `select * from lotes where estado !=0`;
-
   try {
-    const result = await query(queryText, []);
+    const result = await query(`select * from lotes where estado !=0`, []);
     return {
       items: result.data,
       success: true,
@@ -74,10 +68,11 @@ export const _getLotes = async () => {
 };
 
 export const _getLote = async (lote_id: number) => {
-  const queryText = `select * from lotes where estado !=0 and lote_id = ?;`;
-
   try {
-    const result = await query(queryText, [lote_id]);
+    const result = await query(
+      `select * from lotes where estado !=0 and lote_id = ?;`,
+      [lote_id]
+    );
     return {
       item: result.data[0],
       success: true,

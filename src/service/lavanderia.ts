@@ -285,7 +285,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
 
     if (!lavanderias || lavanderias.length === 0) {
       return {
-        message: "No se encontraron lavanderias asociados al lote",
+        message: "No se encontraron lavanderías asociadas al lote",
         success: false,
         status: 404,
       };
@@ -301,8 +301,8 @@ export const _sgteEstadoLavanderiaPorLote = async (
 
       if (!lavanderia) {
         resultados.push({
-          corte_id: detalle.lavanderia_id,
-          message: "Lavanderia no encontrado en la base de datos",
+          lavanderia_id: detalle.lavanderia_id,
+          message: "Lavandería no encontrada en la base de datos",
           success: false,
           status: 404,
         });
@@ -312,109 +312,87 @@ export const _sgteEstadoLavanderiaPorLote = async (
       switch (lavanderia.estado) {
         case 0:
           resultados.push({
-            corte_id: detalle.lavanderia_id,
-            message: "Esta lavanderia está desactivado",
+            lavanderia_id: detalle.lavanderia_id,
+            message: "Esta lavandería está desactivada",
             success: false,
             status: 400,
           });
           break;
 
         case 1:
+          // Actualizar al estado 2
           const updateLavanderia1 = await query(
             "UPDATE lavanderia SET estado = 2 WHERE lavanderia_id = ?",
             [detalle.lavanderia_id]
           );
-          if (updateLavanderia1.affectedRows > 0) {
-            resultados.push({
-              lavanderia_id: detalle.lavanderia_id,
-              message: "La lavanderia ha pasado al estado 2 (en proceso)",
-              nuevoEstado: 2,
-              success: true,
-              status: 200,
-            });
-          } else {
-            resultados.push({
-              lavanderia_id: detalle.lavanderia_id,
-              message: "No se pudo actualizar el estado del corte a 2",
-              success: false,
-              status: 500,
-            });
-          }
+          resultados.push({
+            lavanderia_id: detalle.lavanderia_id,
+            message: updateLavanderia1.affectedRows
+              ? "La lavandería ha pasado al estado 2 (en proceso)"
+              : "No se pudo actualizar la lavandería al estado 2",
+            nuevoEstado: 2,
+            success: updateLavanderia1.affectedRows > 0,
+            status: updateLavanderia1.affectedRows ? 200 : 500,
+          });
           break;
 
         case 2:
-          if (
-            detalle.cantidad_recibida === undefined ||
-            detalle.cantidad_recibida === null
-          ) {
-            return {
+          if (!detalle.cantidad_recibida) {
+            resultados.push({
               lavanderia_id: detalle.lavanderia_id,
               message: "Campo 'cantidad_recibida' obligatorio.",
               success: false,
               status: 400,
-            };
+            });
+            break;
           }
 
+          if (detalle.cantidad_recibida > lavanderia.cantidad_enviada) {
+            resultados.push({
+              lavanderia_id: detalle.lavanderia_id,
+              message: "La cantidad recibida es mayor a la cantidad enviada",
+              success: false,
+              status: 400,
+            });
+            break;
+          }
+
+          cantidadTotal += detalle.cantidad_recibida;
           const now = new Date();
           const fecha = now.toLocaleDateString("en-CA");
-          cantidadTotal += detalle.cantidad_recibida;
 
           const updateLavanderia2 = await query(
             "UPDATE lavanderia SET estado = 3, cantidad_recibida = ?, fecha_recepcion = ? WHERE lavanderia_id = ?",
             [detalle.cantidad_recibida, fecha, detalle.lavanderia_id]
           );
 
-          const updateLote = await query(
-            "UPDATE lotes SET estado = 3 WHERE lote_id = ?",
-            [lote_id]
-          );
-
-          if (
-            updateLavanderia2.affectedRows > 0 &&
-            updateLote.affectedRows > 0
-          ) {
-            const resultLavanderia = await query(
-              "SELECT * FROM lavanderia WHERE lavanderia_id = ?",
-              [detalle.lavanderia_id]
-            );
-            const lavanderia = resultLavanderia.data[0];
-
+          if (updateLavanderia2.affectedRows > 0) {
             const insertAcabado = await query(
               `INSERT INTO taller_acabados (lote_id, lavanderia_id, color_id, talla, cantidad_enviada, fecha_inicio)
-                VALUES (?, ?, ?, ?, ?, ?)
-              `,
+                VALUES (?, ?, ?, ?, ?, ?)`,
               [
                 lote_id,
                 lavanderia.lavanderia_id,
                 lavanderia.color_id,
                 lavanderia.talla,
-                lavanderia.cantidad_enviada,
+                detalle.cantidad_recibida,
                 fecha,
               ]
             );
 
-            if (insertAcabado.affectedRows > 0) {
-              resultados.push({
-                lavanderia_id: detalle.lavanderia_id,
-                message:
-                  "La lavandería ha pasado al estado 3 (finalizado) y se creó un registro en taller_acabados",
-                nuevoEstado: 3,
-                success: true,
-                status: 200,
-              });
-            } else {
-              resultados.push({
-                lavanderia_id: detalle.lavanderia_id,
-                message: "No se pudo crear el registro en taller_acabados",
-                success: false,
-                status: 500,
-              });
-            }
+            resultados.push({
+              lavanderia_id: detalle.lavanderia_id,
+              message: insertAcabado.affectedRows
+                ? "Lavandería finalizada y registro creado en taller_acabados"
+                : "Lavandería finalizada, pero no se pudo crear el registro en taller_acabados",
+              nuevoEstado: 3,
+              success: insertAcabado.affectedRows > 0,
+              status: insertAcabado.affectedRows ? 200 : 500,
+            });
           } else {
             resultados.push({
               lavanderia_id: detalle.lavanderia_id,
-              message:
-                "No se pudo actualizar el estado de la lavanderia a 3 o lote",
+              message: "No se pudo actualizar la lavandería al estado 3",
               success: false,
               status: 500,
             });
@@ -424,7 +402,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
         case 3:
           resultados.push({
             lavanderia_id: detalle.lavanderia_id,
-            message: "Esta lavanderia está finalizado",
+            message: "Esta lavandería ya está finalizada",
             success: false,
             status: 400,
           });
@@ -433,22 +411,21 @@ export const _sgteEstadoLavanderiaPorLote = async (
         default:
           resultados.push({
             lavanderia_id: detalle.lavanderia_id,
-            message: "Estado de la lavanderia no reconocido",
+            message: "Estado de la lavandería no reconocido",
             success: false,
             status: 400,
           });
           break;
       }
-      if (lavanderia.estado == 2) {
-        await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
-          cantidadTotal,
-          lote_id,
-        ]);
-      }
     }
 
+    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+      cantidadTotal,
+      lote_id,
+    ]);
+
     return {
-      message: "Proceso completado para todas las lavanderias del lote",
+      message: "Proceso completado para todas las lavanderías del lote",
       resultados,
       success: true,
       status: 200,
@@ -466,28 +443,16 @@ export const _sgteEstadoLavanderiaPorLote = async (
 export const _getLavanderiaPorLote = async (lote_id: number) => {
   try {
     const queryText = `
-<<<<<<< HEAD
-    select 
-      l.*,
-      c.nombre,
-      c.codigo
-    from lavanderia l
-    inner join color c on c.color_id = l.color_id
-    where lote_id = 1 and estado != 0`;
-=======
-SELECT 
-    l.*, 
-    c.nombre, 
-    c.codigo, 
-    (SELECT p.nombre 
-     FROM producto p 
-     WHERE p.producto_id = co.producto_id) AS producto_nombre
-FROM lavanderia l
-INNER JOIN cortes co ON co.corte_id = l.corte_id
-INNER JOIN color c ON c.color_id = l.color_id
-WHERE l.lote_id = ? AND l.estado != 0;
-`;
->>>>>>> 61f38ed26af568a464873dac0b42769322cc4229
+    SELECT
+      l.*, 
+      c.nombre, 
+      c.codigo, 
+      (SELECT p.nombre FROM producto p WHERE p.producto_id = co.producto_id) AS producto_nombre
+    FROM lavanderia l
+    INNER JOIN cortes co ON co.corte_id = l.corte_id
+    INNER JOIN color c ON c.color_id = l.color_id
+    WHERE l.lote_id = ? AND l.estado != 0;
+    `;
 
     const result = await query(queryText, [lote_id]);
 

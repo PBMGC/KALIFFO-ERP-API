@@ -130,8 +130,8 @@ const queryDeleteUsuario = `
 `;
 
 const queryCreateUsuario = `
-  INSERT INTO usuario (nombre, ap_paterno, ap_materno, fecha_nacimiento, telefono, dni, contraseña, sueldo, tienda_id, rol) 
-  VALUES (p_nombre, p_ap_paterno, p_ap_materno, p_fecha_nacimiento, p_telefono, p_dni, p_contraseña, p_sueldo, p_tienda_id, p_rol);`;
+  INSERT INTO usuario (nombre, ap_paterno, ap_materno, fecha_nacimiento, telefono, dni, sueldo, tienda_id, rol) 
+  VALUES (p_nombre, p_ap_paterno, p_ap_materno, p_fecha_nacimiento, p_telefono, p_dni, p_sueldo, p_tienda_id, p_rol);`;
 
 const initProcedureCreateUsuario = async () => {
   await createSp(
@@ -144,7 +144,6 @@ const initProcedureCreateUsuario = async () => {
       IN p_fecha_nacimiento DATE, 
       IN p_telefono VARCHAR(15), 
       IN p_dni VARCHAR(10), 
-      IN p_contraseña VARCHAR(255), 
       IN p_sueldo DECIMAL(10,2), 
       IN p_tienda_id INT, 
       IN p_rol INT
