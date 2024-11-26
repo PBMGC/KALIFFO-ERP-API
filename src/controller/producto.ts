@@ -115,12 +115,14 @@ export const getColoresProducto = async (req: Request, res: Response) => {
 export const getDetalleProducto = async (req: Request, res: Response) => {
   const { producto_id } = req.params;
   const tienda_id = req.query.tienda_id;
+  const talla = req.query.talla as string;
   const tipo = req.query.tipo as string;
 
   try {
     const response = await _getDetalleProducto(
       Number(producto_id),
       Number(tienda_id),
+      talla,
       tipo
     );
     res.status(response.status).json(response.items);

@@ -25,15 +25,25 @@ SELECT
   tienda.tienda,
   tienda.direccion,
   tienda.telefono,
-  SUM(productodetalle.stock) AS total_stock,
-  COUNT(DISTINCT usuario.tienda_id) AS total_usuarios
+  COALESCE(p.total, 0) AS total_stock, 
+  COUNT(DISTINCT usuario.usuario_id) AS total_usuarios
 FROM 
   tienda
+LEFT JOIN (
+    SELECT 
+        productodetalle.tienda_id, 
+        SUM(productodetalle.stock) AS total
+    FROM 
+        productodetalle
+    GROUP BY 
+        productodetalle.tienda_id
+) p 
+ON tienda.tienda_id = p.tienda_id
 LEFT JOIN 
-  productodetalle ON productodetalle.tienda_id = tienda.tienda_id
-LEFT JOIN 
-  usuario ON usuario.tienda_id = tienda.tienda_id
-WHERE tienda.tienda_id = t_id;
+  usuario 
+ON usuario.tienda_id = tienda.tienda_id
+WHERE 
+  tienda.tienda_id = t_id;
 `;
 
 const queryGetProductoTienda = `
