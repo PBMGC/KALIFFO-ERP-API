@@ -7,7 +7,7 @@ const roles: any = [
     password: "administrador",
     rol: "administrador",
   },
-  { username: "ventas", password: "ventas", rol: "ventas" },
+  { username: "venta", password: "venta", rol: "venta" },
   { username: "produccion", password: "produccion", rol: "produccion" },
 ];
 

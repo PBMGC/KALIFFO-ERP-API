@@ -11,8 +11,13 @@ import {
 } from "../controller/lavanderia";
 import { _createLavanderiaArray } from "../service/lavanderia";
 import { ValidateCreateLavanderiaArray } from "../validation/lavanderia";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador", "produccion"]);
+
+router.use(Validate);
 
 router.get("", getLavanderias);
 router.get("/lote/:lote_id", getLavanderiaPorLote);

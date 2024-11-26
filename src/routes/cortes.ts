@@ -11,8 +11,13 @@ import {
   updateCorte,
 } from "../controller/cortes";
 import { _sgteEstadoCortesPorLote } from "../service/cortes";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador", "produccion"]);
+
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar
