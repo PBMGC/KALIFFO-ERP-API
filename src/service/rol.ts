@@ -13,7 +13,7 @@ export const _createRol = async (rol: any) => {
 
     const result = await query(
       "INSERT INTO rol (username, password, rol, id_tipo) values (?, ?, ?, ?)",
-      [rol.username, rol.password, rol.rol,rol.id_tipo]
+      [rol.username, rol.password, rol.rol, rol.id_tipo]
     );
 
     if (result.error) {
@@ -59,17 +59,17 @@ export const _login = async (username: string, password: string) => {
     const token = jwt.sign(
       {
         rol_id: rol.rol_id,
-        id_tipo:rol.id_tipo,
+        id_tipo: rol.id_tipo,
         username: rol.username,
         rol: rol.rol,
       },
-      process.env.SECRET_KEY || "contraseña_default"
+      process.env.SECRET_KEY || "password"
     );
 
     return {
       message: `Bienvenido ${rol.username}`,
       rol: rol.rol,
-      id_tipo:rol.id_tipo,
+      id_tipo: rol.id_tipo,
       token,
       success: true,
       status: 200,

@@ -10,7 +10,7 @@ export const validateToken = (roles: string[]) => {
     const tokenCookie = req.cookies.token;
 
     if (!tokenCookie) {
-      return res.status(401).json({
+      return res.status(400).json({
         msg: "No se encontró token",
         success: false,
         status: 401,
@@ -20,7 +20,7 @@ export const validateToken = (roles: string[]) => {
     try {
       const decodedToken = jwt.verify(
         tokenCookie,
-        process.env.SECRET_KEY || "contraseña"
+        process.env.SECRET_KEY || "password"
       ) as DecodedToken;
 
       req.decodeToken = decodedToken;
