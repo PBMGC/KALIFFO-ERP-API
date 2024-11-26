@@ -176,3 +176,6 @@ export const _updateTienda = async (tienda_id: number, tienda: any) => {
   }
 };
 
+export const _generarReporte = async (res:any,tienda_id:number)=>{
+  
+}
