@@ -3,9 +3,10 @@ import connection from "../db/connection";
 const rol = `
 CREATE TABLE IF NOT EXISTS rol (
   rol_id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(255) not null,
+  username VARCHAR(255) UNIQUE not null,
   password VARCHAR(255) not null,
-  rol VARCHAR(255)
+  rol VARCHAR(255) not null,
+  id_tipo  INT 
 );`;
 
 const tienda = `

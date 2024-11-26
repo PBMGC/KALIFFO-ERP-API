@@ -16,6 +16,7 @@ import { dropProcedureTela, initProcedureTela } from "./telas";
 import {
   initiProcedureGetLoseProductosTienda,
   initiProcedureGetProductoTienda,
+  initiProcedureGetReporteTienda,
   initiProcedureGetTienda,
   initiProcedureGetTiendas,
 } from "./tienda";
@@ -60,6 +61,7 @@ export const initSp = async () => {
     await initiProcedureUpdateCompra();
     await initiProcedureUpdateCompraDetalle();
     await initiProcedureUpdateCorte();
+    await initiProcedureGetReporteTienda();
     console.log("Se crearon los sp");
   } catch (error) {
     console.error("Error al inicializar procedimientos almacenados:", error);
@@ -88,6 +90,7 @@ export const dropSp = async () => {
     await eliminarProcedimiento("SP_GetProductosTienda");
     await eliminarProcedimiento("SP_GetTiendas");
     await eliminarProcedimiento("SP_GetTienda");
+    await eliminarProcedimiento("SP_GetReporteTienda");
 
     //producto
     await eliminarProcedimiento("SP_ColoresProductos");

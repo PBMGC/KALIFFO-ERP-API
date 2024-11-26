@@ -11,6 +11,7 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 1000 * 60 * 60,
       httpOnly: true,
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
     delete response.token;
     res.status(response.status).json(response);
@@ -32,10 +33,10 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const createRol = async (req: Request, res: Response) => {
-  const { username, password, rol } = req.body;
+  const { username, password, rol, id_tipo } = req.body;
 
   try {
-    const response = await _createRol({ username, password, rol });
+    const response = await _createRol({ username, password, rol, id_tipo });
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createRol", 500);

@@ -363,11 +363,12 @@ export const _getColoresProducto = async (producto_id: number) => {
 export const _getDetalleProducto = async (
   producto_id: number,
   tienda_id: number,
+  talla:string,
   tipo: string
 ) => {
   try {
     let queryS: string;
-    let params: Array<number>;
+    let params: Array<number|string>;
 
     if (tipo === "tiendas") {
       queryS = `
@@ -382,7 +383,16 @@ export const _getDetalleProducto = async (
       queryS = `CALL SP_GetColoresProducto(?, ?);`;
       params = [producto_id, tienda_id];
     } else if (tipo === "tallas") {
-      queryS = `
+      if(talla){
+        queryS = `
+          select productodetalle.color_id,color.nombre,productodetalle.stock from productodetalle 
+          INNER JOIN productotalla on productodetalle.productoDetalle_id = productotalla.productoDetalle_id 
+          inner join color on productodetalle.color_id = color.color_id 
+          where productodetalle.producto_id = ? AND productotalla.talla=?
+        `
+        params = [producto_id,talla];
+      }else{
+        queryS = `
         SELECT talla, COUNT(*) AS cantidad 
         FROM productotalla 
         WHERE productoDetalle_id IN (
@@ -392,7 +402,8 @@ export const _getDetalleProducto = async (
         ) 
         GROUP BY talla;
       `;
-      params = [producto_id];
+        params = [producto_id];
+      }
     } else {
       throw new Error("Tipo no válido");
     }

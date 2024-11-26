@@ -6,9 +6,10 @@ const roles: any = [
     username: "administrador",
     password: "administrador",
     rol: "administrador",
+    id_tipo:null
   },
-  { username: "venta", password: "venta", rol: "venta" },
-  { username: "produccion", password: "produccion", rol: "produccion" },
+  { username: "tienda 1", password: "venta", rol: "venta",id_tipo:"1"},
+  { username: "produccion", password: "produccion", rol: "produccion",id_tipo:null},
 ];
 
 export const createRoles = async () => {
