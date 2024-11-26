@@ -118,6 +118,28 @@ export const _getAcabado = async (acabado_id: number) => {
   }
 };
 
+export const _getAcabadoLote = async (lote_id: string) => {
+  try {
+    const result = await query(
+      "select * from taller_acabados where lote_id = ?",
+      [lote_id]
+    );
+
+    return {
+      items: result.data[0] || [],
+      success: true,
+      status: 200,
+    };
+  } catch (error: any) {
+    return {
+      message: "Error al obtener el acabado.",
+      success: false,
+      error: error.message || error,
+      status: 500,
+    };
+  }
+};
+
 export const _activarAcabado = async (acabado_id: number) => {
   const queryText =
     "UPDATE taller_acabados SET estado = 1 WHERE acabado_id = ? AND estado != 1";
@@ -179,7 +201,7 @@ export const _desactivarAcabado = async (acabado_id: number) => {
 };
 
 export const _sgteEstadoAcabadosPorLote = async (
-  lote_id: number,
+  lote_id: string,
   detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {
@@ -198,6 +220,7 @@ export const _sgteEstadoAcabadosPorLote = async (
     }
 
     const resultados = [];
+    let cantidadTotal = 0;
 
     for (const detalle of detalles) {
       const acabado = acabados.find(
@@ -249,18 +272,33 @@ export const _sgteEstadoAcabadosPorLote = async (
 
         //pasar al almacen
         case 2:
-          if (detalle.cantidad_recibida === undefined) {
-            return {
+          if (!detalle.cantidad_recibida) {
+            resultados.push({
               acabado_id: detalle.acabado_id,
               message: "Campo 'cantidad_recibida' obligatorio.",
               success: false,
               status: 400,
-            };
+            });
+            break;
           }
 
+          if (detalle.cantidad_recibida > acabado.cantidad_enviada) {
+            resultados.push({
+              lavanderia_id: detalle.acabado_id,
+              message: "La cantidad recibida es mayor a la cantidad enviada",
+              success: false,
+              status: 400,
+            });
+            break;
+          }
+
+          cantidadTotal += detalle.cantidad_recibida;
+          const now = new Date();
+          const fecha = now.toLocaleDateString("en-CA");
+
           const updateAcabado2 = await query(
-            "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ? WHERE acabado_id = ?",
-            [detalle.cantidad_recibida, detalle.acabado_id]
+            "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
+            [detalle.cantidad_recibida, now, detalle.acabado_id]
           );
 
           const updateLote = await query(
@@ -306,6 +344,11 @@ export const _sgteEstadoAcabadosPorLote = async (
           break;
       }
     }
+
+    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+      cantidadTotal,
+      lote_id,
+    ]);
 
     return {
       message: "Proceso completado para todos los acabados del lote",

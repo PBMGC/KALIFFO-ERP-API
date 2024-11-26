@@ -6,8 +6,13 @@ import {
   getLoteProductos,
 } from "../controller/lotes";
 import { ValidateCreateLote } from "../validation/lote";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador", "produccion"]);
+
+router.use(Validate);
 
 //Rutas revisadas
 router.post("/create", ValidateCreateLote, createLote);

@@ -5,7 +5,6 @@ import {
   _generarReporte,
   _getUsuario,
   _getUsuarios,
-  _login,
   _updateUsuario,
 } from "../service/usuario";
 import { handleHttp } from "../util/error.handler";
@@ -44,7 +43,6 @@ export const createUsuario = async (req: Request, res: Response) => {
     handleHttp(res, "error_createUsuario");
   }
 };
-
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const rol = req.query.rol;
@@ -119,23 +117,6 @@ export const updateUsuario = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_updateUsuario", 500);
-  }
-};
-
-export const loginUsuario = async (req: Request, res: Response) => {
-  const { dni, contraseña } = req.body;
-
-  try {
-    const response = await _login(dni, contraseña);
-    res.cookie("token", response.token, {
-      maxAge: 1000 * 60 * 60,
-      httpOnly: true,
-      sameSite: "lax",
-    });
-    delete response.token;
-    res.status(response.status).json(response);
-  } catch (error) {
-    handleHttp(res, "error_loginUsusrio", 500);
   }
 };
 

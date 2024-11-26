@@ -9,6 +9,12 @@ export const ValidateCreateLote: any = [
     .not()
     .isEmpty()
     .withMessage("El campo 'tipo_tela' no debe ser vacio."),
+  check("productos")
+    .exists()
+    .withMessage("EL campo 'productos' es obligatorio.")
+    .not()
+    .isEmpty()
+    .withMessage("El campo 'productos' no debe ser vacio."),
   check("metraje")
     .exists()
     .withMessage("EL campo 'metraje' es obligatorio.")
