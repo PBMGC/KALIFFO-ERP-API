@@ -302,7 +302,7 @@ export const _sgteEstadoAcabadosPorLote = async (
           );
 
           const updateLote = await query(
-            "UPDATE lotes SET estado = 2 WHERE lote_id = ?",
+            "UPDATE lotes SET estado = 4 WHERE lote_id = ?",
             [lote_id]
           );
 

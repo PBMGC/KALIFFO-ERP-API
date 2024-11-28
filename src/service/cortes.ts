@@ -390,6 +390,11 @@ export const _sgteEstadoCortesPorLote = async (
             [detalle.cantidad_recibida, detalle.corte_id]
           );
 
+          const updateLote = await query(
+            "UPDATE lotes SET estado = 2 where lote_id = ?",
+            [lote_id]
+          );
+
           resultados.push({
             corte_id: detalle.corte_id,
             message: updateCorte2.affectedRows

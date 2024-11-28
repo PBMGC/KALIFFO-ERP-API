@@ -9,9 +9,9 @@ import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
 
-const Validate = validateToken(["administrador", "venta"]);
+// const Validate = validateToken(["administrador", "venta"]);
 
-router.use(Validate);
+// router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar
