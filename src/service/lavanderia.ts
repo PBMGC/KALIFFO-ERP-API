@@ -380,6 +380,11 @@ export const _sgteEstadoLavanderiaPorLote = async (
               ]
             );
 
+            const updateLote = await query(
+              "UPDATE lotes SET estado = 3 where lote_id = ?",
+              [lote_id]
+            );
+
             resultados.push({
               lavanderia_id: detalle.lavanderia_id,
               message: insertAcabado.affectedRows

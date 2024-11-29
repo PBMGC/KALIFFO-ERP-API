@@ -8,17 +8,13 @@ dotenv.config();
 
 export const _createUsuario = async (usuario: any) => {
   try {
-    const hashPassword = await bcrypt.hash(usuario.contraseña, 8);
-    usuario.contraseña = hashPassword;
-
-    const result = await query("call SP_CreateUsuario(?,?,?,?,?,?,?,?,?,?)", [
+    const result = await query("call SP_CreateUsuario(?,?,?,?,?,?,?,?,?)", [
       usuario.nombre,
       usuario.ap_paterno,
       usuario.ap_materno,
       usuario.fecha_nacimiento,
       usuario.telefono,
       usuario.dni,
-      usuario.contraseña,
       usuario.sueldo,
       usuario.tienda_id || null,
       usuario.rol,

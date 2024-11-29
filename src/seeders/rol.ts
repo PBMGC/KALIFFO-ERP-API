@@ -6,16 +6,21 @@ const roles: any = [
     username: "administrador",
     password: "administrador",
     rol: "administrador",
-    id_tipo:null
+    id_tipo: null,
   },
-  { username: "tienda 1", password: "venta", rol: "venta",id_tipo:"1"},
-  { username: "produccion", password: "produccion", rol: "produccion",id_tipo:null},
+  { username: "tienda 1", password: "venta", rol: "venta", id_tipo: "1" },
+  {
+    username: "produccion",
+    password: "produccion",
+    rol: "produccion",
+    id_tipo: null,
+  },
 ];
 
 export const createRoles = async () => {
   for (const rol of roles) {
     try {
-      const result = await query(`select * from rol where rol = ?`, [
+      const result = await query(`select * from rol where username = ?`, [
         rol.username,
       ]);
 

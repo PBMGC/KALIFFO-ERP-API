@@ -11,9 +11,9 @@ import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
 
-const Validate = validateToken(["administrador", "produccion"]);
+// const Validate = validateToken(["administrador", "produccion"]);
 
-router.use(Validate);
+// router.use(Validate);
 
 router.get("", getAcabados);
 router.get("/lote/:lote_id", getAcabadoLote);
