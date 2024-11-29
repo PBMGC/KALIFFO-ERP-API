@@ -126,7 +126,7 @@ export const _getAcabadoLote = async (lote_id: string) => {
     );
 
     return {
-      items: result.data[0] || [],
+      items: result.data || [],
       success: true,
       status: 200,
     };
