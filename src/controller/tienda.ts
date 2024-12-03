@@ -4,6 +4,7 @@ import {
   _activarTienda,
   _createTienda,
   _desactivarTienda,
+  _generarReporte,
   _getTienda,
   _getTiendas,
   _updateTienda,
@@ -81,5 +82,15 @@ export const updateTienda = async (req: Request, res: Response) => {
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_updateTienda", 500);
+  }
+};
+
+export const generateReporte = async (req: Request, res: Response) => {
+  const { tienda_id } = req.params;
+
+  try {
+    const response = await _generarReporte(res, Number(tienda_id));
+  } catch (error) {
+    handleHttp(res, "error_generarReporte", 500);
   }
 };

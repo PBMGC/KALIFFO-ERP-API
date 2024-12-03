@@ -525,6 +525,8 @@ export const _imprimirCodigo = async (res: any) => {
     const { createCanvas } = require("canvas");
     const PDFDocument = require("pdfkit-table");
 
+    
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');
 

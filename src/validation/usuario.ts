@@ -52,13 +52,6 @@ export const ValidateCreateUsuario: any = [
     .isLength({ min: 9, max: 9 })
     .withMessage("El campo 'telefono' debe tener 9 digitos."),
 
-  check("contraseña")
-    .exists()
-    .withMessage("EL campo 'contraseña' es obligatorio.")
-    .not()
-    .isEmpty()
-    .withMessage("El campo 'contraseña' no debe ser vacio."),
-
   check("rol").exists().withMessage("EL campo 'rol' es obligatorio."),
 
   check("tienda_id")

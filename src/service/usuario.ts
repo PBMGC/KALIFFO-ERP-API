@@ -393,8 +393,8 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
 
     const nuevaTabla = async (tablaData: any, posY: number) => {
       const tablaAltura = await doc.table(tablaData, {
-        width: 450,
-        x: 70,
+        width: 500,
+        x: 50,
         y: posY,
         prepareRow: (
           row: string[],
@@ -454,6 +454,51 @@ export const _generarReporte = async (res: any, usuario_id: number) => {
       status: 500,
     };
   }
+};
+
+export const _login = async (dni: string, contraseña: string) => {
+  try {
+    const resultUsuario = (await query("select * from usuario where dni = ?", [
+      dni,
+    ])) as any;
+
+    const usuario = resultUsuario.data[0];
+
+    if (!usuario || !(await bcrypt.compare(contraseña, usuario.contraseña))) {
+      return {
+        message: "DNI o contraseña incorrectos",
+        success: false,
+        status: 400,
+      };
+    }
+
+    const token = jwt.sign(
+      {
+        usuario_id: usuario.usuario_id,
+        dni: usuario.dni,
+      },
+      process.env.SECRET_KEY || "contraseña_default"
+    );
+
+    return {
+      message: `Bienvenido ${usuario.nombre}`,
+      token,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: "error _login",
+      success: false,
+      status: 500,
+    };
+  }
+};
+
+export const signUp = () => {
+  try {
+  } catch (error) {}
 };
 
 // export const _horaEntrada = async (usuario_id: number) => {
