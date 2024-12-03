@@ -126,7 +126,7 @@ export const _getAcabadoLote = async (lote_id: string) => {
     );
 
     return {
-      items: result.data[0] || [],
+      items: result.data || [],
       success: true,
       status: 200,
     };
@@ -272,6 +272,7 @@ export const _sgteEstadoAcabadosPorLote = async (
 
         //pasar al almacen
         case 2:
+          
           if (!detalle.cantidad_recibida) {
             resultados.push({
               acabado_id: detalle.acabado_id,
