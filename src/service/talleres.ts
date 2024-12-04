@@ -1,4 +1,5 @@
 import { query } from "../util/query";
+import { _createProductoCompleto } from "./producto";
 
 export const _createAcabado = async (acabado: any) => {
   const {
@@ -121,7 +122,7 @@ export const _getAcabado = async (acabado_id: number) => {
 export const _getAcabadoLote = async (lote_id: string) => {
   try {
     const result = await query(
-      "select * from taller_acabados where lote_id = ?",
+      "select ta.acabado_id,co.codigo,ta.talla,ta.cantidad_enviada,ta.cantidad_recibida,ta.estado,ta.fecha_inicio,ta.fecha_final from taller_acabados ta INNER JOIN color co on ta.color_id=co.color_id where lote_id = ?",
       [lote_id]
     );
 
@@ -202,6 +203,8 @@ export const _desactivarAcabado = async (acabado_id: number) => {
 
 export const _sgteEstadoAcabadosPorLote = async (
   lote_id: string,
+  tienda_id:number,
+  almacen_id:number,
   detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {
@@ -272,7 +275,6 @@ export const _sgteEstadoAcabadosPorLote = async (
 
         //pasar al almacen
         case 2:
-          
           if (!detalle.cantidad_recibida) {
             resultados.push({
               acabado_id: detalle.acabado_id,
@@ -308,13 +310,57 @@ export const _sgteEstadoAcabadosPorLote = async (
           );
 
           if (updateAcabado2.affectedRows > 0 && updateLote.affectedRows > 0) {
-            resultados.push({
-              acabado_id: detalle.acabado_id,
-              message: "El acabado ha pasado al estado 3 (finalizado)",
-              nuevoEstado: 3,
-              success: true,
-              status: 200,
-            });
+            const datos = await query(
+              `
+              SELECT 
+                    c.producto_id,
+                    ta.color_id,
+                    ta.cantidad_recibida as stock,
+                    ta.talla
+                FROM 
+                    taller_acabados ta
+                INNER JOIN 
+                    lavanderia l ON ta.lavanderia_id = l.lavanderia_id
+                INNER JOIN 
+                    cortes c ON l.corte_id = c.corte_id
+                WHERE 
+                    ta.lote_id = ?
+              `,
+              [lote_id]
+            );
+
+            const productosFinales = datos.data.reduce((acc:any,producto:any)=>{
+              const {producto_id,...detalle} = producto;
+              const existe = acc.find(
+                (item:any)=> item.producto_id===producto_id
+              );
+              if(existe){
+                existe.detalle.push(detalle);
+              }else{
+                acc.push({producto_id,detalle:[detalle]})
+              }
+              return acc;
+            },[])
+
+            try {
+              const response = await _createProductoCompleto(
+                tienda_id,
+                almacen_id,
+                lote_id,
+                productosFinales.producto_id,
+                productosFinales
+              )
+            } catch (error) {
+              console.log(error)
+            }
+
+            // resultados.push({
+            //   acabado_id: detalle.acabado_id,
+            //   message: "El acabado ha pasado al estado 3 (finalizado)",
+            //   nuevoEstado: 3,
+            //   success: true,
+            //   status: 200,
+            // });
           } else {
             resultados.push({
               acabado_id: detalle.acabado_id,

@@ -34,9 +34,11 @@ export const _createProducto = async (producto: any) => {
 };
 
 export const _createProductoCompleto = async (
-  tienda_id: number,
+  lote_id:number,
   producto_id: number,
-  detalles: any
+  detalles: any,
+  tienda_id?: number,
+  almacen_id?:number
 ) => {
   let errors: any[] = [];
 
@@ -73,6 +75,8 @@ export const _createProductoCompleto = async (
         talla: detalle.talla,
         codigo,
       });
+
+      
     } catch (error: any) {
       console.log(error);
 
