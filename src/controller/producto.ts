@@ -35,13 +35,16 @@ export const createProducto = async (req: Request, res: Response) => {
 
 export const createProductoCompleto = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id as string;
-  const { producto_id, detalles } = req.body;
+  const almacen_id = req.query.almacen_id as string;
+  const { producto_id, lote_id, detalles } = req.body;
 
   try {
     const response = await _createProductoCompleto(
-      Number(tienda_id),
+      tienda_id,
+      almacen_id,
       producto_id,
-      detalles
+      detalles,
+      lote_id
     );
     res.status(response.status).json(response);
   } catch (error) {

@@ -11,19 +11,23 @@ export const createCodigoProductoTalla = async (
 
   const producto = productoResult.data[0];
 
-  const inicialProducto = producto.nombre.charAt(0).toLowerCase();
+  const arrayIniciales = producto.nombre.split(" ");
+  let iniciales = "";
+
+  arrayIniciales.forEach((inicial: any) => {
+    iniciales += inicial.charAt(0).toLowerCase();
+  });
 
   const countResult = await query(
     `SELECT COUNT(*) as total FROM producto WHERE nombre LIKE ?`,
-    [`${inicialProducto}%`]
+    [`${iniciales}%`]
   );
 
   const cantidadProductosConInicial = countResult.data[0].total;
 
-  //iniciales + talla
-  const codigo = `${inicialProducto}${
-    cantidadProductosConInicial + 1
-  }-${producto_id}${detalle.color_id}-${detalle.talla}`;
+  const codigo = `${iniciales}${cantidadProductosConInicial + 1}--${
+    detalle.talla
+  }`;
 
   return codigo;
 };

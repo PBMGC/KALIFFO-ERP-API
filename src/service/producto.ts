@@ -34,9 +34,11 @@ export const _createProducto = async (producto: any) => {
 };
 
 export const _createProductoCompleto = async (
-  tienda_id: number,
+  tienda_id: string | null = null,
+  almacen_id: string | null = null,
   producto_id: number,
-  detalles: any
+  detalles: any,
+  lote_id: string
 ) => {
   let errors: any[] = [];
 
@@ -46,8 +48,9 @@ export const _createProductoCompleto = async (
         producto_id: producto_id,
         color_id: detalle.color_id,
         tienda_id: tienda_id,
+        almacen_id: almacen_id,
         stock: detalle.stock,
-        lote_id: detalle.lote_id,
+        lote_id: lote_id,
       });
 
       const productoDetalle_id = resultDetalle.insertId;
@@ -123,19 +126,21 @@ export const _createProductoTalla = async (productoTalla: any) => {
 };
 
 export const _createProductoDetalle = async (productoDetalle: any) => {
-  const { producto_id, color_id, tienda_id, stock, lote_id } = productoDetalle;
+  const { producto_id, color_id, tienda_id, almacen_id, stock, lote_id } =
+    productoDetalle;
 
   const queryText = `
-        INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock, lote_id )
-        VALUES (?, ?, ?, ?, ?);
+        INSERT INTO productoDetalle (producto_id, color_id, stock, lote_id, tienda_id, almacen_id )
+        VALUES (?, ?, ?, ?, ?, ?);
   `;
 
   const result = await query(queryText, [
     producto_id,
     color_id,
-    tienda_id,
     stock,
     lote_id,
+    tienda_id,
+    almacen_id,
   ]);
 
   if (!result.success) {
@@ -526,8 +531,6 @@ export const _imprimirCodigo = async (res: any) => {
     const JsBarcode = require("jsbarcode");
     const { createCanvas } = require("canvas");
     const PDFDocument = require("pdfkit-table");
-
-    
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');

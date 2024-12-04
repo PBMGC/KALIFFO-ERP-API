@@ -2,38 +2,8 @@ import { Request, Response } from "express";
 import { handleHttp } from "../util/error.handler";
 import { _createUsuario, _login } from "../service/usuario";
 
-<<<<<<< HEAD
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
-
-  console.log(username);
-  console.log(password);
-=======
-export const createUsuario = async (req: Request, res: Response) => {
-  const {
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    telefono,
-    sueldo,
-    tienda_id,
-    rol,
-  } = req.body;
-
-  const newUsuario: any = {
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    telefono,
-    sueldo,
-    tienda_id,
-    rol,
-  };
->>>>>>> f719020c89cb94ece39d97c1a83a46a338cc92ec
 
   try {
     const response = await _login(username, password);
