@@ -15,9 +15,8 @@ import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
 
-// const Validate = validateToken(["administrador", "produccion"]);
-
-// router.use(Validate);
+const Validate = validateToken(["administrador", "produccion"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar

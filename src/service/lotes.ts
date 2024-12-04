@@ -1,7 +1,7 @@
 import { Lote } from "../interface/lote";
 import { query } from "../util/query";
 
-export const _createLote = async (lote: Partial<Lote>) => {
+export const _createLote = async (lote: Lote) => {
   try {
     const result = await query(
       `SELECT codigo_lote FROM lotes ORDER BY lote_id DESC LIMIT 1`,

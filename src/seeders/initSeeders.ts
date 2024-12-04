@@ -1,18 +1,19 @@
+import { createAlmacenes } from "./almacen";
 import { createColores } from "./color";
+import { createLotes } from "./lote";
 import { createProducto } from "./producto";
-import { createRoles } from "./rol";
 import { createTelas } from "./tela";
 import { createTienda } from "./tienda";
-import { createUsuario } from "./usuario";
+import { createTrabajadores } from "./trabajador";
+import { createUsuarios } from "./usuario";
 
 export const initSeeders = async () => {
   await createTienda();
-  await createUsuario();
+  await createTrabajadores();
   await createColores();
+  await createAlmacenes();
   await createProducto();
-  await createRoles();
-  // await createVenta();
+  await createUsuarios();
   await createTelas();
-  // await createLotes();
-  // await createLavanderia();
+  await createLotes();
 };

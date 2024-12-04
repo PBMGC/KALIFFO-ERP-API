@@ -1,134 +1,52 @@
 import { Request, Response } from "express";
-import {
-  _createUsuario,
-  _deleteUsuario,
-  _generarReporte,
-  _getUsuario,
-  _getUsuarios,
-  _updateUsuario,
-} from "../service/usuario";
 import { handleHttp } from "../util/error.handler";
+import { _createUsuario, _login } from "../service/usuario";
 
-export const createUsuario = async (req: Request, res: Response) => {
-  const {
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    telefono,
-    sueldo,
-    tienda_id,
-    rol,
-  } = req.body;
-
-  const newUsuario: any = {
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    telefono,
-    sueldo,
-    tienda_id,
-    rol,
-  };
+export const login = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
 
   try {
-    const response = await _createUsuario(newUsuario);
+    const response = await _login(username, password);
+    res.cookie("token", response.token, {
+      maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+    delete response.token;
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_createUsuario");
+    handleHttp(res, "error_login", 500);
   }
 };
 
-export const getUsuarios = async (req: Request, res: Response) => {
-  const rol = req.query.rol;
-  const tienda_id = req.query.tienda_id;
-  const antiTienda_id = req.query.antiTienda_id as string;
-
+export const logout = async (req: Request, res: Response) => {
   try {
-    const response = await _getUsuarios(
-      Number(rol),
-      Number(tienda_id),
-      Number(antiTienda_id)
-    );
-    res.status(response.status).json(response.items);
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    handleHttp(res, "error_getUsuarios", 500);
+    handleHttp(res, "error_logout", 500);
   }
 };
 
-export const getUsuario = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
+export const createRol = async (req: Request, res: Response) => {
+  const { username, password, rol, id_tipo } = req.body;
 
   try {
-    const response = await _getUsuario(usuario_id);
-    res
-      .status(response.status)
-      .json(response.items ? response.items : response);
-  } catch (error) {
-    handleHttp(res, "Error getUsuario", 500);
-  }
-};
-
-export const deleteUsuario = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
-
-  try {
-    const response = await _deleteUsuario(usuario_id);
+    const response = await _createUsuario({ username, password, rol, id_tipo });
     res.status(response.status).json(response);
   } catch (error) {
-    handleHttp(res, "error_deleteUsuario", 500);
+    handleHttp(res, "error_createRol", 500);
   }
 };
 
-export const updateUsuario = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
-  const {
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    sueldo,
-    telefono,
-    tienda_id,
-    rol,
-  } = req.body;
-
-  const updateUsuario: any = {
-    usuario_id: Number(usuario_id),
-    nombre,
-    ap_paterno,
-    ap_materno,
-    fecha_nacimiento,
-    dni,
-    sueldo,
-    telefono,
-    tienda_id,
-    rol,
-  };
-
+export const validation = async (req: Request, res: Response) => {
   try {
-    const response = await _updateUsuario(updateUsuario);
-    res.status(response.status).json(response);
+    res.status(200).json("Si estas logeado");
   } catch (error) {
-    handleHttp(res, "error_updateUsuario", 500);
-  }
-};
-
-export const signUp = async (req: Request, res: Response) => {
-  try {
-  } catch (error) {}
-};
-
-export const generateReporte = async (req: Request, res: Response) => {
-  const { usuario_id } = req.params;
-
-  try {
-    const response = await _generarReporte(res, Number(usuario_id));
-  } catch (error) {
-    handleHttp(res, "error_generarReporte", 500);
+    handleHttp(res, "error_validation", 500);
   }
 };

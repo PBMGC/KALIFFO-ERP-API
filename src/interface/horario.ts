@@ -3,5 +3,5 @@ export interface Horario {
   hora_entrada: string;
   hora_salida?: string | null;
   fecha: string;
-  usuario_id: number;
+  trabajador_id: number;
 }

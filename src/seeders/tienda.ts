@@ -3,11 +3,6 @@ import { query } from "../util/query";
 
 const tiendas: any = [
   {
-    tienda: "Almacen",
-    direccion: "Av. Siempre Viva 12, Lima",
-    telefono: "987654322",
-  },
-  {
     tienda: "Tienda 1",
     direccion: "Av. Siempre Viva 123, Lima",
     telefono: "987654321",

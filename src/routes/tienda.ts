@@ -9,8 +9,12 @@ import {
   updateTienda,
 } from "../controller/tienda";
 import { ValidateCreateTienda } from "../validation/tienda";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar

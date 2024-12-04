@@ -9,6 +9,7 @@ import { initSeeders } from "../seeders/initSeeders";
 import { initTriggers } from "../db/triggers/initTrigger";
 import { initSp } from "../db/sp/initSp";
 import { exec } from "child_process";
+import { ts } from "../util/tr";
 
 class Serve {
   app: express.Application;
@@ -55,6 +56,7 @@ class Serve {
 
   async db() {
     try {
+      // ts();
       await initBD();
       await initTriggers();
       await initSeeders();
@@ -76,3 +78,9 @@ export default Serve;
 
 //createProductoCompleto
 //movimiento
+
+//codigo
+
+//movimiento
+
+//ventas

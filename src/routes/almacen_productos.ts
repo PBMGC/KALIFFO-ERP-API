@@ -3,7 +3,7 @@ import { createAlmacen_Productos, getAlmacenProductos } from "../controller/alma
 
 const router = Router();
 
-//update,eliminar,getproductos y trigger
+//
 router.get("/",getAlmacenProductos)
 router.post("/create",createAlmacen_Productos)
 

@@ -1,14 +1,14 @@
 import { query } from "../util/query";
 
 export const _createIncidencia = async (incidencia: any) => {
-  const { tipo, descripcion, usuario_id } = incidencia;
+  const { tipo, descripcion, trabajador_id } = incidencia;
   incidencia.fecha_creacion = new Date();
 
   try {
     const result = await query("call SP_CreateIncidencia(?, ?, ?, ?)", [
       tipo,
       descripcion,
-      usuario_id,
+      trabajador_id,
       incidencia.fecha_creacion,
     ]);
 

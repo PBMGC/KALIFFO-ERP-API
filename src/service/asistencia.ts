@@ -1,17 +1,18 @@
+import { Horario } from "../interface/horario";
 import { query } from "../util/query";
 
-export const _createAsistencia = async (horario: any) => {
-  const { hora_entrada, hora_salida, fecha, usuario_id } = horario;
+export const _createAsistencia = async (horario: Horario) => {
+  const { hora_entrada, hora_salida, fecha, trabajador_id } = horario;
 
   const queryText = `
-    INSERT INTO horario (hora_entrada, hora_salida, fecha, usuario_id) 
+    INSERT INTO horario (hora_entrada, hora_salida, fecha, trabajador_id) 
     VALUES (?, ?, ?, ?)`;
 
   const result = await query(queryText, [
     hora_entrada,
     hora_salida,
     fecha,
-    usuario_id,
+    trabajador_id,
   ]);
 
   if (!result.success) {

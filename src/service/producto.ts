@@ -34,11 +34,11 @@ export const _createProducto = async (producto: any) => {
 };
 
 export const _createProductoCompleto = async (
-  lote_id:number,
+  tienda_id: string | null = null,
+  almacen_id: string | null = null,
   producto_id: number,
   detalles: any,
-  tienda_id?: number,
-  almacen_id?:number
+  lote_id: string
 ) => {
   let errors: any[] = [];
 
@@ -48,7 +48,9 @@ export const _createProductoCompleto = async (
         producto_id: producto_id,
         color_id: detalle.color_id,
         tienda_id: tienda_id,
+        almacen_id: almacen_id,
         stock: detalle.stock,
+        lote_id: lote_id,
       });
 
       const productoDetalle_id = resultDetalle.insertId;
@@ -78,7 +80,7 @@ export const _createProductoCompleto = async (
 
       
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
 
       errors.push({
         message: `Error al procesar el producto_id ${producto_id} con color_id ${detalle.color_id}`,
@@ -109,7 +111,7 @@ export const _createProductoTalla = async (productoTalla: any) => {
   const result = await query(queryText, [productoDetalle_id, talla, codigo]);
 
   if (!result.success) {
-    console.error("error");
+    // console.error("error");
     return {
       message: "error _createProductoTalla",
       success: false,
@@ -126,18 +128,21 @@ export const _createProductoTalla = async (productoTalla: any) => {
 };
 
 export const _createProductoDetalle = async (productoDetalle: any) => {
-  const { producto_id, color_id, tienda_id, stock } = productoDetalle;
+  const { producto_id, color_id, tienda_id, almacen_id, stock, lote_id } =
+    productoDetalle;
 
   const queryText = `
-        INSERT INTO productoDetalle (producto_id, color_id, tienda_id, stock)
-        VALUES (?, ?, ?, ?);
+        INSERT INTO productoDetalle (producto_id, color_id, stock, lote_id, tienda_id, almacen_id )
+        VALUES (?, ?, ?, ?, ?, ?);
   `;
 
   const result = await query(queryText, [
     producto_id,
     color_id,
-    tienda_id,
     stock,
+    lote_id,
+    tienda_id,
+    almacen_id,
   ]);
 
   if (!result.success) {
@@ -367,12 +372,12 @@ export const _getColoresProducto = async (producto_id: number) => {
 export const _getDetalleProducto = async (
   producto_id: number,
   tienda_id: number,
-  talla:string,
+  talla: string,
   tipo: string
 ) => {
   try {
     let queryS: string;
-    let params: Array<number|string>;
+    let params: Array<number | string>;
 
     if (tipo === "tiendas") {
       queryS = `
@@ -387,15 +392,15 @@ export const _getDetalleProducto = async (
       queryS = `CALL SP_GetColoresProducto(?, ?);`;
       params = [producto_id, tienda_id];
     } else if (tipo === "tallas") {
-      if(talla){
+      if (talla) {
         queryS = `
           select productodetalle.color_id,color.nombre,productodetalle.stock from productodetalle 
           INNER JOIN productotalla on productodetalle.productoDetalle_id = productotalla.productoDetalle_id 
           inner join color on productodetalle.color_id = color.color_id 
           where productodetalle.producto_id = ? AND productotalla.talla=?
-        `
-        params = [producto_id,talla];
-      }else{
+        `;
+        params = [producto_id, talla];
+      } else {
         queryS = `
         SELECT talla, COUNT(*) AS cantidad 
         FROM productotalla 
@@ -528,8 +533,6 @@ export const _imprimirCodigo = async (res: any) => {
     const JsBarcode = require("jsbarcode");
     const { createCanvas } = require("canvas");
     const PDFDocument = require("pdfkit-table");
-
-    
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');

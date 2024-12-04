@@ -203,8 +203,8 @@ export const _desactivarAcabado = async (acabado_id: number) => {
 
 export const _sgteEstadoAcabadosPorLote = async (
   lote_id: string,
-  tienda_id:number,
-  almacen_id:number,
+  tienda_id:string,
+  almacen_id:string,
   detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {
@@ -346,9 +346,9 @@ export const _sgteEstadoAcabadosPorLote = async (
               const response = await _createProductoCompleto(
                 tienda_id,
                 almacen_id,
-                lote_id,
                 productosFinales.producto_id,
-                productosFinales
+                productosFinales,
+                lote_id,
               )
             } catch (error) {
               console.log(error)

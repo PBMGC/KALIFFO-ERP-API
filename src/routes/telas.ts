@@ -8,8 +8,12 @@ import {
   getTipos,
   updateTela,
 } from "../controller/telas";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador"]);
+router.use(Validate);
 
 //Rutas revisadas
 

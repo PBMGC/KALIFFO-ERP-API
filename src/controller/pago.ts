@@ -48,14 +48,14 @@ export const createPago = async (req: Request, res: Response) => {
 
 export const updatePago = async (req: Request, res: Response) => {
   const { pago_id } = req.params;
-  const { montoPagado, montoFaltante, fecha, usuario_id } = req.body;
+  const { montoPagado, montoFaltante, fecha, trabajador_id } = req.body;
 
   try {
     const response = await _updatePago(Number(pago_id), {
       montoPagado,
       montoFaltante,
       fecha,
-      usuario_id,
+      trabajador_id,
     });
     res.status(response.status).json(response);
   } catch (error) {

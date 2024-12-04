@@ -101,7 +101,7 @@ export const sgteEstadoAcabado = async (req: Request, res: Response) => {
   const { detalles } = req.body;
 
   try {
-    const response = await _sgteEstadoAcabadosPorLote(lote_id,Number(tienda_id),Number(almacen_id) ,detalles);
+    const response = await _sgteEstadoAcabadosPorLote(lote_id,tienda_id,almacen_id ,detalles);
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_sgteEstadoAcabado", 500);
