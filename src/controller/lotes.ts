@@ -10,7 +10,7 @@ import { Lote } from "../interface/lote";
 
 export const createLote = async (req: Request, res: Response) => {
   const { tipo_tela, metraje, productos } = req.body;
-  const lote: Partial<Lote> = {
+  const lote: Lote = {
     tipo_tela,
     metraje,
     productos,

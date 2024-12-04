@@ -3,5 +3,5 @@ export interface Incidencia {
   tipo: number;
   descripcion: string;
   fecha_creacion: string;
-  usuario_id: number;
+  trabajador_id: number;
 }

@@ -13,8 +13,12 @@ import {
   updateProducto,
 } from "../controller/producto";
 import { ValidateCreateProducto } from "../validation/producto";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador", "venta"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar

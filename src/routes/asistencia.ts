@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAsistencias, horasTrabajadas } from "../controller/asistencia";
+import { validateToken } from "../middleware/validateToken";
 // import {
 //   deleteAsistencia,
 //   finalAsitencia,
@@ -8,6 +9,9 @@ import { getAsistencias, horasTrabajadas } from "../controller/asistencia";
 // } from "../controller/usuario";
 
 const router = Router();
+
+const Validate = validateToken(["administrador"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar

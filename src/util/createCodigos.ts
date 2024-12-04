@@ -20,6 +20,7 @@ export const createCodigoProductoTalla = async (
 
   const cantidadProductosConInicial = countResult.data[0].total;
 
+  //iniciales + talla
   const codigo = `${inicialProducto}${
     cantidadProductosConInicial + 1
   }-${producto_id}${detalle.color_id}-${detalle.talla}`;

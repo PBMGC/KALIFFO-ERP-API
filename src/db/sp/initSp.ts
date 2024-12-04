@@ -22,19 +22,21 @@ import {
 } from "./tienda";
 
 import dotenv from "dotenv";
-import { dropProcedureUsuario, initProcedureUsuario } from "./usuario";
 import { dropProcedureColor, initProcedureColor } from "./color";
 import { dropProcedureIncidencia, initProcedureIncidencia } from "./incidencia";
-import { dropProcedureAlmacenProductos, initProcedureAlmacenProductos } from "./almacen_productos";
+import {
+  dropProcedureAlmacenProductos,
+  initProcedureAlmacenProductos,
+} from "./almacen_productos";
+import { dropProcedureTrabajador, initProcedureTrabajador } from "./trabajador";
 
 dotenv.config();
 
 export const initSp = async () => {
   try {
     await dropSp();
-
-    //usuario
-    await initProcedureUsuario();
+    //trabajador
+    await initProcedureTrabajador();
 
     //color
     await initProcedureColor();
@@ -45,8 +47,8 @@ export const initSp = async () => {
     //tela
     await initProcedureTela();
 
-    //almacen Productos 
-    await initProcedureAlmacenProductos(); 
+    //almacen Productos
+    await initProcedureAlmacenProductos();
 
     await initProcedureColoresProductos();
     await initProcedureDeleteHorario();
@@ -71,7 +73,7 @@ export const initSp = async () => {
 export const dropSp = async () => {
   try {
     //usuario
-    await dropProcedureUsuario();
+    await dropProcedureTrabajador();
 
     //color
     await dropProcedureColor();

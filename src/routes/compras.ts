@@ -8,19 +8,23 @@ import {
   getProductos,
   updateCompra,
 } from "../controller/compras";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar
 router.get("", getCompras);
 router.get("/detalle/:compra_id", getComprasDetalle);
-router.get("/empresas",getEmpresas);
-router.get("/productos",getProductos)
+router.get("/empresas", getEmpresas);
+router.get("/productos", getProductos);
 
 router.put("/update/:compra_id", updateCompra);
 
-router.delete("/delete/:compra_id",eliminarCompra)
+router.delete("/delete/:compra_id", eliminarCompra);
 
 router.post("/create", createCompra);
 

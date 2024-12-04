@@ -15,9 +15,8 @@ import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
 
-// const Validate = validateToken(["administrador", "produccion"]);
-
-// router.use(Validate);
+const Validate = validateToken(["administrador", "produccion"]);
+router.use(Validate);
 
 router.get("", getLavanderias);
 router.get("/lote/:lote_id", getLavanderiaPorLote);
@@ -26,7 +25,7 @@ router.get("/:lavanderia_id", getLavanderia);
 router.post("/create", createLavanderia);
 router.post(
   "/create/array/:lote_id",
-  ValidateCreateLavanderiaArray,
+  // ValidateCreateLavanderiaArray,
   createLavanderiaArray
 );
 

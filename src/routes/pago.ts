@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { deletePagos, getPagos } from "../controller/pago";
+import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
+
+const Validate = validateToken(["administrador"]);
+router.use(Validate);
 
 //Rutas revisadas
 //Rutas sin revisar

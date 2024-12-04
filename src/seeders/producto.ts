@@ -178,7 +178,7 @@ export const createProducto = async () => {
     }
   }
 
-  await createProductoDetalle();
+  // await createProductoDetalle();
 };
 
 export const createProductoDetalle = async () => {

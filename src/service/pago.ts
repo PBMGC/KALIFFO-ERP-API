@@ -2,12 +2,12 @@ import { query } from "../util/query";
 
 export const _createPago = async (pago: any) => {
   try {
-    const { usuario_id, montoPagado, montoFaltante, fecha } = pago;
+    const { trabajador_id, montoPagado, montoFaltante, fecha } = pago;
     const sql = `
-      INSERT INTO pago (montoPagado, montoFaltante, fecha, usuario_id)
+      INSERT INTO pago (montoPagado, montoFaltante, fecha, trabajador_id)
       VALUES (?, ?, ?, ?);
     `;
-    await query(sql, [montoFaltante, montoPagado, fecha, usuario_id]);
+    await query(sql, [montoFaltante, montoPagado, fecha, trabajador_id]);
 
     return {
       message: "Pago creado exitosamente",
@@ -24,16 +24,16 @@ export const _createPago = async (pago: any) => {
   }
 };
 
-export const _getPagos = async (usuario_id: number) => {
+export const _getPagos = async (trabajador_id: number) => {
   try {
     const sql = `
-      SELECT * FROM pago WHERE usuario_id = ?;
+      SELECT * FROM pago WHERE trabajador_id = ?;
     `;
-    const result = await query(sql, [usuario_id]);
-    
+    const result = await query(sql, [trabajador_id]);
+
     const dataPagos = result.data.map((pago: any) => ({
       ...pago,
-      fecha: new Date(pago.fecha).toISOString().split('T')[0] // Formato YYYY-MM-DD
+      fecha: new Date(pago.fecha).toISOString().split("T")[0], // Formato YYYY-MM-DD
     }));
 
     return {
@@ -79,11 +79,11 @@ export const _updatePago = async (
     montoPagado?: number;
     montoFaltante?: number;
     fecha?: string;
-    usuario_id: string;
+    trabajador_id: string;
   }
 ) => {
   try {
-    const { montoPagado, montoFaltante, fecha, usuario_id } = pago;
+    const { montoPagado, montoFaltante, fecha, trabajador_id } = pago;
 
     const camposActualizar: string[] = [];
     const valores: any[] = [];
@@ -103,9 +103,9 @@ export const _updatePago = async (
       valores.push(fecha);
     }
 
-    if (usuario_id) {
-      camposActualizar.push("usuario_id = ?");
-      valores.push(usuario_id);
+    if (trabajador_id) {
+      camposActualizar.push("trabajador_id = ?");
+      valores.push(trabajador_id);
     }
 
     if (camposActualizar.length === 0) {

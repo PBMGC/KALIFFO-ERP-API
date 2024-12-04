@@ -14,11 +14,9 @@ const queryDeleteIncidencia = `
 `;
 
 const queryGetIncidencias = `
-      IF p_usuario_id IS NOT NULL THEN
-        -- Si el usuario_id es proporcionado, filtra por usuario_id
-        SELECT * FROM incidencia WHERE usuario_id = p_usuario_id;
+      IF p_trabajador_id IS NOT NULL THEN
+        SELECT * FROM incidencia WHERE trabajador_id = p_trabajador_id;
     ELSE
-        -- Si usuario_id es NULL, retorna todas las incidencias
         SELECT * FROM incidencia;
     END IF;
 `;
@@ -28,15 +26,15 @@ const queryGetIncidencia = `
 `;
 
 const queryCreateIncidencia = `
-    INSERT INTO incidencia (tipo, descripcion, usuario_id, fecha_creacion)
-    VALUES (p_tipo, p_descripcion, p_usuario_id, p_fecha_creacion);
+    INSERT INTO incidencia (tipo, descripcion, trabajador_id, fecha_creacion)
+    VALUES (p_tipo, p_descripcion, p_trabajador_id, p_fecha_creacion);
 `;
 
 const initProcedureCreateIncidencia = async () => {
   await createSp(
     "SP_CreateIncidencia",
     queryCreateIncidencia,
-    "IN p_tipo INT, IN p_descripcion TEXT, IN p_usuario_id INT,  IN p_fecha_creacion DATETIME"
+    "IN p_tipo INT, IN p_descripcion TEXT, IN p_trabajador_id INT,  IN p_fecha_creacion DATETIME"
   );
 };
 
@@ -52,7 +50,7 @@ const initProcedureGetIncidencias = async () => {
   await createSp(
     "SP_GetIncidencias",
     queryGetIncidencias,
-    "IN p_usuario_id INT"
+    "IN p_trabajador_id INT"
   );
 };
 
