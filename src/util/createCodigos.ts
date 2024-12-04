@@ -5,43 +5,34 @@ export const createCodigoProductoTalla = async (
   detalle: any
 ) => {
   const productoResult = await query(
-    `select * from producto where producto_id = ?`,
+    `SELECT * FROM producto WHERE producto_id = ?`,
     [producto_id]
   );
 
   const producto = productoResult.data[0];
 
+  if (!producto) {
+    throw new Error("Producto no encontrado");
+  }
+
   const arrayIniciales = producto.nombre.split(" ");
   let iniciales = "";
 
-  arrayIniciales.forEach((inicial: any) => {
-    iniciales += inicial.charAt(0).toLowerCase();
+  arrayIniciales.forEach((palabra: string) => {
+    iniciales += palabra.charAt(0).toLowerCase();
   });
 
-  const countResult = await query(
-    `SELECT COUNT(*) as total FROM producto WHERE nombre LIKE ?`,
+  const existingCodesResult = await query(
+    `SELECT COUNT(*) as count
+    FROM productoTalla 
+    WHERE codigo LIKE ?;
+    `,
     [`${iniciales}%`]
   );
 
-  const cantidadProductosConInicial = countResult.data[0].total;
+  const existingCodes = existingCodesResult.data[0].count;
 
-  const codigo = `${iniciales}${cantidadProductosConInicial + 1}--${
-    detalle.talla
-  }`;
-
-  return codigo;
-};
-
-export const createCodigoVenta = async (
-  tipoComprobante: number,
-  tienda_id: number
-) => {
-  const result = await query(`SELECT COUNT(*) as numero FROM venta;`);
-
-  let codigo =
-    tipoComprobante === 1
-      ? `BT${tienda_id}${result.data[0].numero + 1}`
-      : `FT${tienda_id}${result.data[0].numero + 1}`;
+  const codigo = `${iniciales}${existingCodes + 1}--${detalle.talla}`;
 
   return codigo;
 };
