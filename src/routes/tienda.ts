@@ -3,6 +3,7 @@ import {
   activarTienda,
   createTienda,
   desactivarTienda,
+  generateReporte,
   getTienda,
   getTiendas,
   updateTienda,
@@ -20,6 +21,7 @@ router.use(Validate);
 router.post("/create", ValidateCreateTienda, createTienda);
 router.get("/", getTiendas);
 router.get("/:tienda_id", getTienda);
+router.get("/reporte/:tienda_id",generateReporte)
 
 router.put("/update/:tienda_id", updateTienda);
 router.put("/desactivar/:tienda_id", desactivarTienda);

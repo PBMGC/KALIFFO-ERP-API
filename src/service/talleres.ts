@@ -272,6 +272,7 @@ export const _sgteEstadoAcabadosPorLote = async (
 
         //pasar al almacen
         case 2:
+          
           if (!detalle.cantidad_recibida) {
             resultados.push({
               acabado_id: detalle.acabado_id,

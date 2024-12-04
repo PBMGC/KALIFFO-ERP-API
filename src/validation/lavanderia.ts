@@ -86,7 +86,7 @@ export const ValidateCreateLavanderiaArray = [
         );
       }
 
-      if (cantidadesPorCorte[corte.corte_id] !== corte.cantidad_recibida) {
+      if (cantidadesPorCorte[corte.corte_id] !== corte.cantidad_recibida && cantidadesPorCorte[corte.corte_id]!=undefined ) {
         throw new Error(
           `La suma no es la indicada el el corte_id => ${corte.corte_id}`
         );

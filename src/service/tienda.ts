@@ -1,3 +1,4 @@
+import { title } from "process";
 import { query } from "../util/query";
 
 export const _createTienda = async (tienda: any) => {
@@ -176,6 +177,274 @@ export const _updateTienda = async (tienda_id: number, tienda: any) => {
   }
 };
 
-export const _generarReporte = async (res:any,tienda_id:number)=>{
-  
-}
+export const _generarReporte = async (res: any, tienda_id: number) => {
+  try {
+    const PDFDocument = require("pdfkit-table");
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="reporte.pdf"');
+
+    const dataTienda: any = await query(
+      `CALL SP_GetReporteTienda(${tienda_id})`
+    );
+
+    const trabajadoresData = dataTienda.data[0][0].usuarios_info!=null?
+    dataTienda.data[0][0].usuarios_info.split("), (")
+      .map((item: string) => {
+        const [
+          usuario_id,
+          nombre,
+          apellido_p,
+          apellido_m,
+          telefono,
+          dni,
+          sueldo,
+        ] = item.replace(/\(|\)/g, "").trim().split(",");
+        return {
+          usuario_id: usuario_id,
+          nombre: nombre,
+          apellido_p: apellido_p,
+          apellido_m: apellido_m,
+          telefono: telefono,
+          dni:dni,
+          sueldo: sueldo,
+        };
+      }):[];
+
+    const productosData = dataTienda.data[0][0].productos_info!=null?
+    dataTienda.data[0][0].productos_info.split("),(")
+      .map((item: string) => {
+        const [nombre_producto, color, lote, stock, talla, cantidad] = item
+          .replace(/\(|\)/g, "")
+          .trim()
+          .split(",");
+        return {
+          nombre_producto: nombre_producto,
+          color: color,
+          lote: lote,
+          stock: stock,
+          talla: talla,
+          cantidad: cantidad,
+        };
+      })
+      .reduce((acc: any, producto: any) => {
+        const { nombre_producto, ...detalle } = producto;
+        const existente = acc.find(
+          (item: any) => item.nombre_producto === nombre_producto
+        );
+        if (existente) {
+          existente.detalle.push(detalle);
+        } else {
+          acc.push({ nombre_producto, detalle: [detalle] });
+        }
+        return acc;
+      }, []):[];
+
+    const doc = new PDFDocument({
+      bufferPages: true,
+      title: "Reporte Tienda",
+      permissions: {
+        printing: "highResolution",
+      },
+      size: "A4",
+      layout: "portrait",
+    });
+
+    doc.pipe(res);
+
+    // Cabecera del PDF
+    doc.image("src/Img/logo.png", 60, 10, {
+      fit: [100, 100],
+      align: "center",
+      valign: "center",
+    });
+
+    doc.fontSize(20).text("KALIFFO SAC", 250, 50);
+    doc.font("Helvetica-Bold").fontSize(18).text("REPORTE DE TIENDA", 230, 75);
+
+    // Tabla de datos de la tienda
+    const tablaDatosTienda = {
+      title: `Datos de ${dataTienda.data[0][0].tienda}`,
+      headers: [
+        {
+          label: "Nombre",
+          property: "tienda",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Direccion",
+          property: "direccion",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Telefono",
+          property: "telefono",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Stock Total",
+          property: "total_stock",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Trabajadores Totales",
+          property: "usuarios",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas: [
+        {
+          tienda: dataTienda.data[0][0].tienda,
+          direccion: dataTienda.data[0][0].direccion,
+          telefono: dataTienda.data[0][0].telefono,
+          total_stock: dataTienda.data[0][0].total_stock?dataTienda.data[0][0].total_stock:null,
+          usuarios: dataTienda.data[0][0].usuarios?dataTienda.data[0][0].usuarios:null,
+        },
+      ],
+    };
+
+    const tablaDatosTrabajadores={
+      title:"TRABAJADORES",
+      headers:[
+        {
+          label: "Nombre",
+          property: "nombre_completo",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Telefono",
+          property: "telefono",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "DNI",
+          property: "dni",
+          headerAlign: "center",
+          align: "center",
+        },
+        {
+          label: "Sueldo",
+          property: "sueldo",
+          headerAlign: "center",
+          align: "center",
+        },
+      ],
+      datas:trabajadoresData.map((trabajador:any)=>{
+        return{
+          nombre_completo:trabajador.nombre+" "+trabajador.apellido_p+" "+trabajador.apellido_m,
+          telefono:trabajador.telefono,
+          dni:trabajador.dni,
+          sueldo:trabajador.sueldo
+        }
+      })
+    }
+
+    // Función para agregar nuevas tablas
+    const nuevaTabla = async (tablaData: any, posY: number) => {
+      const tablaAltura = await doc.table(tablaData, {
+        width: 500,
+        x: 55,
+        y: posY,
+        prepareRow: (
+          row: string[],
+          indexColumn: number,
+          indexRow: number,
+          rectRow: { x: number; y: number; width: number; height: number },
+          rectCell: { x: number; y: number; width: number; height: number }
+        ) => {
+          const { x, y, width, height } = rectCell;
+          if (indexColumn === 0) {
+            doc
+              .lineWidth(0.5)
+              .moveTo(x, y)
+              .lineTo(x, y + height)
+              .stroke();
+          }
+          doc
+            .lineWidth(0.5)
+            .moveTo(x + width, y)
+            .lineTo(x + width, y + height)
+            .stroke();
+        },
+      });
+
+      const nuevaY = posY + tablaAltura 
+
+      if (tablaAltura + posY > doc.page.height - doc.page.margins.bottom) {
+        doc.addPage();
+      }
+
+      return posY + tablaAltura;
+    };
+
+    let posY = 120;
+
+    // Agregar la tabla de datos de la tienda
+    posY = await nuevaTabla(tablaDatosTienda, posY);
+
+    posY= await nuevaTabla(tablaDatosTrabajadores,posY)
+
+    // Agregar tablas para productos
+    for (const producto of productosData) {
+      const tablaDatosProducto = {
+        title: `${producto.nombre_producto}`,
+        headers: [
+          {
+            label: "Color",
+            property: "color",
+            headerAlign: "center",
+            align: "center",
+          },
+          {
+            label: "Lote",
+            property: "lote",
+            headerAlign: "center",
+            align: "center",
+          },
+          {
+            label: "Stock",
+            property: "stock",
+            headerAlign: "center",
+            align: "center",
+          },
+          {
+            label: "Talla",
+            property: "talla",
+            headerAlign: "center",
+            align: "center",
+          },
+          {
+            label: "Cantidad",
+            property: "cantidad",
+            headerAlign: "center",
+            align: "center",
+          },
+        ],
+        datas: producto.detalle.map((detalle: any) => ({
+          color: detalle.color,
+          lote: detalle.lote,
+          stock: detalle.stock,
+          talla: detalle.talla,
+          cantidad: detalle.cantidad,
+        })),
+      };
+
+      posY = await nuevaTabla(tablaDatosProducto, posY);
+    }
+
+    doc.end();
+  } catch (error) {
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};
