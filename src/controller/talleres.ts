@@ -96,13 +96,18 @@ export const getAcabado = async (req: Request, res: Response) => {
 
 export const sgteEstadoAcabado = async (req: Request, res: Response) => {
   const { lote_id } = req.params;
-  const tienda_id = req.query.tienda_id;
-  const almacen_id = req.query.almacen_id;
+  const tienda_id = req.query.tienda_id as string;
+  const almacen_id = req.query.almacen_id as string;
   const { detalles } = req.body;
 
   try {
-    const response = await _sgteEstadoAcabadosPorLote(lote_id,tienda_id,almacen_id ,detalles);
-    res.status(response.status).json(response);
+    const response = await _sgteEstadoAcabadosPorLote(
+      res,
+      lote_id,
+      tienda_id,
+      almacen_id,
+      detalles
+    );
   } catch (error) {
     handleHttp(res, "error_sgteEstadoAcabado", 500);
   }

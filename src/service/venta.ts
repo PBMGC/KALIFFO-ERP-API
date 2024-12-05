@@ -1,8 +1,8 @@
-import { createCodigoVenta } from "../util/createCodigos";
 import { query } from "../util/query";
 
 export const _createVenta = async (venta: any) => {
   const {
+    codigo,
     tipoVenta,
     tipoComprobante,
     fecha,
@@ -19,10 +19,10 @@ export const _createVenta = async (venta: any) => {
     detalles,
   } = venta;
 
-  const codigo = await createCodigoVenta(tipoComprobante, tienda_id);
+  // const codigo = await createCodigoVenta(tipoComprobante, tienda_id);
 
   const ventaExistente = (await query(`SELECT * FROM venta WHERE codigo = ?`, [
-    codigo,
+    "FS-1",
   ])) as any;
 
   if (ventaExistente.data.length !== 0) {

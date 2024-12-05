@@ -1,5 +1,5 @@
 import { query } from "../util/query";
-import { _createProductoCompleto } from "./producto";
+import { _createProductoCompleto, _imprimirCodigo } from "./producto";
 
 export const _createAcabado = async (acabado: any) => {
   const {
@@ -202,9 +202,10 @@ export const _desactivarAcabado = async (acabado_id: number) => {
 };
 
 export const _sgteEstadoAcabadosPorLote = async (
+  res: any,
   lote_id: string,
-  tienda_id:string,
-  almacen_id:string,
+  tienda_id: string,
+  almacen_id: string,
   detalles: { acabado_id: number; cantidad_recibida: number }[]
 ) => {
   try {
@@ -251,125 +252,22 @@ export const _sgteEstadoAcabadosPorLote = async (
           break;
 
         case 1:
-          const updateAcabado1 = await query(
-            "UPDATE taller_acabados SET estado = 2 WHERE acabado_id = ?",
-            [detalle.acabado_id]
-          );
-          if (updateAcabado1.affectedRows > 0) {
-            resultados.push({
-              acabado_id: detalle.acabado_id,
-              message: "El acabado ha pasado al estado 2 (en proceso)",
-              nuevoEstado: 2,
-              success: true,
-              status: 200,
-            });
-          } else {
-            resultados.push({
-              acabado_id: detalle.acabado_id,
-              message: "No se pudo actualizar el estado del acabado a 2",
-              success: false,
-              status: 500,
-            });
-          }
+          await caso1(detalle.acabado_id, resultados);
           break;
 
         //pasar al almacen
         case 2:
-          if (!detalle.cantidad_recibida) {
-            resultados.push({
-              acabado_id: detalle.acabado_id,
-              message: "Campo 'cantidad_recibida' obligatorio.",
-              success: false,
-              status: 400,
-            });
-            break;
-          }
-
-          if (detalle.cantidad_recibida > acabado.cantidad_enviada) {
-            resultados.push({
-              lavanderia_id: detalle.acabado_id,
-              message: "La cantidad recibida es mayor a la cantidad enviada",
-              success: false,
-              status: 400,
-            });
-            break;
-          }
-
-          cantidadTotal += detalle.cantidad_recibida;
-          const now = new Date();
-          const fecha = now.toLocaleDateString("en-CA");
-
-          const updateAcabado2 = await query(
-            "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
-            [detalle.cantidad_recibida, now, detalle.acabado_id]
+          await caso2(
+            lote_id,
+            tienda_id,
+            almacen_id,
+            detalle.acabado_id,
+            detalle.cantidad_recibida,
+            acabado.cantidad_enviada,
+            resultados,
+            cantidadTotal,
+            res
           );
-
-          const updateLote = await query(
-            "UPDATE lotes SET estado = 4 WHERE lote_id = ?",
-            [lote_id]
-          );
-
-          if (updateAcabado2.affectedRows > 0 && updateLote.affectedRows > 0) {
-            const datos = await query(
-              `
-              SELECT 
-                    c.producto_id,
-                    ta.color_id,
-                    ta.cantidad_recibida as stock,
-                    ta.talla
-                FROM 
-                    taller_acabados ta
-                INNER JOIN 
-                    lavanderia l ON ta.lavanderia_id = l.lavanderia_id
-                INNER JOIN 
-                    cortes c ON l.corte_id = c.corte_id
-                WHERE 
-                    ta.lote_id = ?
-              `,
-              [lote_id]
-            );
-
-            const productosFinales = datos.data.reduce((acc:any,producto:any)=>{
-              const {producto_id,...detalle} = producto;
-              const existe = acc.find(
-                (item:any)=> item.producto_id===producto_id
-              );
-              if(existe){
-                existe.detalle.push(detalle);
-              }else{
-                acc.push({producto_id,detalle:[detalle]})
-              }
-              return acc;
-            },[])
-
-            try {
-              const response = await _createProductoCompleto(
-                tienda_id,
-                almacen_id,
-                productosFinales.producto_id,
-                productosFinales,
-                lote_id,
-              )
-            } catch (error) {
-              console.log(error)
-            }
-
-            // resultados.push({
-            //   acabado_id: detalle.acabado_id,
-            //   message: "El acabado ha pasado al estado 3 (finalizado)",
-            //   nuevoEstado: 3,
-            //   success: true,
-            //   status: 200,
-            // });
-          } else {
-            resultados.push({
-              acabado_id: detalle.acabado_id,
-              message:
-                "No se pudo actualizar el estado del acabado a 3 o del lote",
-              success: false,
-              status: 500,
-            });
-          }
           break;
 
         case 3:
@@ -412,3 +310,152 @@ export const _sgteEstadoAcabadosPorLote = async (
     };
   }
 };
+
+async function caso1(acabado_id: number, resultados: any) {
+  try {
+    const updateAcabado1 = await query(
+      "UPDATE taller_acabados SET estado = 2 WHERE acabado_id = ?",
+      [acabado_id]
+    );
+    if (updateAcabado1.affectedRows > 0) {
+      resultados.push({
+        acabado_id: acabado_id,
+        message: "El acabado ha pasado al estado 2 (en proceso)",
+        nuevoEstado: 2,
+        success: true,
+        status: 200,
+      });
+    } else {
+      resultados.push({
+        acabado_id: acabado_id,
+        message: "No se pudo actualizar el estado del acabado a 2",
+        success: false,
+        status: 500,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function caso2(
+  lote_id: string,
+  tienda_id: string,
+  almacen_id: string,
+  acabado_id: number,
+  cantidad_recibida: number,
+  cantidad_enviada: number,
+  resultados: any,
+  cantidad_total: number,
+  res: any
+) {
+  if (!cantidad_recibida) {
+    resultados.push({
+      acabado_id: acabado_id,
+      message: "Campo 'cantidad_recibida' obligatorio.",
+      success: false,
+      status: 400,
+    });
+    return;
+  }
+
+  if (cantidad_recibida > cantidad_enviada) {
+    resultados.push({
+      lavanderia_id: acabado_id,
+      message: "La cantidad recibida es mayor a la cantidad enviada",
+      success: false,
+      status: 400,
+    });
+    return;
+  }
+
+  cantidad_total += cantidad_recibida;
+
+  const now = new Date();
+  const fecha = now.toLocaleTimeString("en-CA");
+
+  try {
+    const updateAcabado = await query(
+      "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
+      [cantidad_recibida, now, acabado_id]
+    );
+
+    const updateLote = await query(
+      "UPDATE lotes SET estado = 4 WHERE lote_id = ?",
+      [lote_id]
+    );
+
+    if (updateAcabado.affectedRows > 0 && updateLote.affectedRows > 0) {
+      const datos = await obtenerProductosTaller(lote_id);
+      await procesoCrearProductos(datos, tienda_id, almacen_id, lote_id, res);
+    } else {
+      resultados.push({
+        acabado_id: acabado_id,
+        message: "No se pudo actualizar el estado del acabado o del lote",
+        success: false,
+        status: 500,
+      });
+    }
+  } catch (error) {
+    resultados.push({
+      acabado_id: acabado_id,
+      message: `Error al actualizar estado`,
+      success: false,
+      status: 500,
+    });
+  }
+}
+
+async function obtenerProductosTaller(lote_id: string) {
+  return await query(
+    `
+    SELECT 
+          c.producto_id,
+          ta.color_id,
+          ta.cantidad_recibida as stock,
+          ta.talla
+      FROM 
+          taller_acabados ta
+      INNER JOIN 
+          lavanderia l ON ta.lavanderia_id = l.lavanderia_id
+      INNER JOIN 
+          cortes c ON l.corte_id = c.corte_id
+      WHERE 
+          ta.lote_id = ?
+    `,
+    [lote_id]
+  );
+}
+
+async function procesoCrearProductos(
+  datos: any,
+  tienda_id: string,
+  almacen_id: string,
+  lote_id: string,
+  res: any
+) {
+  const productosOrdenados = datos.data.reduce((acc: any, producto: any) => {
+    const { producto_id, ...detalle } = producto;
+    const existe = acc.find((item: any) => item.producto_id === producto_id);
+    if (existe) {
+      existe.detalle.push(detalle);
+    } else {
+      acc.push({ producto_id, detalle: [detalle] });
+    }
+    return acc;
+  }, []);
+
+  for (const producto of productosOrdenados) {
+    await _createProductoCompleto(
+      tienda_id,
+      almacen_id,
+      producto.producto_id,
+      producto.detalle,
+      lote_id
+    );
+  }
+
+  await _imprimirCodigo(res, lote_id);
+
+  return;
+}

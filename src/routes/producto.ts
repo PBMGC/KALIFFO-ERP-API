@@ -2,14 +2,12 @@ import { Router } from "express";
 import {
   activarProducto,
   createProducto,
-  createProductoCompleto,
   desactivarProducto,
   getColoresProducto,
   getDetalleProducto,
   getProducto,
   getProductos,
   getTallaProducto,
-  Imprimir,
   updateProducto,
 } from "../controller/producto";
 import { ValidateCreateProducto } from "../validation/producto";
@@ -27,12 +25,12 @@ router.get("/", getProductos);
 router.get("/detalle/:producto_id", getDetalleProducto);
 router.get("/talla/:detalle_id", getTallaProducto);
 
-router.get("/imprimir", Imprimir);
+// router.get("/imprimir", Imprimir);
 
 router.get("/colores/:producto_id", getColoresProducto);
 router.get("/:producto_id", getProducto);
 
-router.post("/create/detalle", createProductoCompleto);
+// router.post("/create/detalle", createProductoCompleto);
 router.post("/create", ValidateCreateProducto, createProducto);
 
 router.put("/update/:producto_id", updateProducto);

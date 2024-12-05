@@ -33,24 +33,24 @@ export const createProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const createProductoCompleto = async (req: Request, res: Response) => {
-  const tienda_id = req.query.tienda_id as string;
-  const almacen_id = req.query.almacen_id as string;
-  const { producto_id, lote_id, detalles } = req.body;
+// export const createProductoCompleto = async (req: Request, res: Response) => {
+//   const tienda_id = req.query.tienda_id as string;
+//   const almacen_id = req.query.almacen_id as string;
+//   const { producto_id, lote_id, detalles } = req.body;
 
-  try {
-    const response = await _createProductoCompleto(
-      tienda_id,
-      almacen_id,
-      producto_id,
-      detalles,
-      lote_id
-    );
-    res.status(response.status).json(response);
-  } catch (error) {
-    handleHttp(res, "error_createProductoCompleto", 500);
-  }
-};
+//   try {
+//     const response = await _createProductoCompleto(
+//       tienda_id,
+//       almacen_id,
+//       producto_id,
+//       detalles,
+//       lote_id
+//     );
+//     res.status(response.status).json(response);
+//   } catch (error) {
+//     handleHttp(res, "error_createProductoCompleto", 500);
+//   }
+// };
 
 export const getProductos = async (req: Request, res: Response) => {
   const tienda_id = req.query.tienda_id;
@@ -167,11 +167,11 @@ export const activarProducto = async (req: Request, res: Response) => {
   }
 };
 
-export const Imprimir = async (req: Request, res: Response) => {
-  try {
-    const response = await _imprimirCodigo(res);
-  } catch (error) {
-    console.log(error);
-    handleHttp(res, "error_desactivarProducto", 500);
-  }
-};
+// export const Imprimir = async (req: Request, res: Response) => {
+//   try {
+//     const response = await _imprimirCodigo(res);
+//   } catch (error) {
+//     console.log(error);
+//     handleHttp(res, "error_desactivarProducto", 500);
+//   }
+// };
