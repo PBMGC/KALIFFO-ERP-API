@@ -73,10 +73,13 @@ export const _createProductoCompleto = async (
       }
 
       await _createProductoTalla({
+        stock:detalle.stock,
         productoDetalle_id: productoDetalle_id,
         talla: detalle.talla,
         codigo,
       });
+
+
     } catch (error: any) {
       // console.log(error);
 
@@ -99,22 +102,17 @@ export const _createProductoCompleto = async (
 };
 
 export const _createProductoTalla = async (productoTalla: any) => {
-  const { productoDetalle_id, talla, codigo } = productoTalla;
+  const {stock, productoDetalle_id, talla, codigo } = productoTalla;
+  
+  for(var i = 0; i<stock;i++){
+    
+      const queryText = `
+            INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
+            VALUES (?, ?, ?);
+      `;
+    
+      const result = await query(queryText, [productoDetalle_id, talla, codigo]);
 
-  const queryText = `
-        INSERT INTO productoTalla (productoDetalle_id, talla, codigo)
-        VALUES (?, ?, ?);
-  `;
-
-  const result = await query(queryText, [productoDetalle_id, talla, codigo]);
-
-  if (!result.success) {
-    // console.error("error");
-    return {
-      message: "error _createProductoTalla",
-      success: false,
-      status: result.status || 500,
-    };
   }
 
   return {
@@ -526,14 +524,28 @@ export const _activarProducto = async (producto_id: number) => {
   }
 };
 
-export const _imprimirCodigo = async (res: any) => {
+export const _imprimirCodigo = async (res: any, lote_id: string) => {
   try {
     const JsBarcode = require("jsbarcode");
     const { createCanvas } = require("canvas");
     const PDFDocument = require("pdfkit-table");
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'inline; filename="codigos.pdf"');
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="codigo_${lote_id}.pdf"`
+    );
+
+    const dataCodigos: any = await query(`
+        SELECT 
+          pt.codigo
+        FROM 
+            productotalla pt
+        INNER JOIN 
+            productodetalle pd ON pt.productoDetalle_id = pd.productoDetalle_id
+        WHERE 
+            pd.lote_id = ${lote_id};
+      `);
 
     const doc = new PDFDocument({
       size: [100 * 2.83, 140 * 2.83],
@@ -550,16 +562,18 @@ export const _imprimirCodigo = async (res: any) => {
     const barcodeHeight = 60;
     const maxCodesPerPage = 10;
 
-    for (let i = 0; i < 10; i++) {
+    dataCodigos.data.forEach((item:any,i:number)=>{
+
+      const codigo = item.codigo
+
       if (i > 0 && i % maxCodesPerPage === 0) {
         doc.addPage();
         posX = 0;
         posY = 5;
       }
 
-      const barcodeValue = `C${i + 1}PT01sgf`;
       const canvas = createCanvas(barcodeWidth, barcodeHeight);
-      JsBarcode(canvas, barcodeValue, {
+      JsBarcode(canvas, codigo, {
         format: "CODE128",
         width: 2,
         fontOptions: "bold",
@@ -568,6 +582,7 @@ export const _imprimirCodigo = async (res: any) => {
       });
 
       const imgData = canvas.toBuffer("image/png");
+
       doc.image(imgData, posX, posY, {
         width: barcodeWidth,
         height: barcodeHeight,
@@ -575,7 +590,7 @@ export const _imprimirCodigo = async (res: any) => {
 
       posX = (i + 1) % 2 === 0 ? 0 : posX + barcodeWidth + spaceX;
       posY += (i + 1) % 2 === 0 ? barcodeHeight + spaceY : 0;
-    }
+    })
 
     doc.end();
   } catch (error) {
