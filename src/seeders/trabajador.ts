@@ -1,7 +1,7 @@
 import { _createAsistencia } from "../service/asistencia";
 import { _createIncidencia } from "../service/incidencia";
 import { _createPago } from "../service/pago";
-import { _createTrabajador } from "../service/trabajadores";
+import { _createTrabajador } from "../service/trabajador";
 
 import { query } from "../util/query";
 

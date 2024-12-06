@@ -1,5 +1,5 @@
 import { Lote } from "../interface/lote";
-import { _createLote } from "../service/lotes";
+import { _createLote } from "../service/lote";
 import { query } from "../util/query";
 
 const lotes: Lote[] = [
@@ -38,7 +38,7 @@ const lotes: Lote[] = [
 export const createLotes = async () => {
   try {
     for (const lote of lotes) {
-      const result = await query("select * from lotes where lote_id = ?", [
+      const result = await query("select * from lote where lote_id = ?", [
         lote.lote_id,
       ]);
       if (result.data.length === 0) {

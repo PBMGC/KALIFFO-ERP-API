@@ -1,4 +1,4 @@
-import { _createTela } from "../service/telas";
+import { _createTela } from "../service/tela";
 import { query } from "../util/query";
 
 const telas: any = [
@@ -278,7 +278,7 @@ export const createTelas = async () => {
   try {
     for (const tela of telas) {
       const result = await query(
-        "select * from almacen_telas where tipo = ? and metraje = ? and articulo = ?",
+        "select * from almacen_tela where tipo = ? and metraje = ? and articulo = ?",
         [tela.tipo, tela.metraje, tela.articulo]
       );
 

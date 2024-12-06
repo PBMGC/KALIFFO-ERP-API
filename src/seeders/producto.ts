@@ -181,23 +181,23 @@ export const createProducto = async () => {
   // await createProductoDetalle();
 };
 
-export const createProductoDetalle = async () => {
-  for (const productoDetalle of productoDetalles) {
-    try {
-      const result = await query(
-        "select * from productoDetalle where producto_id = ?  and tienda_id = 1",
-        [productoDetalle.producto_id]
-      );
+// export const createProductoDetalle = async () => {
+//   for (const productoDetalle of productoDetalles) {
+//     try {
+//       const result = await query(
+//         "select * from productoDetalle where producto_id = ?  and tienda_id = 1",
+//         [productoDetalle.producto_id]
+//       );
 
-      if (result.data.length === 0) {
-        await _createProductoCompleto(
-          1,
-          productoDetalle.producto_id,
-          productoDetalle.detalles
-        );
-      }
-    } catch (error) {
-      console.log("Error al crear productoDetalle:", error);
-    }
-  }
-};
+//       if (result.data.length === 0) {
+//         await _createProductoCompleto(
+//           1,
+//           productoDetalle.producto_id,
+//           productoDetalle.detalles
+//         );
+//       }
+//     } catch (error) {
+//       console.log("Error al crear productoDetalle:", error);
+//     }
+//   }
+// };

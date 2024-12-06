@@ -8,7 +8,7 @@ import {
   _desactivarAcabado,
   _getAcabadoLote,
   _sgteEstadoAcabadosPorLote,
-} from "../service/talleres";
+} from "../service/taller";
 
 export const createAcabado = async (req: Request, res: Response) => {
   const {
@@ -108,6 +108,7 @@ export const sgteEstadoAcabado = async (req: Request, res: Response) => {
       almacen_id,
       detalles
     );
+    res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_sgteEstadoAcabado", 500);
   }

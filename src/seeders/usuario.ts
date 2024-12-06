@@ -1,4 +1,4 @@
-import { _createTrabajador } from "../service/trabajadores";
+import { _createTrabajador } from "../service/trabajador";
 import { _createUsuario } from "../service/usuario";
 import { query } from "../util/query";
 

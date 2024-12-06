@@ -4,7 +4,7 @@ export const _createTela = async (tela: any) => {
   const { tipo, metraje, articulo, empresa_compra, fecha_compra } = tela;
 
   const queryText = `
-      INSERT INTO almacen_telas (tipo,metraje,articulo,empresa_compra,fecha_compra) 
+      INSERT INTO almacen_tela (tipo,metraje,articulo,empresa_compra,fecha_compra) 
       VALUES (?, ?, ?, ?, ?)`;
 
   const result = await query(queryText, [
@@ -59,7 +59,7 @@ export const _UpdateTela = async (updateTela: any) => {
 };
 
 export const _desactivarTela = async (tela_id: number) => {
-  const queryS = `UPDATE almacen_telas SET estado = 0 WHERE tela_id = ?`;
+  const queryS = `UPDATE almacen_tela SET estado = 0 WHERE tela_id = ?`;
 
   try {
     const result = (await query(queryS, [tela_id])) as any;
@@ -90,7 +90,7 @@ export const _desactivarTela = async (tela_id: number) => {
 export const _getTiposTelas = async () => {
   try {
     const result = await query(
-      "select a_t.tipo from almacen_telas a_t group by a_t.tipo",
+      "select a_t.tipo from almacen_tela a_t group by a_t.tipo",
       []
     );
     return {
@@ -148,7 +148,7 @@ export const _getTelaPorTipo = async (tipo_tela: string, estado: number) => {
 };
 
 export const _getEmpresas = async () => {
-  const queryText = `select a_t.empresa_compra from almacen_telas a_t group by a_t.empresa_compra;`;
+  const queryText = `select a_t.empresa_compra from almacen_tela a_t group by a_t.empresa_compra;`;
 
   try {
     const result = await query(queryText, []);

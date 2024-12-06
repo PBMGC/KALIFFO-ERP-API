@@ -3,7 +3,7 @@ import { executeDDL } from "../../util/query";
 export const triggerInsertCorte = async () => {
   const trigger = `
       CREATE TRIGGER TR_INS_Corte 
-AFTER INSERT ON cortes
+AFTER INSERT ON corte
 FOR EACH ROW 
 BEGIN
     DECLARE total_metraje_usado DECIMAL(10,2);
@@ -16,13 +16,13 @@ BEGIN
     WHILE total_metraje_usado > 0 DO
 
         SELECT tela_id, metraje INTO selected_tela_id, tela_metraje
-        FROM almacen_telas
+        FROM almacen_tela
         WHERE tipo = NEW.tipo_tela AND estado = 1
         ORDER BY fecha_compra ASC
         LIMIT 1;
 
             IF tela_metraje >= total_metraje_usado THEN
-                UPDATE almacen_telas 
+                UPDATE almacen_tela
                 SET metraje = metraje - total_metraje_usado
                 WHERE tela_id = selected_tela_id;
 
@@ -30,7 +30,7 @@ BEGIN
             ELSE
                 SET metraje_faltante = total_metraje_usado - tela_metraje;
     
-                UPDATE almacen_telas 
+                UPDATE almacen_tela
                 SET metraje = 0
                 WHERE tela_id = selected_tela_id;
     
@@ -39,7 +39,7 @@ BEGIN
     END WHILE;
 
     -- Aquí se cambia NEW.cantidad por NEW.cantidad_enviada
-    UPDATE lotes
+    UPDATE lote
     SET cantidad_total = cantidad_total + NEW.cantidad_enviada
     WHERE lote_id = NEW.lote_id;
 
@@ -69,11 +69,11 @@ export const droptriggerInsertCorte = async () => {
 export const triggerUpdatecorte = async () => {
   const trigger = `
       CREATE TRIGGER TR_UPD_Corte 
-      AFTER UPDATE ON cortes
+      AFTER UPDATE ON corte
       FOR EACH ROW 
       BEGIN
           -- Cambiar NEW.cantidad y OLD.cantidad por cantidad_enviada
-          UPDATE lotes
+          UPDATE lote
           SET cantidad_total = cantidad_total + (NEW.cantidad_enviada - OLD.cantidad_enviada)
           WHERE lote_id = NEW.lote_id;
       END;

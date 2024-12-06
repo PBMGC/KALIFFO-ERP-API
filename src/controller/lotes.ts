@@ -5,7 +5,7 @@ import {
   _getLote,
   _getLoteProductos,
   _getLotes,
-} from "../service/lotes";
+} from "../service/lote";
 import { Lote } from "../interface/lote";
 
 export const createLote = async (req: Request, res: Response) => {

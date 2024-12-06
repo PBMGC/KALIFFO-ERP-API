@@ -1,4 +1,4 @@
-import { _createAlmacen_Productos } from "../service/almacen_productos";
+import { _createAlmacen_Productos } from "../service/almacen_producto";
 import { query } from "../util/query";
 
 const almacenes: any = [
@@ -15,7 +15,7 @@ export const createAlmacenes = async () => {
   for (const almacen of almacenes) {
     try {
       const result = await query(
-        `select * from almacen_productos where almacen_id = ?`,
+        `select * from almacen_producto where almacen_id = ?`,
         [almacen.almacen_id]
       );
 

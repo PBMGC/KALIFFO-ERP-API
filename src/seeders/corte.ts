@@ -208,7 +208,7 @@ export const createCortes = async () => {
   for (const corte of cortes) {
     try {
       const result = await query(
-        "select * from cortes where lote_id = ? and taller_id = ? and producto_id = ?",
+        "select * from corte where lote_id = ? and taller_id = ? and producto_id = ?",
         [corte.lote_id, corte.taller_id, corte.producto_id]
       );
 

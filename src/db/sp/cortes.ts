@@ -1,7 +1,7 @@
 import { createSp } from "../../util/funcion_sp";
 
 const queryUpdateCorte = `
-    UPDATE cortes
+    UPDATE corte
     SET
         taller_id = IF(p_taller_id IS NOT NULL, p_taller_id, taller_id),
         producto_id = IF(p_producto_id IS NOT NULL, p_producto_id, producto_id),

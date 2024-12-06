@@ -27,7 +27,7 @@ import { dropProcedureIncidencia, initProcedureIncidencia } from "./incidencia";
 import {
   dropProcedureAlmacenProductos,
   initProcedureAlmacenProductos,
-} from "./almacen_productos";
+} from "./almacen_producto";
 import { dropProcedureTrabajador, initProcedureTrabajador } from "./trabajador";
 
 dotenv.config();

@@ -1,7 +1,7 @@
 import { createSp, eliminarProcedimiento } from "../../util/funcion_sp";
 
 const queryUpdateTela = `
-    UPDATE almacen_telas
+    UPDATE almacen_tela
     SET
         tipo = IF(p_tipo IS NOT NULL AND p_tipo != '', p_tipo, tipo),
         metraje = IF(p_metraje IS NOT NULL AND p_metraje != 0, p_metraje, metraje),
@@ -13,15 +13,19 @@ const queryUpdateTela = `
 `;
 
 const queryGetTelas = `
-    select a_t.tipo,COUNT(a_t.tipo) as "STOCK" from almacen_telas a_t group by a_t.tipo;
+    select a_t.tipo,COUNT(a_t.tipo) as "STOCK" from almacen_tela a_t group by a_t.tipo;
 `;
 
 const queryGetTelaPorTipo = `
-  SELECT * FROM almacen_telas WHERE tipo = u_tipo AND estado = u_estado;
+  SELECT * FROM almacen_tela WHERE tipo = u_tipo AND estado = u_estado;
 `;
 
 const initProcedureGetTela = async () => {
-  await createSp("SP_GetTelaPorTipo", queryGetTelaPorTipo, "IN u_tipo varchar(15), IN u_estado INT");
+  await createSp(
+    "SP_GetTelaPorTipo",
+    queryGetTelaPorTipo,
+    "IN u_tipo varchar(15), IN u_estado INT"
+  );
 };
 
 const initProcedureGetTelas = async () => {

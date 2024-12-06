@@ -8,7 +8,7 @@ import {
   _getTelas,
   _getTiposTelas,
   _UpdateTela,
-} from "../service/telas";
+} from "../service/tela";
 import { _getTiendas } from "../service/tienda";
 import { AlmacenTela } from "../interface/almacenTela";
 

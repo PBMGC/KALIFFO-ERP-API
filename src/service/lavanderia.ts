@@ -60,7 +60,7 @@ export const _createLavanderiaArray = async (
       cantidad_enviada,
     } = detalle;
 
-    const resultCorte = await query("SELECT * FROM cortes WHERE corte_id = ?", [
+    const resultCorte = await query("SELECT * FROM corte WHERE corte_id = ?", [
       color_id,
     ]);
 
@@ -368,7 +368,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
 
           if (updateLavanderia2.affectedRows > 0) {
             const insertAcabado = await query(
-              `INSERT INTO taller_acabados (lote_id, lavanderia_id, color_id, talla, cantidad_enviada, fecha_inicio)
+              `INSERT INTO taller_acabado (lote_id, lavanderia_id, color_id, talla, cantidad_enviada, fecha_inicio)
                 VALUES (?, ?, ?, ?, ?, ?)`,
               [
                 lote_id,
@@ -381,7 +381,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
             );
 
             const updateLote = await query(
-              "UPDATE lotes SET estado = 3 where lote_id = ?",
+              "UPDATE lote SET estado = 3 where lote_id = ?",
               [lote_id]
             );
 
@@ -424,7 +424,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
       }
     }
 
-    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+    await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
       cantidadTotal,
       lote_id,
     ]);
@@ -454,7 +454,7 @@ export const _getLavanderiaPorLote = async (lote_id: number) => {
       c.codigo, 
       (SELECT p.nombre FROM producto p WHERE p.producto_id = co.producto_id) AS producto_nombre
     FROM lavanderia l
-    INNER JOIN cortes co ON co.corte_id = l.corte_id
+    INNER JOIN corte co ON co.corte_id = l.corte_id
     INNER JOIN color c ON c.color_id = l.color_id
     WHERE l.lote_id = ? AND l.estado != 0;
     `;

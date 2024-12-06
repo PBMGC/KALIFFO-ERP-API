@@ -8,14 +8,14 @@ export const _createCorte = async (corte: Corte) => {
   try {
     await query(
       `
-        INSERT INTO cortes (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
+        INSERT INTO corte (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
         VALUES (?, ?, ?, ?, ?)`,
       [lote_id, taller_id, producto_id, cantidad_enviada, talla]
     );
 
     await query(
       `
-      UPDATE lotes 
+      UPDATE lote
       SET cantidad_total = cantidad_total + ?
       WHERE lote_id = ?;
     `,
@@ -47,14 +47,14 @@ export const _createCorteArray = async (corte: any, lote_id: number) => {
     try {
       await query(
         `
-        INSERT INTO cortes (lote_id, taller_id, producto_id, cantidad_enviada, talla) 
+        INSERT INTO corte (lote_id, taller_id, producto_id, cantidad_enviada, talla) 
         VALUES (?, ?, ?, ?, ?)`,
         [lote_id, taller_id, producto_id, cantidad_enviada, talla]
       );
 
       await query(
         `
-        UPDATE lotes 
+        UPDATE lote
         SET cantidad_total = cantidad_total + ?
         WHERE lote_id = ?;
         `,
@@ -129,7 +129,7 @@ export const _UpdateCorte = async (updateCorte: any) => {
 
 export const _getCortes = async () => {
   try {
-    const queryText = `SELECT * FROM cortes`;
+    const queryText = `SELECT * FROM corte`;
     const result = await query(queryText);
 
     return {
@@ -151,29 +151,29 @@ export const _getCortesPorLote = async (lote_id: number) => {
   try {
     const queryText = `
     SELECT 
-                cortes.estado, 
-                cortes.corte_id, 
-                cortes.taller_id,
+                corte.estado, 
+                corte.corte_id, 
+                corte.taller_id,
                 usuario.nombre AS taller,
                 producto.nombre AS producto, 
-                cortes.cantidad_enviada,
-                cortes.cantidad_recibida,
-                cortes.talla,
+                corte.cantidad_enviada,
+                corte.cantidad_recibida,
+                corte.talla,
                 CAST(
-                    (cortes.cantidad_recibida - 
+                    (corte.cantidad_recibida - 
                      COALESCE((SELECT SUM(cantidad_enviada) 
                                FROM lavanderia 
-                               WHERE lavanderia.corte_id = cortes.corte_id), 0)) 
+                               WHERE lavanderia.corte_id = corte.corte_id), 0)) 
                     AS SIGNED) AS cantidad_restante
             FROM 
-                cortes
+                corte
             LEFT JOIN 
-                usuario ON cortes.taller_id = usuario.usuario_id
+                usuario ON corte.taller_id = usuario.usuario_id
             INNER JOIN 
-                producto ON producto.producto_id = cortes.producto_id
+                producto ON producto.producto_id = corte.producto_id
             WHERE 
-                cortes.lote_id = ? 
-                AND cortes.estado != 0;
+                corte.lote_id = ? 
+                AND corte.estado != 0;
     `;
     const result = await query(queryText, [lote_id]);
 
@@ -194,7 +194,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
 
 export const _getTallas = async () => {
   try {
-    const queryText = `SELECT cortes.talla from cortes group by cortes.talla`;
+    const queryText = `SELECT corte.talla from corte group by corte.talla`;
     const result = await query(queryText);
     return {
       items: result.data || [],
@@ -213,7 +213,7 @@ export const _getTallas = async () => {
 
 export const _getCorte = async (corte_id: number) => {
   try {
-    const queryText = `SELECT * FROM cortes WHERE corte_id = ?`;
+    const queryText = `SELECT * FROM corte WHERE corte_id = ?`;
     const result = await query(queryText, [corte_id]);
 
     return {
@@ -233,7 +233,7 @@ export const _getCorte = async (corte_id: number) => {
 
 export const _desactivarCorte = async (corte_id: number) => {
   const queryText =
-    "UPDATE cortes SET estado = 0 WHERE corte_id = ? AND estado != 0;";
+    "UPDATE corte SET estado = 0 WHERE corte_id = ? AND estado != 0;";
 
   try {
     const result = await query(queryText, [corte_id]);
@@ -263,7 +263,7 @@ export const _desactivarCorte = async (corte_id: number) => {
 
 export const _activarCorte = async (corte_id: number) => {
   const queryText =
-    "UPDATE cortes SET estado = true WHERE corte_id = ? AND estado != true;";
+    "UPDATE corte SET estado = true WHERE corte_id = ? AND estado != true;";
 
   try {
     const result = await query(queryText, [corte_id]);
@@ -296,14 +296,14 @@ export const _sgteEstadoCortesPorLote = async (
   detalles: { corte_id: number; cantidad_recibida: number; taller_id: number }[]
 ) => {
   try {
-    const result = await query("SELECT * FROM cortes WHERE lote_id = ?", [
+    const result = await query("SELECT * FROM corte WHERE lote_id = ?", [
       lote_id,
     ]);
     const cortes = result.data;
 
     if (!cortes || cortes.length === 0) {
       return {
-        message: "No se encontraron cortes asociados al lote",
+        message: "No se encontraron corte asociados al lote",
         success: false,
         status: 404,
       };
@@ -347,7 +347,7 @@ export const _sgteEstadoCortesPorLote = async (
           }
 
           const updateCorte1 = await query(
-            "UPDATE cortes SET estado = 2, taller_id = ? WHERE corte_id = ?",
+            "UPDATE corte SET estado = 2, taller_id = ? WHERE corte_id = ?",
             [detalle.taller_id, detalle.corte_id]
           );
 
@@ -386,12 +386,12 @@ export const _sgteEstadoCortesPorLote = async (
           }
 
           const updateCorte2 = await query(
-            "UPDATE cortes SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
+            "UPDATE corte SET estado = 3, cantidad_recibida = ? WHERE corte_id = ?",
             [detalle.cantidad_recibida, detalle.corte_id]
           );
 
           const updateLote = await query(
-            "UPDATE lotes SET estado = 2 where lote_id = ?",
+            "UPDATE lote SET estado = 2 where lote_id = ?",
             [lote_id]
           );
 
@@ -427,7 +427,7 @@ export const _sgteEstadoCortesPorLote = async (
     }
 
     // Actualizar cantidad total del lote
-    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+    await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
       cantidadTotal,
       lote_id,
     ]);

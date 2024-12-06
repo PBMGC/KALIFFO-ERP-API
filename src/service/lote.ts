@@ -4,7 +4,7 @@ import { query } from "../util/query";
 export const _createLote = async (lote: Lote) => {
   try {
     const result = await query(
-      `SELECT codigo_lote FROM lotes ORDER BY lote_id DESC LIMIT 1`,
+      `SELECT codigo_lote FROM lote ORDER BY lote_id DESC LIMIT 1`,
       []
     );
 
@@ -22,7 +22,7 @@ export const _createLote = async (lote: Lote) => {
 
     const resultInsert = await query(
       `
-        INSERT INTO lotes (codigo_lote, fecha_creacion, tipo_tela, metraje, productos)
+        INSERT INTO lote (codigo_lote, fecha_creacion, tipo_tela, metraje, productos)
         VALUES (?, ?, ?, ?, ?);`,
       [codigo, fechaHoy, lote.tipo_tela, lote.metraje, lote.productos]
     );
@@ -52,7 +52,7 @@ export const _createLote = async (lote: Lote) => {
 
 export const _getLotes = async () => {
   try {
-    const result = await query(`select * from lotes where estado !=0`, []);
+    const result = await query(`select * from lote where estado !=0`, []);
     return {
       items: result.data,
       success: true,
@@ -70,7 +70,7 @@ export const _getLotes = async () => {
 export const _getLote = async (lote_id: number) => {
   try {
     const result = await query(
-      `select * from lotes where estado !=0 and lote_id = ?;`,
+      `select * from lote where estado !=0 and lote_id = ?;`,
       [lote_id]
     );
     return {
@@ -89,7 +89,7 @@ export const _getLote = async (lote_id: number) => {
 
 export const _getLoteProductos = async (lote_id: number) => {
   try {
-    const resultLote = await query("SELECT * FROM lotes WHERE lote_id = ?", [
+    const resultLote = await query("SELECT * FROM lote WHERE lote_id = ?", [
       lote_id,
     ]);
     const lote = resultLote.data[0];

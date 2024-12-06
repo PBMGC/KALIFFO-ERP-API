@@ -7,7 +7,7 @@ import {
   _getTrabajador,
   _getTrabajadores,
   _updateTrabajador,
-} from "../service/trabajadores";
+} from "../service/trabajador";
 
 export const createTrabajador = async (req: Request, res: Response) => {
   const {

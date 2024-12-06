@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { _createAcabado } from "../service/talleres";
+import { _createAcabado } from "../service/taller";
 import {
   createAcabado,
   getAcabado,
@@ -18,7 +18,7 @@ router.get("", getAcabados);
 router.get("/lote/:lote_id", getAcabadoLote);
 router.get("/:acabado_id", getAcabado);
 
-router.put("/sgte/:lote_id", sgteEstadoAcabado);
+router.post("/sgte/:lote_id", sgteEstadoAcabado);
 
 router.post("/create", createAcabado);
 

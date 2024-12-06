@@ -12,7 +12,7 @@ export const _createAcabado = async (acabado: any) => {
   } = acabado;
 
   const queryText = `
-    INSERT INTO taller_acabados (lote_id, color_id, talla, cantidad_recibida, fecha_inicio, fecha_final)
+    INSERT INTO taller_acabado (lote_id, color_id, talla, cantidad_recibida, fecha_inicio, fecha_final)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
@@ -73,7 +73,7 @@ export const _createAcabado = async (acabado: any) => {
 
 export const _getAcabados = async () => {
   try {
-    const queryText = `SELECT * FROM taller_acabados where estado != 0`;
+    const queryText = `SELECT * FROM taller_acabado where estado != 0`;
     const result = await query(queryText);
 
     return {
@@ -93,7 +93,7 @@ export const _getAcabados = async () => {
 
 export const _getAcabado = async (acabado_id: number) => {
   try {
-    const queryText = `SELECT * FROM taller_acabados WHERE acabado_id = ? and estado != 0`;
+    const queryText = `SELECT * FROM taller_acabado WHERE acabado_id = ? and estado != 0`;
     const result = await query(queryText, [acabado_id]);
 
     if (result.data && result.data.length === 0) {
@@ -122,7 +122,7 @@ export const _getAcabado = async (acabado_id: number) => {
 export const _getAcabadoLote = async (lote_id: string) => {
   try {
     const result = await query(
-      "select ta.acabado_id,co.codigo,ta.talla,ta.cantidad_enviada,ta.cantidad_recibida,ta.estado,ta.fecha_inicio,ta.fecha_final from taller_acabados ta INNER JOIN color co on ta.color_id=co.color_id where lote_id = ?",
+      "select ta.acabado_id,co.codigo,ta.talla,ta.cantidad_enviada,ta.cantidad_recibida,ta.estado,ta.fecha_inicio,ta.fecha_final from taller_acabado ta INNER JOIN color co on ta.color_id=co.color_id where lote_id = ?",
       [lote_id]
     );
 
@@ -143,7 +143,7 @@ export const _getAcabadoLote = async (lote_id: string) => {
 
 export const _activarAcabado = async (acabado_id: number) => {
   const queryText =
-    "UPDATE taller_acabados SET estado = 1 WHERE acabado_id = ? AND estado != 1";
+    "UPDATE taller_acabado SET estado = 1 WHERE acabado_id = ? AND estado != 1";
 
   try {
     const result = await query(queryText, [acabado_id]);
@@ -173,7 +173,7 @@ export const _activarAcabado = async (acabado_id: number) => {
 
 export const _desactivarAcabado = async (acabado_id: number) => {
   const queryText =
-    "UPDATE taller_acabados SET estado = 0 WHERE acabado_id = ? AND estado != 0";
+    "UPDATE taller_acabado SET estado = 0 WHERE acabado_id = ? AND estado != 0";
 
   try {
     const result = await query(queryText, [acabado_id]);
@@ -210,7 +210,7 @@ export const _sgteEstadoAcabadosPorLote = async (
 ) => {
   try {
     const result = await query(
-      "SELECT * FROM taller_acabados WHERE lote_id = ?",
+      "SELECT * FROM taller_acabado WHERE lote_id = ?",
       [lote_id]
     );
     const acabados = result.data;
@@ -223,7 +223,7 @@ export const _sgteEstadoAcabadosPorLote = async (
       };
     }
 
-    const resultados = [];
+    const resultados: any[] = [];
     let cantidadTotal = 0;
 
     for (const detalle of detalles) {
@@ -252,11 +252,15 @@ export const _sgteEstadoAcabadosPorLote = async (
           break;
 
         case 1:
+          console.log("============");
+          console.log("Entro al caso 1");
+
           await caso1(detalle.acabado_id, resultados);
           break;
 
-        //pasar al almacen
         case 2:
+          console.log("============");
+          console.log("Entro al caso 2");
           await caso2(
             lote_id,
             tienda_id,
@@ -290,7 +294,7 @@ export const _sgteEstadoAcabadosPorLote = async (
       }
     }
 
-    await query("UPDATE lotes SET cantidad_total = ? WHERE lote_id = ?", [
+    await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
       cantidadTotal,
       lote_id,
     ]);
@@ -302,8 +306,9 @@ export const _sgteEstadoAcabadosPorLote = async (
       status: 200,
     };
   } catch (error: any) {
+    console.error("Error en _sgteEstadoAcabadosPorLote:", error);
     return {
-      msg: "Error en _sgteEstadoAcabadosPorLote",
+      message: "Error en _sgteEstadoAcabadosPorLote",
       error: error.message,
       success: false,
       status: 500,
@@ -311,100 +316,101 @@ export const _sgteEstadoAcabadosPorLote = async (
   }
 };
 
-async function caso1(acabado_id: number, resultados: any) {
+const caso1 = async (acabado_id: number, resultados: any[]) => {
   try {
-    const updateAcabado1 = await query(
-      "UPDATE taller_acabados SET estado = 2 WHERE acabado_id = ?",
+    console.log("============");
+    console.log("Entro a la funcion caso 1");
+    const { affectedRows } = await query(
+      "UPDATE taller_acabado SET estado = 2 WHERE acabado_id = ?",
       [acabado_id]
     );
-    if (updateAcabado1.affectedRows > 0) {
-      resultados.push({
-        acabado_id: acabado_id,
-        message: "El acabado ha pasado al estado 2 (en proceso)",
-        nuevoEstado: 2,
-        success: true,
-        status: 200,
-      });
-    } else {
-      resultados.push({
-        acabado_id: acabado_id,
-        message: "No se pudo actualizar el estado del acabado a 2",
-        success: false,
-        status: 500,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
 
-async function caso2(
+    resultados.push({
+      acabado_id,
+      message:
+        affectedRows > 0
+          ? "El acabado ha pasado al estado 2 (en proceso)"
+          : "No se pudo actualizar el estado del acabado a 2",
+      nuevoEstado: affectedRows > 0 ? 2 : undefined,
+      success: affectedRows > 0,
+      status: affectedRows > 0 ? 200 : 500,
+    });
+  } catch (error) {
+    console.error("Error en caso1:", error);
+    resultados.push({
+      acabado_id,
+      message: "Ocurrió un error al intentar actualizar el acabado",
+      success: false,
+      status: 500,
+    });
+  }
+};
+
+const caso2 = async (
   lote_id: string,
   tienda_id: string,
   almacen_id: string,
   acabado_id: number,
   cantidad_recibida: number,
   cantidad_enviada: number,
-  resultados: any,
+  resultados: any[],
   cantidad_total: number,
   res: any
-) {
+) => {
+  console.log("============");
+  console.log("Entro a la funcion caso 2");
   if (!cantidad_recibida) {
-    resultados.push({
-      acabado_id: acabado_id,
+    return resultados.push({
+      acabado_id,
       message: "Campo 'cantidad_recibida' obligatorio.",
       success: false,
       status: 400,
     });
-    return;
   }
 
   if (cantidad_recibida > cantidad_enviada) {
-    resultados.push({
-      lavanderia_id: acabado_id,
+    return resultados.push({
+      acabado_id,
       message: "La cantidad recibida es mayor a la cantidad enviada",
       success: false,
       status: 400,
     });
-    return;
   }
 
   cantidad_total += cantidad_recibida;
 
-  const now = new Date();
-  const fecha = now.toLocaleTimeString("en-CA");
+  const now = new Date().toISOString();
 
   try {
-    const updateAcabado = await query(
-      "UPDATE taller_acabados SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
-      [cantidad_recibida, now, acabado_id]
-    );
-
-    const updateLote = await query(
-      "UPDATE lotes SET estado = 4 WHERE lote_id = ?",
-      [lote_id]
-    );
+    const [updateAcabado, updateLote] = await Promise.all([
+      query(
+        "UPDATE taller_acabado SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
+        [cantidad_recibida, now, acabado_id]
+      ),
+      query("UPDATE lote SET estado = 4 WHERE lote_id = ?", [lote_id]),
+    ]);
 
     if (updateAcabado.affectedRows > 0 && updateLote.affectedRows > 0) {
       const datos = await obtenerProductosTaller(lote_id);
       await procesoCrearProductos(datos, tienda_id, almacen_id, lote_id, res);
     } else {
       resultados.push({
-        acabado_id: acabado_id,
-        message: "No se pudo actualizar el estado del acabado o del lote",
+        acabado_id,
+        message: "No se pudo actualizar el estado del acabado o del lote.",
         success: false,
         status: 500,
       });
     }
   } catch (error) {
+    console.error("Error en caso2:", error);
     resultados.push({
-      acabado_id: acabado_id,
-      message: `Error al actualizar estado`,
+      acabado_id,
+      message: "Error al actualizar estado.",
       success: false,
       status: 500,
     });
   }
-}
+};
 
 async function obtenerProductosTaller(lote_id: string) {
   return await query(
@@ -415,11 +421,11 @@ async function obtenerProductosTaller(lote_id: string) {
           ta.cantidad_recibida as stock,
           ta.talla
       FROM 
-          taller_acabados ta
+          taller_acabado ta
       INNER JOIN 
           lavanderia l ON ta.lavanderia_id = l.lavanderia_id
       INNER JOIN 
-          cortes c ON l.corte_id = c.corte_id
+          corte c ON l.corte_id = c.corte_id
       WHERE 
           ta.lote_id = ?
     `,
@@ -455,7 +461,7 @@ async function procesoCrearProductos(
     );
   }
 
-  await _imprimirCodigo(res, lote_id);
+  // await _imprimirCodigo(res, lote_id);
 
   return;
 }
