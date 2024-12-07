@@ -7,13 +7,13 @@ SELECT
   tienda.direccion,
   tienda.telefono,
   SUM(productodetalle.stock) AS total_stock,
-  COUNT(DISTINCT usuario.tienda_id) AS total_usuarios
+  COUNT(DISTINCT trabajador.tienda_id) AS total_usuarios
 FROM 
   tienda
 LEFT JOIN 
   productodetalle ON productodetalle.tienda_id = tienda.tienda_id
 LEFT JOIN 
-  usuario ON usuario.tienda_id = tienda.tienda_id
+  trabajador ON trabajador.tienda_id = tienda.tienda_id
 WHERE 
 	estado = true
 GROUP BY 
