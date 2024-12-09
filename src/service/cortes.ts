@@ -154,7 +154,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
                 corte.estado, 
                 corte.corte_id, 
                 corte.taller_id,
-                usuario.nombre AS taller,
+                trabajador.nombre AS taller,
                 producto.nombre AS producto, 
                 corte.cantidad_enviada,
                 corte.cantidad_recibida,
@@ -168,11 +168,11 @@ export const _getCortesPorLote = async (lote_id: number) => {
             FROM 
                 corte
             LEFT JOIN 
-                usuario ON corte.taller_id = usuario.usuario_id
+                trabajador ON corte.taller_id = trabajador.trabajador_id
             INNER JOIN 
                 producto ON producto.producto_id = corte.producto_id
             WHERE 
-                corte.lote_id = ? 
+                corte.lote_id = 6
                 AND corte.estado != 0;
     `;
     const result = await query(queryText, [lote_id]);
