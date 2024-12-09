@@ -8,7 +8,6 @@ import morgan from "morgan";
 import { initSeeders } from "../seeders/initSeeders";
 import { initTriggers } from "../db/triggers/initTrigger";
 import { initSp } from "../db/sp/initSp";
-import { exec } from "child_process";
 import { ts } from "../util/tr";
 
 class Serve {
