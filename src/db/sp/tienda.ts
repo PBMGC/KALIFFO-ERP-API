@@ -26,7 +26,7 @@ SELECT
   tienda.direccion,
   tienda.telefono,
   COALESCE(p.total, 0) AS total_stock, 
-  COUNT(DISTINCT usuario.usuario_id) AS total_usuarios
+  COUNT(DISTINCT trabajador.trabajador_id) AS total_usuarios
 FROM 
   tienda
 LEFT JOIN (
@@ -40,8 +40,8 @@ LEFT JOIN (
 ) p 
 ON tienda.tienda_id = p.tienda_id
 LEFT JOIN 
-  usuario 
-ON usuario.tienda_id = tienda.tienda_id
+  trabajador 
+ON trabajador.tienda_id = tienda.tienda_id
 WHERE 
   tienda.tienda_id = t_id;
 `;

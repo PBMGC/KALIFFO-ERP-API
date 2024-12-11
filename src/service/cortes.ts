@@ -172,7 +172,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
             INNER JOIN 
                 producto ON producto.producto_id = corte.producto_id
             WHERE 
-                corte.lote_id = 6
+                corte.lote_id = ?
                 AND corte.estado != 0;
     `;
     const result = await query(queryText, [lote_id]);
