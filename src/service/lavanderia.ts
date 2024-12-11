@@ -346,6 +346,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
             });
             break;
           }
+          console.log("cantida_recibida => ", detalle.cantidad_recibida);
 
           if (detalle.cantidad_recibida > lavanderia.cantidad_enviada) {
             resultados.push({
@@ -422,12 +423,17 @@ export const _sgteEstadoLavanderiaPorLote = async (
           });
           break;
       }
-    }
 
-    await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
-      cantidadTotal,
-      lote_id,
-    ]);
+      if (lavanderia.estado === 2) {
+        console.log("===========");
+        console.log(cantidadTotal);
+
+        await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
+          cantidadTotal,
+          lote_id,
+        ]);
+      }
+    }
 
     return {
       message: "Proceso completado para todas las lavanderías del lote",
