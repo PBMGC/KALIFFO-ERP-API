@@ -55,7 +55,7 @@ class Serve {
 
   async db() {
     try {
-      // ts();
+      ts();
       await initBD();
       await initTriggers();
       await initSeeders();

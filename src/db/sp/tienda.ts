@@ -68,8 +68,8 @@ GROUP BY producto.producto_id;
 const queryReporteTienda = `
   SELECT 
     t.*, 
-    u.usuarios,
-    u.usuarios_info, 
+    u.trabajadores,
+    u.trabajadores_info, 
     p.productos_info,
     p.total_stock
 FROM 
@@ -79,13 +79,13 @@ LEFT JOIN (
         u.tienda_id, 
         GROUP_CONCAT(
             CONCAT("(", 
-                u.usuario_id, ",", u.nombre, ",", u.ap_paterno, ",", u.ap_materno, 
+                u.trabajador_id, ",", u.nombre, ",", u.ap_paterno, ",", u.ap_materno, 
                 ",", u.telefono, ",", u.dni, ",", u.sueldo, ")"
             ) SEPARATOR ","
-        ) AS usuarios_info,
-    	COUNT(DISTINCT u.usuario_id) as usuarios
+        ) AS trabajadores_info,
+    	COUNT(DISTINCT u.trabajador_id) as trabajadores
     FROM 
-        usuario u
+        trabajador u
     GROUP BY 
         u.tienda_id
 ) u 
@@ -127,9 +127,9 @@ ON
 WHERE 
     t.tienda_id = t_id
 GROUP BY 
-    t.tienda_id, u.usuarios_info, p.productos_info, p.total_stock;
+    t.tienda_id, u.trabajadores_info, p.productos_info, p.total_stock;
 
-`
+`;
 
 export const initiProcedureGetLoseProductosTienda = async () => {
   await createSp(

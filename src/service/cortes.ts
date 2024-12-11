@@ -426,7 +426,6 @@ export const _sgteEstadoCortesPorLote = async (
       }
     }
 
-    // Actualizar cantidad total del lote
     await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
       cantidadTotal,
       lote_id,
