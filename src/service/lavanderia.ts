@@ -425,9 +425,6 @@ export const _sgteEstadoLavanderiaPorLote = async (
       }
 
       if (lavanderia.estado === 2) {
-        console.log("===========");
-        console.log(cantidadTotal);
-
         await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
           cantidadTotal,
           lote_id,

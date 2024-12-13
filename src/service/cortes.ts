@@ -424,12 +424,13 @@ export const _sgteEstadoCortesPorLote = async (
           });
           break;
       }
+      if (corte.estado === 2) {
+        await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
+          cantidadTotal,
+          lote_id,
+        ]);
+      }
     }
-
-    await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
-      cantidadTotal,
-      lote_id,
-    ]);
 
     return {
       message: "Proceso completado para todos los cortes del lote",
