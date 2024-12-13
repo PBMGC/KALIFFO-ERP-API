@@ -1,5 +1,6 @@
 import { query } from "../util/query";
 
+// Función para crear un pago
 export const _createPago = async (pago: any) => {
   try {
     const { trabajador_id, montoPagado, montoFaltante, fecha } = pago;
@@ -7,7 +8,7 @@ export const _createPago = async (pago: any) => {
       INSERT INTO pago (montoPagado, montoFaltante, fecha, trabajador_id)
       VALUES (?, ?, ?, ?);
     `;
-    await query(sql, [montoFaltante, montoPagado, fecha, trabajador_id]);
+    await query(sql, [montoPagado, montoFaltante, fecha, trabajador_id]);
 
     return {
       message: "Pago creado exitosamente",
@@ -24,6 +25,7 @@ export const _createPago = async (pago: any) => {
   }
 };
 
+// Función para obtener los pagos de un trabajador
 export const _getPagos = async (trabajador_id: number) => {
   try {
     const sql = `
@@ -51,6 +53,7 @@ export const _getPagos = async (trabajador_id: number) => {
   }
 };
 
+// Función para eliminar un pago
 export const _deletePagos = async (pago_id: number) => {
   try {
     const sql = `
@@ -73,13 +76,14 @@ export const _deletePagos = async (pago_id: number) => {
   }
 };
 
+// Función para actualizar un pago
 export const _updatePago = async (
   pago_id: number,
   pago: {
     montoPagado?: number;
     montoFaltante?: number;
     fecha?: string;
-    trabajador_id: string;
+    trabajador_id?: string;
   }
 ) => {
   try {
@@ -88,12 +92,27 @@ export const _updatePago = async (
     const camposActualizar: string[] = [];
     const valores: any[] = [];
 
+    // Validar que los campos a actualizar no sean undefined
     if (montoPagado !== undefined) {
+      if (typeof montoPagado !== "number" || montoPagado <= 0) {
+        return {
+          message: "Monto pagado inválido",
+          success: false,
+          status: 400,
+        };
+      }
       camposActualizar.push("montoPagado = ?");
       valores.push(montoPagado);
     }
 
     if (montoFaltante !== undefined) {
+      if (typeof montoFaltante !== "number" || montoFaltante < 0) {
+        return {
+          message: "Monto faltante inválido",
+          success: false,
+          status: 400,
+        };
+      }
       camposActualizar.push("montoFaltante = ?");
       valores.push(montoFaltante);
     }

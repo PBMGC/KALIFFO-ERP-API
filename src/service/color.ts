@@ -1,6 +1,8 @@
 import { Color } from "../interface/color";
 import { query } from "../util/query";
 
+// Función para crear un nuevo color utilizando un procedimiento almacenado
+// Recibe un objeto de tipo Color y llama al procedimiento almacenado SP_CreateColor
 export const _createColor = async (color: Color) => {
   const { nombre, codigo } = color;
 
@@ -21,6 +23,8 @@ export const _createColor = async (color: Color) => {
   };
 };
 
+// Función para obtener todos los colores registrados llamando a un procedimiento almacenado
+// Utiliza SP_GetColores para recuperar los colores desde la base de datos
 export const _getColores = async () => {
   const result = await query("call SP_GetColores()");
 
@@ -33,7 +37,7 @@ export const _getColores = async () => {
   }
 
   return {
-    items: result.data[0]||[],
+    items: result.data[0] || [],
     success: true,
     status: 200,
   };

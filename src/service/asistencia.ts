@@ -1,6 +1,8 @@
 import { Horario } from "../interface/horario";
 import { query } from "../util/query";
 
+// Función para crear un nuevo registro de horario en la base de datos
+// Recibe un objeto de tipo Horario y realiza una inserción en la tabla correspondiente
 export const _createAsistencia = async (horario: Horario) => {
   const { hora_entrada, hora_salida, fecha, trabajador_id } = horario;
 
@@ -31,6 +33,8 @@ export const _createAsistencia = async (horario: Horario) => {
   };
 };
 
+// Función para obtener todos los registros de horarios de la base de datos
+// Permite filtrar los registros por el ID del usuario si se proporciona
 export const _getAsistencias = async (ususario_id?: number) => {
   let queryText = `
   SELECT *, 
@@ -59,6 +63,8 @@ export const _getAsistencias = async (ususario_id?: number) => {
   };
 };
 
+// Función para calcular el total de horas trabajadas por un usuario en un rango de fechas
+// Realiza la consulta sumando la diferencia en segundos entre hora de entrada y salida
 export const _horasTrabajadas = async (
   fechaInicio: string,
   fechaFinal: string,

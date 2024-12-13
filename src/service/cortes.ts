@@ -2,17 +2,21 @@ import { Corte } from "../interface/corte";
 import { query } from "../util/query";
 import { _createLavanderia } from "./lavanderia";
 
+// Función para crear un corte en la base de datos y actualizar el lote correspondiente
 export const _createCorte = async (corte: Corte) => {
   const { lote_id, taller_id, producto_id, cantidad_enviada, talla } = corte;
 
   try {
+    // Inserta el corte en la tabla 'corte' con los datos proporcionados
     await query(
       `
         INSERT INTO corte (lote_id ,taller_id ,producto_id ,cantidad_enviada ,talla) 
         VALUES (?, ?, ?, ?, ?)`,
+
       [lote_id, taller_id, producto_id, cantidad_enviada, talla]
     );
 
+    // Actualiza la cantidad total del lote sumando la cantidad enviada
     await query(
       `
       UPDATE lote
@@ -36,6 +40,7 @@ export const _createCorte = async (corte: Corte) => {
   }
 };
 
+// Función para crear múltiples cortes a partir de un array de detalles
 export const _createCorteArray = async (corte: any, lote_id: number) => {
   const { detalles, producto_id } = corte;
   const errors: any[] = [];
@@ -45,6 +50,7 @@ export const _createCorteArray = async (corte: any, lote_id: number) => {
     const { taller_id, cantidad_enviada, talla } = detalle;
 
     try {
+      // Inserta cada corte en la base de datos
       await query(
         `
         INSERT INTO corte (lote_id, taller_id, producto_id, cantidad_enviada, talla) 
@@ -52,6 +58,7 @@ export const _createCorteArray = async (corte: any, lote_id: number) => {
         [lote_id, taller_id, producto_id, cantidad_enviada, talla]
       );
 
+      // Actualiza el lote con la cantidad enviada
       await query(
         `
         UPDATE lote
@@ -82,6 +89,7 @@ export const _createCorteArray = async (corte: any, lote_id: number) => {
     }
   }
 
+  // Devuelve los resultados si todo salió bien o con los errores
   if (errors.length === 0) {
     return {
       message: "Todos los cortes se crearon con éxito.",
@@ -100,8 +108,10 @@ export const _createCorteArray = async (corte: any, lote_id: number) => {
   }
 };
 
+// Función para actualizar un corte en la base de datos
 export const _UpdateCorte = async (updateCorte: any) => {
   try {
+    // Llama al procedimiento almacenado SP_UpdateCorte para actualizar el corte
     await query(`CALL SP_UpdateCorte(?,?,?,?,?,?,?)`, [
       updateCorte.corte_id,
       updateCorte.taller_id || null,
@@ -127,6 +137,7 @@ export const _UpdateCorte = async (updateCorte: any) => {
   }
 };
 
+// Función para obtener todos los cortes de la base de datos
 export const _getCortes = async () => {
   try {
     const queryText = `SELECT * FROM corte`;
@@ -147,6 +158,7 @@ export const _getCortes = async () => {
   }
 };
 
+// Función para obtener los cortes asociados a un lote específico
 export const _getCortesPorLote = async (lote_id: number) => {
   try {
     const queryText = `
@@ -192,6 +204,7 @@ export const _getCortesPorLote = async (lote_id: number) => {
   }
 };
 
+// Función para obtener una lista de todas las tallas disponibles en los cortes
 export const _getTallas = async () => {
   try {
     const queryText = `SELECT corte.talla from corte group by corte.talla`;
@@ -211,6 +224,7 @@ export const _getTallas = async () => {
   }
 };
 
+// Función para obtener un corte específico por su ID
 export const _getCorte = async (corte_id: number) => {
   try {
     const queryText = `SELECT * FROM corte WHERE corte_id = ?`;
@@ -231,6 +245,7 @@ export const _getCorte = async (corte_id: number) => {
   }
 };
 
+// Función para desactivar un corte (poner su estado en 0)
 export const _desactivarCorte = async (corte_id: number) => {
   const queryText =
     "UPDATE corte SET estado = 0 WHERE corte_id = ? AND estado != 0;";
@@ -261,6 +276,7 @@ export const _desactivarCorte = async (corte_id: number) => {
   }
 };
 
+// Función para activar un corte (poner su estado en true)
 export const _activarCorte = async (corte_id: number) => {
   const queryText =
     "UPDATE corte SET estado = true WHERE corte_id = ? AND estado != true;";
@@ -291,6 +307,7 @@ export const _activarCorte = async (corte_id: number) => {
   }
 };
 
+// Función para actualizar el estado de los cortes de un lote en base a la cantidad recibida
 export const _sgteEstadoCortesPorLote = async (
   lote_id: number,
   detalles: { corte_id: number; cantidad_recibida: number; taller_id: number }[]
