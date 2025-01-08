@@ -9,10 +9,10 @@ import {
 import { handleHttp } from "../util/error.handler";
 
 export const createIncidencia = async (req: Request, res: Response) => {
-  const { usuario_id, tipo, descripcion } = req.body;
+  const { trabajador_id, tipo, descripcion } = req.body;
 
   try {
-    const response = await _createIncidencia({ usuario_id, tipo, descripcion });
+    const response = await _createIncidencia({ trabajador_id, tipo, descripcion });
     res.status(response.status).json(response);
   } catch (error) {
     handleHttp(res, "error_createIncidencia", 500);
