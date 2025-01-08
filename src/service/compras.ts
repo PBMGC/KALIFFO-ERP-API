@@ -199,7 +199,7 @@ export const _getCompras = async (tienda_id: number | null) => {
 // Función para obtener las empresas proveedoras únicas
 // Agrupa por el campo `empresa_proveedor` y devuelve la lista
 export const _getEmpresas = async () => {
-  const queryText = `select compras.empresa_proveedor from compras group by compras.empresa_proveedor`;
+  const queryText = `select compra.empresa_proveedor from compra group by compra.empresa_proveedor`;
 
   const result = await query(queryText);
 
