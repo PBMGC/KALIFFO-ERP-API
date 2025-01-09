@@ -1,22 +1,25 @@
 import { query } from "../util/query";
 import { _createProductoCompleto, _imprimirCodigo } from "./producto";
 
+// Función para crear un nuevo registro de 'acabado' (acabado o proceso de finalización)
 export const _createAcabado = async (acabado: any) => {
   const {
-    lote_id,
-    color_id,
-    talla,
-    cantidad_recibida,
-    fecha_inicio,
-    fecha_final,
+    lote_id, // ID del lote
+    color_id, // ID del color
+    talla, // Talla
+    cantidad_recibida, // Cantidad recibida
+    fecha_inicio, // Fecha de inicio
+    fecha_final, // Fecha final
   } = acabado;
 
+  // Consulta SQL para insertar un nuevo registro en la tabla 'taller_acabado'
   const queryText = `
     INSERT INTO taller_acabado (lote_id, color_id, talla, cantidad_recibida, fecha_inicio, fecha_final)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
   try {
+    // Ejecutar la consulta para insertar los datos
     const result = await query(queryText, [
       lote_id,
       color_id,
@@ -26,12 +29,14 @@ export const _createAcabado = async (acabado: any) => {
       fecha_final,
     ]);
 
+    // Retorna un mensaje de éxito si la inserción fue exitosa
     return {
       message: "Acabado creado con éxito.",
       success: true,
       status: 201,
     };
   } catch (error: any) {
+    // Retorna un mensaje de error en caso de fallo
     return {
       message: "Error al crear el acabado.",
       success: false,
@@ -41,36 +46,7 @@ export const _createAcabado = async (acabado: any) => {
   }
 };
 
-// export const _updateAcabado = async (updateAcabado: any) => {
-//   try {
-//     const queryText = `CALL SP_UpdateAcabado(?,?,?,?,?,?,?,?)`;
-
-//     await query(queryText, [
-//       updateAcabado.acabado_id,
-//       updateAcabado.lote_id || null,
-//       updateAcabado.color_id || null,
-//       updateAcabado.talla || null,
-//       updateAcabado.cantidad_recibida || null,
-//       updateAcabado.cantidad_enviada || null,
-//       updateAcabado.fecha_inicio || null,
-//       updateAcabado.fecha_final || null,
-//     ]);
-
-//     return {
-//       message: "Acabado actualizado con éxito.",
-//       success: true,
-//       status: 200,
-//     };
-//   } catch (error: any) {
-//     return {
-//       message: "Error al actualizar el acabado.",
-//       success: false,
-//       error: error.message || error,
-//       status: 500,
-//     };
-//   }
-// };
-
+// Función para obtener todos los 'acabados' (procesos de finalización) que no están en estado inactivo
 export const _getAcabados = async () => {
   try {
     const queryText = `SELECT * FROM taller_acabado where estado != 0`;
@@ -91,6 +67,7 @@ export const _getAcabados = async () => {
   }
 };
 
+// Función para obtener un 'acabado' (proceso de finalización) específico por su ID
 export const _getAcabado = async (acabado_id: number) => {
   try {
     const queryText = `SELECT * FROM taller_acabado WHERE acabado_id = ? and estado != 0`;
@@ -119,10 +96,11 @@ export const _getAcabado = async (acabado_id: number) => {
   }
 };
 
+// Función para obtener todos los 'acabados' de un 'lote' (lote de producción)
 export const _getAcabadoLote = async (lote_id: string) => {
   try {
     const result = await query(
-      "select ta.acabado_id,co.codigo,ta.talla,ta.cantidad_enviada,ta.cantidad_recibida,ta.estado,ta.fecha_inicio,ta.fecha_final from taller_acabado ta INNER JOIN color co on ta.color_id=co.color_id where lote_id = ?",
+      "SELECT ta.acabado_id, co.codigo, ta.talla, ta.cantidad_enviada, ta.cantidad_recibida, ta.estado, ta.fecha_inicio, ta.fecha_final FROM taller_acabado ta INNER JOIN color co on ta.color_id = co.color_id WHERE lote_id = ?",
       [lote_id]
     );
 
@@ -141,6 +119,7 @@ export const _getAcabadoLote = async (lote_id: string) => {
   }
 };
 
+// Función para activar un 'acabado' (pasarlo al estado activo)
 export const _activarAcabado = async (acabado_id: number) => {
   const queryText =
     "UPDATE taller_acabado SET estado = 1 WHERE acabado_id = ? AND estado != 1";
@@ -171,6 +150,7 @@ export const _activarAcabado = async (acabado_id: number) => {
   }
 };
 
+// Función para desactivar un 'acabado' (pasarlo al estado inactivo)
 export const _desactivarAcabado = async (acabado_id: number) => {
   const queryText =
     "UPDATE taller_acabado SET estado = 0 WHERE acabado_id = ? AND estado != 0";
@@ -201,12 +181,13 @@ export const _desactivarAcabado = async (acabado_id: number) => {
   }
 };
 
+// Función para realizar una transición de estado de todos los 'acabados' de un 'lote' (lote de producción)
 export const _sgteEstadoAcabadosPorLote = async (
   res: any,
   lote_id: string,
   tienda_id: string,
   almacen_id: string,
-  detalles: { acabado_id: number; cantidad_recibida: number }[]
+  detalles: { acabado_id: number; cantidad_recibida: number }[] // Detalles de cada acabado y su cantidad recibida
 ) => {
   try {
     const result = await query(
@@ -226,6 +207,7 @@ export const _sgteEstadoAcabadosPorLote = async (
     const resultados: any[] = [];
     let cantidadTotal = 0;
 
+    // Recorre los detalles de los acabados y procesa según su estado
     for (const detalle of detalles) {
       const acabado = acabados.find(
         (a: any) => a.acabado_id === detalle.acabado_id
@@ -241,8 +223,9 @@ export const _sgteEstadoAcabadosPorLote = async (
         continue;
       }
 
+      // Switch para procesar según el estado actual del acabado
       switch (acabado.estado) {
-        case 0:
+        case 0: // Inactivo
           resultados.push({
             acabado_id: detalle.acabado_id,
             message: "Este acabado está desactivado",
@@ -251,14 +234,13 @@ export const _sgteEstadoAcabadosPorLote = async (
           });
           break;
 
-        case 1:
+        case 1: // Activo
           console.log("============");
           console.log("Entro al caso 1");
-
-          await caso1(detalle.acabado_id, resultados);
+          await caso1(detalle.acabado_id, resultados); // Procesa transición a estado 2
           break;
 
-        case 2:
+        case 2: // En proceso
           console.log("============");
           console.log("Entro al caso 2");
           await caso2(
@@ -274,7 +256,7 @@ export const _sgteEstadoAcabadosPorLote = async (
           );
           break;
 
-        case 3:
+        case 3: // Finalizado
           resultados.push({
             acabado_id: detalle.acabado_id,
             message: "Este acabado está finalizado",
@@ -294,6 +276,7 @@ export const _sgteEstadoAcabadosPorLote = async (
       }
     }
 
+    // Actualiza la cantidad total del lote después de procesar todos los acabados
     await query("UPDATE lote SET cantidad_total = ? WHERE lote_id = ?", [
       cantidadTotal,
       lote_id,
@@ -316,6 +299,7 @@ export const _sgteEstadoAcabadosPorLote = async (
   }
 };
 
+// Función para procesar la transición de estado de un 'acabado' cuando está en estado activo (estado 1)
 const caso1 = async (acabado_id: number, resultados: any[]) => {
   try {
     console.log("============");
@@ -325,6 +309,7 @@ const caso1 = async (acabado_id: number, resultados: any[]) => {
       [acabado_id]
     );
 
+    // Retorna el resultado de la operación de actualización
     resultados.push({
       acabado_id,
       message:
@@ -346,6 +331,7 @@ const caso1 = async (acabado_id: number, resultados: any[]) => {
   }
 };
 
+// Función para procesar la transición de estado cuando el 'acabado' está en proceso (estado 2)
 const caso2 = async (
   lote_id: string,
   tienda_id: string,
@@ -359,6 +345,8 @@ const caso2 = async (
 ) => {
   console.log("============");
   console.log("Entro a la funcion caso 2");
+
+  // Validaciones antes de procesar la transición de estado
   if (!cantidad_recibida) {
     return resultados.push({
       acabado_id,
@@ -377,11 +365,12 @@ const caso2 = async (
     });
   }
 
-  cantidad_total += cantidad_recibida;
+  cantidad_total += cantidad_recibida; // Actualiza la cantidad total
 
   const now = new Date().toISOString();
 
   try {
+    // Actualiza los registros de 'acabado' y 'lote'
     const [updateAcabado, updateLote] = await Promise.all([
       query(
         "UPDATE taller_acabado SET estado = 3, cantidad_recibida = ?, fecha_final = ? WHERE acabado_id = ?",
@@ -391,8 +380,8 @@ const caso2 = async (
     ]);
 
     if (updateAcabado.affectedRows > 0 && updateLote.affectedRows > 0) {
-      const datos = await obtenerProductosTaller(lote_id);
-      await procesoCrearProductos(datos, tienda_id, almacen_id, lote_id, res);
+      const datos = await obtenerProductosTaller(lote_id); // Obtiene los productos asociados al lote
+      await procesoCrearProductos(datos, tienda_id, almacen_id, lote_id, res); // Crea los productos
     } else {
       resultados.push({
         acabado_id,
@@ -412,6 +401,7 @@ const caso2 = async (
   }
 };
 
+// Función para obtener los detalles de productos asociados a un 'lote' desde el taller
 async function obtenerProductosTaller(lote_id: string) {
   return await query(
     `
@@ -433,6 +423,7 @@ async function obtenerProductosTaller(lote_id: string) {
   );
 }
 
+// Función para manejar la creación de productos basados en los datos procesados
 async function procesoCrearProductos(
   datos: any,
   tienda_id: string,
@@ -451,6 +442,7 @@ async function procesoCrearProductos(
     return acc;
   }, []);
 
+  // Crear productos para cada producto agrupado
   for (const producto of productosOrdenados) {
     await _createProductoCompleto(
       tienda_id,
@@ -460,8 +452,6 @@ async function procesoCrearProductos(
       lote_id
     );
   }
-
-  // await _imprimirCodigo(res, lote_id);
 
   return;
 }

@@ -11,6 +11,7 @@ import {
   _desactivarCorte,
   _sgteEstadoCortesPorLote,
   _createCorteArray,
+  _getCortesPorLoteDiferido,
 } from "../service/cortes";
 import { Corte } from "../interface/corte";
 
@@ -79,9 +80,15 @@ export const updateCorte = async (req: Request, res: Response) => {
 
 export const getCortesPorLote = async (req: Request, res: Response) => {
   const { lote_id } = req.params;
+  const tipo = req.query.tipo as string; 
 
   try {
-    const response = await _getCortesPorLote(Number(lote_id));
+    let response;
+    if(tipo==="diferido")
+      response = await _getCortesPorLoteDiferido(Number(lote_id));
+    else{
+      response = await _getCortesPorLote(Number(lote_id));
+    }
     res
       .status(response.status)
       .json(response.items ? response.items : response);

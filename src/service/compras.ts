@@ -1,5 +1,7 @@
 import { query } from "../util/query";
 
+// Función para crear una nueva compra y su detalle asociado
+// Inserta los datos de la compra y opcionalmente llama a `_createCompraDetalle` para insertar los detalles
 export const _createCompra = async (compra: any) => {
   const {
     empresa_proveedor,
@@ -28,22 +30,15 @@ export const _createCompra = async (compra: any) => {
     await _createCompraDetalle(compra_id, detalle);
   }
 
-  // if (!result.success) {
-  //   console.error("Error al crear la compra:", result.error);
-  //   return {
-  //     message: "Error al crear el compra. Intente nuevamente más tarde.",
-  //     success: false,
-  //     status: result.status || 500,
-  //   };
-  // }
-
   return {
-    message: "compra creada con éxito.",
+    message: "Compra creada con éxito.",
     success: true,
     status: 201,
   };
 };
 
+// Función para crear el detalle de una compra específica
+// Inserta los productos, cantidades y totales relacionados con la compra
 export const _createCompraDetalle = async (
   compra_id: number,
   detalleCompra: any
@@ -53,32 +48,18 @@ export const _createCompraDetalle = async (
     VALUES (?, ?, ?, ?)`;
 
   for (const c of detalleCompra) {
-    console.log(c);
-
-    const result = await query(queryText, [
-      compra_id,
-      c.producto,
-      c.cantidad,
-      c.total,
-    ]);
+    await query(queryText, [compra_id, c.producto, c.cantidad, c.total]);
   }
 
-  // if (!result.success) {
-  //   console.error("Error al crear la compra:", result.error);
-  //   return {
-  //     message: "Error al crear el compra. Intente nuevamente más tarde.",
-  //     success: false,
-  //     status: result.status || 500,
-  //   };
-  // }
-
   return {
-    message: "detalle creado con éxito.",
+    message: "Detalle creado con éxito.",
     success: true,
     status: 201,
   };
 };
 
+// Función para actualizar una compra existente
+// Actualiza la información general de la compra y su detalle si es necesario
 export const _UpdateCompra = async (updatecompra: any) => {
   try {
     await query(`CALL SP_UpdateCompra(?,?,?,?,?,?)`, [
@@ -118,6 +99,8 @@ export const _UpdateCompra = async (updatecompra: any) => {
   }
 };
 
+// Función para actualizar el detalle de una compra
+// Itera sobre los detalles y actualiza cada uno mediante un procedimiento almacenado
 export const _UpdateCompraDetalle = async (detalle: any) => {
   try {
     for (const d of detalle) {
@@ -144,6 +127,8 @@ export const _UpdateCompraDetalle = async (detalle: any) => {
   }
 };
 
+// Función para eliminar una compra de la base de datos
+// Elimina la compra utilizando su `compra_id` y verifica si se afectaron filas
 export const _eliminarCompra = async (compra_id: number) => {
   const queryS = `DELETE FROM compras where compra_id=?`;
 
@@ -159,7 +144,7 @@ export const _eliminarCompra = async (compra_id: number) => {
     }
 
     return {
-      msg: "compra eliminada",
+      msg: "Compra eliminada",
       success: true,
       status: 200,
     };
@@ -173,6 +158,8 @@ export const _eliminarCompra = async (compra_id: number) => {
   }
 };
 
+// Función para obtener las compras registradas
+// Filtra por `tienda_id` si se proporciona, devolviendo la lista de compras
 export const _getCompras = async (tienda_id: number | null) => {
   let queryText: string;
   let params: Array<number> = [];
@@ -189,11 +176,10 @@ export const _getCompras = async (tienda_id: number | null) => {
 
   const result = await query(queryText, params.length ? params : undefined);
 
-  const dataCompras = result.data.map((compra:any)=>({
+  const dataCompras = result.data.map((compra: any) => ({
     ...compra,
-    fecha_compra:new Date(compra.fecha_compra).toISOString().split("T")[0]
-  }))
-
+    fecha_compra: new Date(compra.fecha_compra).toISOString().split("T")[0],
+  }));
 
   if (!result.success) {
     return {
@@ -210,6 +196,8 @@ export const _getCompras = async (tienda_id: number | null) => {
   };
 };
 
+// Función para obtener las empresas proveedoras únicas
+// Agrupa por el campo `empresa_proveedor` y devuelve la lista
 export const _getEmpresas = async () => {
   const queryText = `select compras.empresa_proveedor from compras group by compras.empresa_proveedor`;
 
@@ -230,6 +218,8 @@ export const _getEmpresas = async () => {
   };
 };
 
+// Función para obtener los productos únicos del detalle de compras
+// Agrupa por el campo `producto` y devuelve la lista
 export const _getProductos = async () => {
   const queryText = `select compras_detalle.producto from compras_detalle GROUP BY compras_detalle.producto`;
 
@@ -250,6 +240,8 @@ export const _getProductos = async () => {
   };
 };
 
+// Función para obtener los detalles de una compra específica
+// Incluye información de la compra y su detalle relacionado
 export const _getComprasDetalle = async (compra_id: number) => {
   const queryCompra = `
      SELECT compras.compra_id,tienda.tienda,compras.empresa_proveedor,compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda 
@@ -277,11 +269,10 @@ export const _getComprasDetalle = async (compra_id: number) => {
 
     const compraFixed = {
       ...compraResult.data[0],
-      fecha_compra: new Date(compraResult.data[0].fecha_compra).toISOString().split("T")[0],
-    }
-
-
-    
+      fecha_compra: new Date(compraResult.data[0].fecha_compra)
+        .toISOString()
+        .split("T")[0],
+    };
 
     const compraConDetalle = {
       ...compraFixed,

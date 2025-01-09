@@ -8,7 +8,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const response = await _login(username, password);
     res.cookie("token", response.token, {
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 6000 * 6000,
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",

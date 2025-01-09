@@ -320,7 +320,6 @@ export const _sgteEstadoLavanderiaPorLote = async (
           break;
 
         case 1:
-          // Actualizar al estado 2
           const updateLavanderia1 = await query(
             "UPDATE lavanderia SET estado = 2 WHERE lavanderia_id = ?",
             [detalle.lavanderia_id]

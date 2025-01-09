@@ -1,10 +1,15 @@
 import dotenv from "dotenv";
-
 import { query } from "../util/query";
 import { Trabajador } from "../interface/trabajador";
 
+// Cargar variables de entorno desde el archivo .env
 dotenv.config();
 
+/**
+ * Crea un nuevo trabajador en la base de datos.
+ * @param trabajador Objeto con los datos del trabajador.
+ * @returns Resultado de la operación.
+ */
 export const _createTrabajador = async (trabajador: Trabajador) => {
   try {
     const result = await query("call SP_CreateTrabajador(?,?,?,?,?,?,?,?,?)", [
@@ -19,6 +24,7 @@ export const _createTrabajador = async (trabajador: Trabajador) => {
       trabajador.rol,
     ]);
 
+    // Si hubo un error en la consulta, se devuelve un mensaje de error
     if (result.error) {
       return {
         error: result.error,
@@ -27,6 +33,7 @@ export const _createTrabajador = async (trabajador: Trabajador) => {
       };
     }
 
+    // Si la creación fue exitosa
     return {
       message: "Trabajador creado exitosamente",
       success: true,
@@ -41,6 +48,13 @@ export const _createTrabajador = async (trabajador: Trabajador) => {
   }
 };
 
+/**
+ * Obtiene la lista de trabajadores según los filtros proporcionados.
+ * @param rol Rol del trabajador (opcional).
+ * @param tienda_id ID de la tienda (opcional).
+ * @param antiTienda_id ID de la tienda anterior (opcional).
+ * @returns Lista de trabajadores.
+ */
 export const _getTrabajadores = async (
   rol?: number,
   tienda_id?: number,
@@ -53,6 +67,7 @@ export const _getTrabajadores = async (
       antiTienda_id || null,
     ])) as any;
 
+    // Mapear los datos obtenidos para devolverlos en el formato adecuado
     const trabajadoresData = trabajadores.data[0].map((trabajador: any) => {
       return {
         ...trabajador,
@@ -74,12 +89,18 @@ export const _getTrabajadores = async (
   }
 };
 
+/**
+ * Obtiene los datos de un trabajador específico.
+ * @param trabajador_id ID del trabajador a obtener.
+ * @returns Datos del trabajador.
+ */
 export const _getTrabajador = async (trabajador_id: string) => {
   try {
     const trabajador = (await query(`CALL SP_GetTrabajador(?)`, [
       trabajador_id,
     ])) as any;
 
+    // Mapear los datos obtenidos para devolverlos en el formato adecuado
     const trabajadoresData = trabajador.data[0].map((trabajadorD: any) => {
       return {
         ...trabajadorD,
@@ -101,6 +122,11 @@ export const _getTrabajador = async (trabajador_id: string) => {
   }
 };
 
+/**
+ * Elimina un trabajador de la base de datos.
+ * @param trabajador_id ID del trabajador a eliminar.
+ * @returns Resultado de la operación.
+ */
 export const _deleteTrabajador = async (trabajador_id: string) => {
   try {
     await query(`Call SP_DeleteTrabajador(?)`, [trabajador_id]);
@@ -119,8 +145,14 @@ export const _deleteTrabajador = async (trabajador_id: string) => {
   }
 };
 
+/**
+ * Actualiza los datos de un trabajador en la base de datos.
+ * @param trabajador Objeto con los datos a actualizar.
+ * @returns Resultado de la operación.
+ */
 export const _updateTrabajador = async (trabajador: Partial<Trabajador>) => {
   try {
+    // Llamada al procedimiento almacenado para actualizar el trabajador
     (await query(`CALL SP_UpdateTrabajador(?,?,?,?,?,?,?,?,?,?)`, [
       trabajador.trabajador_id,
       trabajador.nombre || null,
@@ -148,10 +180,14 @@ export const _updateTrabajador = async (trabajador: Partial<Trabajador>) => {
   }
 };
 
+/**
+ * Elimina un horario de asistencia.
+ * @param horario_id ID del horario a eliminar.
+ * @returns Resultado de la operación.
+ */
 export const _deleteAsistencia = async (horario_id: number) => {
   try {
-    await query(`
-      CALL SP_DeleteHorario(${horario_id})`);
+    await query(`CALL SP_DeleteHorario(${horario_id})`);
 
     return {
       message: "Eliminacion exitosa",
@@ -168,17 +204,26 @@ export const _deleteAsistencia = async (horario_id: number) => {
   }
 };
 
+/**
+ * Genera un reporte en formato PDF para un trabajador específico.
+ * @param res Objeto de respuesta HTTP.
+ * @param trabajador_id ID del trabajador.
+ * @returns Resultado de la operación.
+ */
 export const _generarReporte = async (res: any, trabajador_id: number) => {
   try {
     const PDFDocument = require("pdfkit-table");
 
+    // Establecer cabeceras para la respuesta HTTP como un archivo PDF
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", 'inline; filename="reporte.pdf"');
 
+    // Obtener datos del trabajador
     const dataUsuario: any = await query(
       `CALL SP_ReporteTrabajador(${trabajador_id})`
     );
 
+    // Procesar horarios, pagos e incidencias de la base de datos
     const horariodata: any =
       dataUsuario?.data?.[0]?.[0]?.horarios != null
         ? dataUsuario.data[0][0].horarios.split("), (").map((item: string) => {
@@ -225,6 +270,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
           })
         : [];
 
+    // Crear documento PDF
     const doc = new PDFDocument({
       bufferPages: true,
       title: "Reporte Usuario",
@@ -237,6 +283,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
 
     doc.pipe(res);
 
+    // Agregar logo y encabezado al documento PDF
     doc.image("src/Img/logo.png", 60, 10, {
       fit: [100, 100],
       align: "center",
@@ -248,6 +295,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
       .fontSize(18)
       .text("REPORTE DE TRABAJADOR", 190, 75);
 
+    // Crear y mostrar las tablas con los datos del trabajador, horarios, pagos e incidencias
     const tablaDatosTrabajador = {
       title: `Datos de ${dataUsuario.data[0][0].nombre} ${dataUsuario.data[0][0].ap_paterno} ${dataUsuario.data[0][0].ap_materno}`,
       headers: [
@@ -391,6 +439,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
       }),
     };
 
+    // Función para generar las tablas dentro del documento PDF
     const nuevaTabla = async (tablaData: any, posY: number) => {
       const tablaAltura = await doc.table(tablaData, {
         width: 450,
@@ -429,6 +478,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
         },
       });
 
+      // Si la tabla no cabe en la página, agregar una nueva
       if (tablaAltura + posY > doc.page.height - doc.page.margins.bottom) {
         doc.addPage();
       }
@@ -438,14 +488,13 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
 
     let posY = 120;
 
+    // Generar las tablas
     posY = await nuevaTabla(tablaDatosTrabajador, posY);
-
     posY = await nuevaTabla(tablaDatosHorario, posY);
-
     posY = await nuevaTabla(tablaDatosPago, posY);
-
     posY = await nuevaTabla(tablaDatosIncidencias, posY);
 
+    // Finalizar el documento PDF
     doc.end();
   } catch (error) {
     return {

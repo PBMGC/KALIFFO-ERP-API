@@ -1,5 +1,6 @@
 import { query } from "../util/query";
 
+// Función para crear un nuevo almacén de productos en la base de datos
 export const _createAlmacen_Productos = async (AlmacenProductos: any) => {
   const queryText = `
     INSERT INTO almacen_producto (nombre_almacen,direccion) 
@@ -25,6 +26,7 @@ export const _createAlmacen_Productos = async (AlmacenProductos: any) => {
   }
 };
 
+// Función para actualizar un almacén de productos existente utilizando un procedimiento almacenado
 export const _UpdateAlmacen_Productos = async (updateAlmacenProductos: any) => {
   try {
     await query(`CALL sp_UpdateAlmacen_Producto(?,?,?)`, [
@@ -48,6 +50,7 @@ export const _UpdateAlmacen_Productos = async (updateAlmacenProductos: any) => {
   }
 };
 
+// Función para obtener todos los registros de almacenes de productos desde la base de datos
 export const _getAlmacen_productos = async () => {
   try {
     const result = await query("SELECT * from almacen_producto");
