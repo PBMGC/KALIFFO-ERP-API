@@ -1,5 +1,6 @@
 import connection from "../db/connection";
 
+// Define la estructura de la tabla "usuario"
 const usuario = `
 CREATE TABLE IF NOT EXISTS usuario (
   usuario_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -9,6 +10,7 @@ CREATE TABLE IF NOT EXISTS usuario (
   id_tipo INT 
 );`;
 
+// Define la estructura de la tabla "tienda"
 const tienda = `
 CREATE TABLE IF NOT EXISTS tienda (
   tienda_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS tienda (
   INDEX I_estado (estado)
 );`;
 
+// Define la estructura de la tabla "trabajador"
 const trabajador = `
 CREATE TABLE IF NOT EXISTS trabajador (
   trabajador_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,6 +42,7 @@ CREATE TABLE IF NOT EXISTS trabajador (
   FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE SET NULL
 );`;
 
+// Define la estructura de la tabla "horario"
 const horario = `
 CREATE TABLE IF NOT EXISTS horario (
   horario_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -50,6 +54,7 @@ CREATE TABLE IF NOT EXISTS horario (
   FOREIGN KEY (trabajador_id) REFERENCES trabajador(trabajador_id) ON DELETE CASCADE
 );`;
 
+// Define la estructura de la tabla "incidencia"
 const incidencia = `
 CREATE TABLE IF NOT EXISTS incidencia (
   incidencia_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,6 +68,7 @@ CREATE TABLE IF NOT EXISTS incidencia (
   FOREIGN KEY (trabajador_id) REFERENCES trabajador(trabajador_id) ON DELETE CASCADE
 );`;
 
+// Define la estructura de la tabla "producto"
 const producto = `
 CREATE TABLE IF NOT EXISTS producto (
   producto_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -76,6 +82,7 @@ CREATE TABLE IF NOT EXISTS producto (
   INDEX I_estado (estado) 
 );`;
 
+// Define la estructura de la tabla "color"
 const color = `
 CREATE TABLE IF NOT EXISTS color (
   color_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -85,6 +92,7 @@ CREATE TABLE IF NOT EXISTS color (
   INDEX I_codigo (codigo)
 );`;
 
+// Define la estructura de la tabla "productoDetalle"
 const productoDetalle = `
 CREATE TABLE IF NOT EXISTS productoDetalle (
   productoDetalle_id INT AUTO_INCREMENT PRIMARY KEY, 
@@ -104,6 +112,7 @@ CREATE TABLE IF NOT EXISTS productoDetalle (
   INDEX (tienda_id)
 );`;
 
+// Define la estructura de la tabla "productoTalla"
 const productoTalla = `
 CREATE TABLE IF NOT EXISTS productoTalla (
   productoDetalle_id INT NOT NULL,
@@ -113,6 +122,7 @@ CREATE TABLE IF NOT EXISTS productoTalla (
   INDEX (codigo)
 );`;
 
+// Define la estructura de la tabla "pago"
 const pago = `
 CREATE TABLE IF NOT EXISTS pago (
   pago_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -127,7 +137,7 @@ CREATE TABLE IF NOT EXISTS pago (
   FOREIGN KEY (trabajador_id) REFERENCES trabajador(trabajador_id) ON DELETE CASCADE
 );`;
 
-//se necesita un campo de cantidad total
+// Define la estructura de la tabla "venta"
 const venta = `
 CREATE TABLE IF NOT EXISTS venta (
   venta_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,15 +161,7 @@ CREATE TABLE IF NOT EXISTS venta (
   FOREIGN KEY (tienda_id) REFERENCES tienda(tienda_id) ON DELETE CASCADE
 );`;
 
-/*
-tipoVenta => 
-  1 => por menor
-  2 => por mayor
-
-tipoComprobante => 
-  1 => boleta
-  2 => factura
-*/
+// Define la estructura de la tabla "detalleVenta"
 const detalleVenta = `
 CREATE TABLE IF NOT EXISTS detalleVenta (
   venta_id INT NOT NULL,
@@ -175,6 +177,7 @@ CREATE TABLE IF NOT EXISTS detalleVenta (
   INDEX I_productoDetalleid (productoDetalle_id)
 );`;
 
+// Define la estructura de la tabla "movimientos_tienda_tienda"
 const movimientos_tienda_tienda = `
 CREATE TABLE IF NOT EXISTS movimientos_tienda_tienda (
   movimiento_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -193,6 +196,7 @@ CREATE TABLE IF NOT EXISTS movimientos_tienda_tienda (
   INDEX I_fecha (fecha)
 );`;
 
+// Define la estructura de la tabla "compra"
 const compra = `
 CREATE TABLE IF NOT EXISTS compra (
   compra_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -206,6 +210,7 @@ CREATE TABLE IF NOT EXISTS compra (
   INDEX I_empresa_proveedor (empresa_proveedor)
 );`;
 
+// Define la estructura de la tabla "compra_detalle"
 const compra_detalle = `
 CREATE TABLE IF NOT EXISTS compra_detalle (
   compraDetalle_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -217,6 +222,7 @@ CREATE TABLE IF NOT EXISTS compra_detalle (
   INDEX I_producto (producto)
 );`;
 
+// Define la estructura de la tabla "Envios"
 const Envios = `
 CREATE TABLE IF NOT EXISTS envio (
   envio_id INT AUTO_INCREMENT PRIMARY KEY,  
@@ -230,6 +236,7 @@ CREATE TABLE IF NOT EXISTS envio (
   INDEX I_estado (estado)
 );`;
 
+// Define la estructura de la tabla "almacen_tela"
 const almacen_tela = `
 CREATE TABLE IF NOT EXISTS almacen_tela (
   tela_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -245,11 +252,7 @@ CREATE TABLE IF NOT EXISTS almacen_tela (
   INDEX I_estado (estado)
 );`;
 
-//estado 0 = desactivado
-//estado 1 = corte
-//estado 2 = lavanderia
-//estado 3 = taller
-//estado 4 = almacen
+// Define la estructura de la tabla "lote"
 const lote = `
 CREATE TABLE IF NOT EXISTS lote (
   lote_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -262,10 +265,7 @@ CREATE TABLE IF NOT EXISTS lote (
   estado INT DEFAULT 1
 );`;
 
-//estado 0 = desactivado
-//estado 1 = inicio
-//estado 2 = proceso
-//estado 3 = finalizado
+// Define la estructura de la tabla "corte"
 const corte = `
 CREATE TABLE IF NOT EXISTS corte (
   corte_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -287,15 +287,7 @@ CREATE TABLE IF NOT EXISTS corte (
   INDEX I_cantidad_recibida(cantidad_recibida)
 );`;
 
-//campo nuevo en el select
-// local = 28->10
-// 1envio = 28->9
-// 2envio= 28->9
-
-//estado 0 = desactivado
-//estado 1 = inicio
-//estado 2 = proceso
-//estado 3 = finalizado
+// Define la estructura de la tabla "lavanderia"
 const lavanderia = `
 CREATE TABLE IF NOT EXISTS lavanderia (
   lavanderia_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -315,10 +307,7 @@ CREATE TABLE IF NOT EXISTS lavanderia (
   FOREIGN KEY (color_id) REFERENCES color(color_id)
 );`;
 
-//estado 0 = desactivado
-//estado 1 = inicio
-//estado 2 = proceso
-//estado 3 = finalizado
+// Define la estructura de la tabla "taller_acabados"
 const taller_acabados = `
 CREATE TABLE IF NOT EXISTS taller_acabado (
   acabado_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -340,8 +329,7 @@ CREATE TABLE IF NOT EXISTS taller_acabado (
   INDEX I_estado (estado)
 );`;
 
-//estado 0 = desactivado
-//estado 1 = activo
+// Define la estructura de la tabla "almacen_producto"
 const almacen_producto = `
 CREATE TABLE IF NOT EXISTS almacen_producto (
   almacen_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -353,7 +341,7 @@ CREATE TABLE IF NOT EXISTS almacen_producto (
   INDEX I_estado (estado)
 );`;
 
-//001-N123123
+// Define la estructura de la tabla "movimientos_almacen_tienda"
 const movimientos_almacen_tienda = `
 CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda (
   movimiento_id INT PRIMARY KEY,
@@ -371,6 +359,7 @@ CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda (
   INDEX I_estado (estado)
 );`;
 
+// Define la estructura de la tabla "movimientos_almacen_tienda_detalle"
 const movimientos_almacen_tienda_detalle = `
 CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda_detalle (
   movimiento_id INT NOT NULL,
@@ -388,12 +377,11 @@ CREATE TABLE IF NOT EXISTS movimientos_almacen_tienda_detalle (
   INDEX I_cantidad(cantidad)
 );`;
 
+// Inicializa la base de datos ejecutando las consultas de creación de tablas
 export const initBD = async () => {
   const conn = await connection();
-
   if (conn) {
     try {
-      // Ejecución de todas las tablas
       await conn.execute(usuario);
       await conn.execute(tienda);
       await conn.execute(trabajador);
@@ -425,16 +413,13 @@ export const initBD = async () => {
     }
   }
 };
-
+// Elimina las tablas en el orden inverso a sus dependencias
 export const borrarBD = async () => {
   const conn = await connection();
-
   if (conn) {
     try {
-      // Desactivar restricciones de claves foráneas
+      // Desactiva las restricciones de claves foráneas
       await conn.execute("SET foreign_key_checks = 0;");
-
-      // Eliminar tablas en orden inverso a sus dependencias
       await conn.execute(
         "DROP TABLE IF EXISTS movimientos_almacen_tienda_detalle;"
       );
@@ -460,10 +445,10 @@ export const borrarBD = async () => {
       await conn.execute("DROP TABLE IF EXISTS tienda;");
       await conn.execute("DROP TABLE IF EXISTS usuario;");
       await conn.execute("DROP TABLE IF EXISTS almacen_producto;");
-
       console.log("Base de datos eliminada con éxito.");
     } catch (error) {
     } finally {
+      // Reactiva las restricciones de claves foráneas
       await conn.execute("SET foreign_key_checks = 1;");
       await conn.end();
     }

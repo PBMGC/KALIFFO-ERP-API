@@ -1,4 +1,3 @@
-import { title } from "process";
 import { query } from "../util/query";
 
 // Función para crear una nueva tienda
