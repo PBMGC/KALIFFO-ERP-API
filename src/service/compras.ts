@@ -165,13 +165,13 @@ export const _getCompras = async (tienda_id: number | null) => {
   let params: Array<number> = [];
 
   if (tienda_id) {
-    queryText = `SELECT compras.compra_id,tienda.tienda,compras.empresa_proveedor,
-    compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda on compras.tienda_id=tienda.tienda_id
+    queryText = `SELECT compra.compra_id,tienda.tienda,compra.empresa_proveedor,
+    compra.fecha_compra,compra.cantidad,compra.total from compra inner join tienda on compra.tienda_id=tienda.tienda_id
      WHERE tienda_id = ?`;
     params = [tienda_id];
   } else {
-    queryText = `SELECT compras.compra_id,
-    tienda.tienda,compras.empresa_proveedor,compras.fecha_compra,compras.cantidad,compras.total from compras inner join tienda on compras.tienda_id=tienda.tienda_id`;
+    queryText = `SELECT compra.compra_id,
+    tienda.tienda,compra.empresa_proveedor,compra.fecha_compra,compra.cantidad,compra.total from compra inner join tienda on compra.tienda_id=tienda.tienda_id`;
   }
 
   const result = await query(queryText, params.length ? params : undefined);
@@ -199,7 +199,7 @@ export const _getCompras = async (tienda_id: number | null) => {
 // Función para obtener las empresas proveedoras únicas
 // Agrupa por el campo `empresa_proveedor` y devuelve la lista
 export const _getEmpresas = async () => {
-  const queryText = `select compras.empresa_proveedor from compras group by compras.empresa_proveedor`;
+  const queryText = `select compra.empresa_proveedor from compra group by compra.empresa_proveedor`;
 
   const result = await query(queryText);
 
@@ -221,7 +221,7 @@ export const _getEmpresas = async () => {
 // Función para obtener los productos únicos del detalle de compras
 // Agrupa por el campo `producto` y devuelve la lista
 export const _getProductos = async () => {
-  const queryText = `select compras_detalle.producto from compras_detalle GROUP BY compras_detalle.producto`;
+  const queryText = `select compra_detalle.producto from compra_detalle GROUP BY compra_detalle.producto`;
 
   const result = await query(queryText);
 

@@ -43,7 +43,7 @@ export const _getAsistencias = async (ususario_id?: number) => {
   FROM horario`;
 
   if (ususario_id) {
-    queryText += ` WHERE usuario_id = ?`;
+    queryText += ` WHERE trabajador_id = ?`;
   }
 
   const result = await query(queryText, ususario_id ? [ususario_id] : []);

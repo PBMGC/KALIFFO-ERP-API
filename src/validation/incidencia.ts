@@ -4,19 +4,19 @@ import { NextFunction, Request, Response } from "express";
 import { validateResult } from "../util/validation";
 
 export const ValidateCreateIncidencia: any = [
-  check("usuario_id")
+  check("trabajador_id")
     .exists()
-    .withMessage("EL campo 'usuario_id' es obligatorio.")
+    .withMessage("EL campo 'trabajador_id' es obligatorio.")
     .not()
     .isEmpty()
-    .withMessage("EL campo 'usuario_id' no debe ser vacío.")
+    .withMessage("EL campo 'trabajador_id' no debe ser vacío.")
     .isInt()
-    .withMessage("El campo 'usuario_id' debe ser un número entero.")
-    .custom(async (usuario_id) => {
-      if (usuario_id) {
+    .withMessage("El campo 'trabajador_id' debe ser un número entero.")
+    .custom(async (trabajador_id) => {
+      if (trabajador_id) {
         const result = await query(
           `SELECT * FROM usuario WHERE usuario_id = ?`,
-          [usuario_id]
+          [trabajador_id]
         );
 
         if (result.data.length === 0) {
