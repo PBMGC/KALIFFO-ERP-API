@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS horario (
   fecha DATE NOT NULL,
   trabajador_id INT NOT NULL,
   INDEX I_trabajadorID (trabajador_id),
+  INDEX I_fecha (fecha),
   FOREIGN KEY (trabajador_id) REFERENCES trabajador(trabajador_id) ON DELETE CASCADE
 );`;
 
@@ -55,11 +56,11 @@ CREATE TABLE IF NOT EXISTS incidencia (
   incidencia_id INT AUTO_INCREMENT PRIMARY KEY,
   tipo INT NOT NULL,
   descripcion TEXT NOT NULL,
-  fecha_creacion DATE NOT NULL,
+  fecha DATE NOT NULL,
   trabajador_id INT NOT NULL,
   INDEX I_tipo (tipo),
   INDEX I_trabajadorID (trabajador_id),
-  INDEX I_fechacreacion (fecha_creacion),
+  INDEX I_fechacreacion (fecha),
   FOREIGN KEY (trabajador_id) REFERENCES trabajador(trabajador_id) ON DELETE CASCADE
 );`;
 

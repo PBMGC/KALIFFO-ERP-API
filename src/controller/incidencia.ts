@@ -20,11 +20,11 @@ export const createIncidencia = async (req: Request, res: Response) => {
 };
 
 export const getIncidencias = async (req: Request, res: Response) => {
-  const usuario_id = req.query.usuario_id as string;
-  console.log("Uusuario => ", usuario_id);
+  const trabajador_id = req.query.trabajador_id as string;
+  console.log("Uusuario => ", trabajador_id);
 
   try {
-    const response = await _getIncidencias(Number(usuario_id));
+    const response = await _getIncidencias(Number(trabajador_id));
     res.status(response.status).json(response.items);
   } catch (error) {
     handleHttp(res, "error_getIncidencias", 500);

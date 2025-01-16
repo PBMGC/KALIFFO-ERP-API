@@ -122,9 +122,10 @@ export const updateTrabajador = async (req: Request, res: Response) => {
 
 export const generateReporte = async (req: Request, res: Response) => {
   const { trabajador_id } = req.params;
+  const tipo = req.query.tipo
 
   try {
-    const response = await _generarReporte(res, Number(trabajador_id));
+    const response = await _generarReporte(res, Number(trabajador_id),Number(tipo));
   } catch (error) {
     handleHttp(res, "error_generarReporte", 500);
   }

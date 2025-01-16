@@ -4,8 +4,8 @@ import { query } from "../util/query";
  * Crea una nueva incidencia en la base de datos.
  */
 export const _createIncidencia = async (incidencia: any) => {
-  const { tipo, descripcion, trabajador_id } = incidencia;
-  incidencia.fecha_creacion = new Date(); // Establece la fecha de creación de la incidencia.
+  const { tipo, descripcion, trabajador_id,fecha } = incidencia;
+  incidencia.fecha = new Date(); // Establece la fecha de creación de la incidencia.
 
   try {
     // Llama al procedimiento almacenado para insertar una nueva incidencia en la base de datos.
@@ -13,7 +13,7 @@ export const _createIncidencia = async (incidencia: any) => {
       tipo,
       descripcion,
       trabajador_id,
-      incidencia.fecha_creacion,
+      incidencia.fecha,
     ]);
 
     return {

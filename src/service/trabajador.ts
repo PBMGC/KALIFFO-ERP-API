@@ -210,7 +210,8 @@ export const _deleteAsistencia = async (horario_id: number) => {
  * @param trabajador_id ID del trabajador.
  * @returns Resultado de la operación.
  */
-export const _generarReporte = async (res: any, trabajador_id: number) => {
+export const _generarReporte = async (res: any, trabajador_id: number,tipo:number) => {
+  const consultas = ["1=1",`'fecha BETWEEN DATE_FORMAT(CURRENT_DATE - INTERVAL 1 MONTH, "%Y-%m-01") AND LAST_DAY(CURRENT_DATE - INTERVAL 1 MONTH)'`]
   try {
     const PDFDocument = require("pdfkit-table");
 
@@ -220,7 +221,7 @@ export const _generarReporte = async (res: any, trabajador_id: number) => {
 
     // Obtener datos del trabajador
     const dataUsuario: any = await query(
-      `CALL SP_ReporteTrabajador(${trabajador_id})`
+      `CALL SP_ReporteTrabajador(${trabajador_id},${consultas[tipo-1]})`
     );
 
     // Procesar horarios, pagos e incidencias de la base de datos

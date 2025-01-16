@@ -5,7 +5,7 @@ const queryUpdateIncidencias = `
   SET 
       tipo = IF(p_tipo IS NOT NULL AND p_tipo != '', p_tipo, tipo), 
       descripcion = IF(p_descripcion IS NOT NULL AND p_descripcion != '', p_descripcion, descripcion), 
-      fecha_creacion = IF(p_fecha IS NOT NULL, p_fecha, fecha_creacion)
+      fecha= IF(p_fecha IS NOT NULL, p_fecha, fecha)
   WHERE incidencia_id = i_id;
 `;
 
@@ -26,15 +26,15 @@ const queryGetIncidencia = `
 `;
 
 const queryCreateIncidencia = `
-    INSERT INTO incidencia (tipo, descripcion, trabajador_id, fecha_creacion)
-    VALUES (p_tipo, p_descripcion, p_trabajador_id, p_fecha_creacion);
+    INSERT INTO incidencia (tipo, descripcion, trabajador_id, fecha)
+    VALUES (p_tipo, p_descripcion, p_trabajador_id, p_fecha);
 `;
 
 const initProcedureCreateIncidencia = async () => {
   await createSp(
     "SP_CreateIncidencia",
     queryCreateIncidencia,
-    "IN p_tipo INT, IN p_descripcion TEXT, IN p_trabajador_id INT,  IN p_fecha_creacion DATETIME"
+    "IN p_tipo INT, IN p_descripcion TEXT, IN p_trabajador_id INT,  IN p_fecha DATETIME"
   );
 };
 
@@ -81,3 +81,4 @@ export const dropProcedureIncidencia = async () => {
   await eliminarProcedimiento("SP_DeleteIncidencia");
   await eliminarProcedimiento("SP_CreateIncidencia");
 };
+ 

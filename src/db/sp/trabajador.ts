@@ -1,43 +1,46 @@
 import { createSp, eliminarProcedimiento } from "../../util/funcion_sp";
 
 const queryGetReporteTrabajador = `
-SET @consulta = '
-    SELECT
-        u.trabajador_id,
-        u.nombre,
-        u.ap_paterno,
-        u.ap_materno,
-        u.telefono,
-        u.dni,
-        t.tienda,
-        h.horarios,
-        i.incidencias,
-        pg.pagos
-    FROM
-        trabajador u
-    LEFT JOIN
-        tienda t ON u.tienda_id = t.tienda_id
-    LEFT JOIN
-        (SELECT trabajador_id, GROUP_CONCAT(CONCAT("(", fecha, ", " , hora_entrada, ", ", hora_salida, ")") ORDER BY fecha DESC SEPARATOR ", ") AS horarios
-        FROM horario
-        GROUP BY trabajador_id) h ON u.trabajador_id = h.trabajador_id
-    LEFT JOIN
-        (SELECT trabajador_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ", ", fecha_creacion, ")") ORDER BY tipo SEPARATOR "; ") AS incidencias
-        FROM incidencia
-        GROUP BY trabajador_id) i ON u.trabajador_id = i.trabajador_id
-    LEFT JOIN
-        (SELECT trabajador_id, GROUP_CONCAT(DISTINCT CONCAT("(", fecha, ", " , montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
-        FROM pago
-        GROUP BY trabajador_id) pg ON u.trabajador_id = pg.trabajador_id
-    WHERE
-        u.trabajador_id = ?
-';
+SET @consulta = CONCAT(
+        'SELECT 
+            u.trabajador_id, 
+            u.nombre, 
+            u.ap_paterno, 
+            u.ap_materno, 
+            u.telefono, 
+            u.dni, 
+            t.tienda, 
+            h.horarios, 
+            i.incidencias, 
+            pg.pagos 
+        FROM 
+            trabajador u 
+        LEFT JOIN 
+            tienda t ON u.tienda_id = t.tienda_id 
+        LEFT JOIN 
+            (SELECT trabajador_id, GROUP_CONCAT(CONCAT("(", fecha, ", ", hora_entrada, ", ", hora_salida, ")") ORDER BY fecha DESC SEPARATOR ", ") AS horarios
+            FROM horario
+            WHERE ', filtrado_u, ' 
+            GROUP BY trabajador_id) h ON u.trabajador_id = h.trabajador_id 
+        LEFT JOIN 
+            (SELECT trabajador_id, GROUP_CONCAT(DISTINCT CONCAT("(", tipo, ", ", descripcion, ", ", fecha , ")") ORDER BY tipo SEPARATOR "; ") AS incidencias
+            FROM incidencia
+            WHERE ', filtrado_u, ' 
+            GROUP BY trabajador_id) i ON u.trabajador_id = i.trabajador_id 
+        LEFT JOIN 
+            (SELECT trabajador_id, GROUP_CONCAT(DISTINCT CONCAT("(", fecha, ", ", montoPagado, ", ", montoFaltante, ")") ORDER BY montoPagado SEPARATOR ", ") AS pagos
+            FROM pago
+            WHERE ', filtrado_u, ' 
+            GROUP BY trabajador_id) pg ON u.trabajador_id = pg.trabajador_id 
+        WHERE 
+            u.trabajador_id = ', u_id, ' 
+        ORDER BY u.trabajador_id;'
+    );
 
-SET @consulta = CONCAT(@consulta, ' ORDER BY u.trabajador_id;');
+    PREPARE stmt FROM @consulta;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
 
-PREPARE stmt FROM @consulta;
-EXECUTE stmt USING u_id;
-DEALLOCATE PREPARE stmt;
 `;
 
 const queryGetTrabajadores = `
@@ -95,6 +98,7 @@ SELECT
     trabajador.telefono,
     trabajador.tienda_id,
     trabajador.sueldo,
+    DATE_FORMAT(trabajador.fecha_nacimiento, '%d-%m-%Y') AS fecha_nacimiento,
     IFNULL((SELECT COUNT(*) 
             FROM incidencia 
             WHERE incidencia.trabajador_id = trabajador.trabajador_id), 0) AS total_incidencias,
@@ -159,7 +163,10 @@ const initProcedureGetReporteTrabajador = async () => {
   await createSp(
     "SP_ReporteTrabajador",
     queryGetReporteTrabajador,
-    "IN u_id INT"
+    `
+    IN u_id INT,
+    IN filtrado_u varchar(300)
+    `
   );
 };
 
