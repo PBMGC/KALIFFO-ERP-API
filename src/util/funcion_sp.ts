@@ -1,5 +1,6 @@
 import { executeDDL } from "./query";
 
+// Función para crear un procedimiento almacenado en la base de datos
 export const createSp = async (
   nombre: string,
   queryCodigo: string,
@@ -18,6 +19,7 @@ export const createSp = async (
   }
 };
 
+// Función para eliminar un procedimiento almacenado existente en la base de datos
 export const eliminarProcedimiento = async (nombre: string) => {
   try {
     const sql = `DROP PROCEDURE IF EXISTS ${nombre};`;

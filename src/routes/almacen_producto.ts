@@ -1,11 +1,19 @@
-import { Router } from "express";
-import { createAlmacen_Productos, getAlmacenProductos } from "../controller/almacen_productos";
+// Importa las dependencias necesarias
+import { Router } from "express"; // Router para definir rutas
+import {
+  createAlmacen_Productos,
+  getAlmacenProductos,
+} from "../controller/almacen_productos"; // Controladores para las operaciones del almacén
 
+// Crea una instancia del enrutador
 const router = Router();
 
-//
-router.get("/",getAlmacenProductos)
-router.post("/create",createAlmacen_Productos)
+// Define las rutas
+// Ruta para obtener productos del almacén
+router.get("/", getAlmacenProductos);
 
+// Ruta para crear un nuevo producto en el almacén
+router.post("/create", createAlmacen_Productos);
 
-export {router};
+// Exporta el enrutador
+export { router };

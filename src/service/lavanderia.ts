@@ -1,5 +1,6 @@
 import { query } from "../util/query";
 
+// Función para crear un registro de lavandería
 export const _createLavanderia = async (lavanderia: any) => {
   const {
     lote_id,
@@ -43,6 +44,7 @@ export const _createLavanderia = async (lavanderia: any) => {
   }
 };
 
+// Función para crear múltiples registros de lavandería a partir de un array
 export const _createLavanderiaArray = async (
   lote_id: string,
   detalles: any
@@ -123,6 +125,7 @@ export const _createLavanderiaArray = async (
   }
 };
 
+// Función para obtener un registro de lavandería por su ID
 export const _getLavanderia = async (lavanderia_id: number) => {
   const queryText = `SELECT * FROM lavanderia WHERE lavanderia_id = ?`;
 
@@ -154,6 +157,7 @@ export const _getLavanderia = async (lavanderia_id: number) => {
   }
 };
 
+// Función para obtener todos los registros de lavandería
 export const _getLavanderias = async () => {
   const queryText = `SELECT * FROM lavanderia`;
 
@@ -184,6 +188,7 @@ export const _getLavanderias = async () => {
   }
 };
 
+// Función para actualizar un registro de lavandería por su ID
 export const _updateLavanderia = async (
   lavanderia_id: number,
   lavanderia: any
@@ -243,6 +248,7 @@ export const _updateLavanderia = async (
   }
 };
 
+// Función para eliminar un registro de lavandería por su ID
 export const _deleteLavanderia = async (lavanderia_id: number) => {
   const queryText = `DELETE FROM lavanderia WHERE lavanderia_id = ?`;
 
@@ -273,6 +279,7 @@ export const _deleteLavanderia = async (lavanderia_id: number) => {
   }
 };
 
+// Función para gestionar el siguiente estado de lavandería por lote
 export const _sgteEstadoLavanderiaPorLote = async (
   lote_id: number,
   detalles: { lavanderia_id: number; cantidad_recibida: number }[]
@@ -447,6 +454,7 @@ export const _sgteEstadoLavanderiaPorLote = async (
   }
 };
 
+// Función para obtener registros de lavandería asociados a un lote específico
 export const _getLavanderiaPorLote = async (lote_id: number) => {
   try {
     const queryText = `

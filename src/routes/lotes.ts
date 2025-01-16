@@ -10,15 +10,16 @@ import { validateToken } from "../middleware/validateToken";
 
 const router = Router();
 
+// Middleware para validar roles de usuario (solo accesible por 'administrador' o 'produccion')
 const Validate = validateToken(["administrador", "produccion"]);
 router.use(Validate);
 
-//Rutas revisadas
-router.post("/create", ValidateCreateLote, createLote);
+// Rutas con lógica de validación y creación
+router.post("/create", ValidateCreateLote, createLote); // Crear un nuevo lote
 
-//Rutas sin revisar
-router.get("", getLotes);
-router.get("/productos/:lote_id", getLoteProductos);
-router.get("/:lote_id", getLote);
+// Rutas para obtener datos
+router.get("", getLotes); // Obtener todos los lotes
+router.get("/productos/:lote_id", getLoteProductos); // Obtener los productos para un lote específico
+router.get("/:lote_id", getLote); // Obtener un lote específico por su ID
 
 export { router };
