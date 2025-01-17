@@ -3,7 +3,7 @@ import { executeDDL } from "../../util/query";
 //Agrega estock a la tabla producto cuando agregas productosDetalle
 export const triggerInsertProductoDetalle = async () => {
   const trigger = `
-    CREATE TRIGGER TR_INS_productodetalle AFTER INSERT ON productodetalle
+    CREATE TRIGGER TR_INS_productoDetalle AFTER INSERT ON productoDetalle
     FOR EACH ROW BEGIN
         -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
         UPDATE producto 
@@ -20,7 +20,7 @@ export const triggerInsertProductoDetalle = async () => {
 };
 
 export const dropTriggerInsertProductoDetalle = async () => {
-  const trigger = `DROP TRIGGER IF EXISTS TR_INS_productodetalle;`;
+  const trigger = `DROP TRIGGER IF EXISTS TR_INS_productoDetalle;`;
 
   const result = await executeDDL(trigger);
   if (result.success) {

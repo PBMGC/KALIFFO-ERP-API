@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS pago (
   montoPagado DECIMAL(10, 2) NOT NULL,
   montoFaltante DECIMAL(10, 2) NOT NULL,
   fecha DATE NOT NULL,
-  estado INT NOT NULL,
+  estado INT NOT NULL DEFAULT 1,
   trabajador_id INT NOT NULL,
   INDEX I_fecha (fecha),
   INDEX I_estado (estado),

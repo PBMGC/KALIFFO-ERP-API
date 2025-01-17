@@ -22,7 +22,7 @@ const trabajadores: any = [
     nombre: "María",
     ap_paterno: "López",
     ap_materno: "Hernández",
-    fecha_nacimiento: "19*92-07-02",
+    fecha_nacimiento: "1992-07-02",
     dni: "65478932",
     telefono: "912345678",
     contraseña: "maria2021",

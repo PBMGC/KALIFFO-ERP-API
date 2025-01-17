@@ -1,4 +1,10 @@
 import {
+  droptriggerInsertCorte,
+  droptriggerUpdatecorte,
+  triggerInsertCorte,
+  triggerUpdatecorte,
+} from "./cortes";
+import {
   dropTriggerInsertProductoDetalle,
   dropTriggerRestaStockProducto,
   triggerInsertProductoDetalle,

@@ -27,7 +27,7 @@ IF t_id IS NOT NULL AND t_id != ' ' THEN
 END IF;
 
 PREPARE stmt FROM @consulta;
-EXECUTE stmt using p_id;
+EXECUTE stmt using @p_id;
 DEALLOCATE PREPARE stmt;
 `;
 
@@ -50,7 +50,7 @@ const queryGetColoresProducto = `
     END IF;
 
     PREPARE stmt FROM @consulta;
-    EXECUTE stmt USING p_id;
+    EXECUTE stmt USING @p_id;
     DEALLOCATE PREPARE stmt;
 `;
 // SP_GetColoresProducto

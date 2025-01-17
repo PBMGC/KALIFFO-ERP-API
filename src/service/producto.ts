@@ -423,3 +423,133 @@ export const _imprimirCodigo = async (res: any, lote_id: string) => {
     res.status(500).send("Error al generar el PDF");
   }
 };
+
+export const _loseProductos = async (tienda_id: number) => {
+  try {
+    const consulta = (await query(`CALL SP_GetLoseProductosTienda(?)`, [
+      tienda_id,
+    ])) as any;
+    return {
+      items: consulta.data[0],
+      success: true,
+      status: 202,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "_loseProductos",
+      success: false,
+      status: 404,
+    };
+  }
+};
+export const _getColoresProducto = async (producto_id: number) => {
+  try {
+    const consulta = (await query(`CALL SP_ColoresProductos(?);`, [
+      producto_id,
+    ])) as any;
+    console.log(consulta.data[0]);
+    return {
+      items: consulta.data[0],
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};
+export const _getDetalleProducto = async (
+  producto_id: number,
+  tienda_id: number,
+  talla: string,
+  tipo: string
+) => {
+  try {
+    let queryS: string;
+    let params: Array<number | string>;
+    if (tipo === "tiendas") {
+      queryS = `
+      SELECT tienda.tienda_id, tienda.tienda, SUM(productodetalle.stock) as "STOCK"
+      FROM productodetalle
+      INNER JOIN tienda ON tienda.tienda_id = productodetalle.tienda_id
+      WHERE productodetalle.producto_id=?
+      GROUP BY tienda.tienda;
+      `;
+      params = [producto_id];
+    } else if (tipo === "colores") {
+      queryS = `CALL SP_GetColoresProducto(?, ?);`;
+      params = [producto_id, tienda_id];
+    } else if (tipo === "tallas") {
+      if (talla) {
+        queryS = `
+          select productodetalle.color_id,color.nombre,productodetalle.stock from productodetalle 
+          INNER JOIN productotalla on productodetalle.productoDetalle_id = productotalla.productoDetalle_id 
+          inner join color on productodetalle.color_id = color.color_id 
+          where productodetalle.producto_id = ? AND productotalla.talla=?
+        `;
+        params = [producto_id, talla];
+      } else {
+        queryS = `
+        SELECT talla, COUNT(*) AS cantidad 
+        FROM productotalla 
+        WHERE productoDetalle_id IN (
+          SELECT productodetalle.productoDetalle_id 
+          FROM productodetalle 
+          WHERE producto_id=?
+        ) 
+        GROUP BY talla;
+      `;
+        params = [producto_id];
+      }
+    } else {
+      throw new Error("Tipo no válido");
+    }
+    const consulta = await query(queryS, params);
+    let data;
+    if (tipo === "colores") {
+      data = consulta.data[0];
+    } else {
+      data = consulta.data;
+    }
+    return {
+      items: data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error instanceof Error ? error.message : "Error desconocido",
+      success: false,
+      status: 500,
+    };
+  }
+};
+export const _getTallaProducto = async (detalle_id: number) => {
+  try {
+    const consulta = (await query(
+      `
+        SELECT talla, COUNT(*) AS cantidad FROM productotalla WHERE productoDetalle_id = ? GROUP BY talla;
+      `,
+      [detalle_id]
+    )) as any;
+    console.log(consulta.data);
+    return {
+      items: consulta.data,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: error,
+      success: false,
+      status: 500,
+    };
+  }
+};

@@ -1,4 +1,4 @@
-CREATE TRIGGER `TR_INS_productodetalle` AFTER INSERT ON `productodetalle`
+CREATE TRIGGER `TR_INS_productoDetalle` AFTER INSERT ON `productoDetalle`
  FOR EACH ROW BEGIN
         -- Actualizar el stock total del producto, restando el stock antiguo y sumando el nuevo
         UPDATE producto 
