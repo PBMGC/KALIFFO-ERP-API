@@ -18,14 +18,14 @@ import {
 import { handleHttp } from "../util/error.handler";
 
 export const createProducto = async (req: Request, res: Response) => {
-  const { nombre, stockTotal, precioBase, descuento } = req.body;
-
+  const { nombre, stockTotal, precioBase, descuento, estado = 1 } = req.body;
   try {
     const response = await _createProducto({
       nombre,
       stockTotal,
       precioBase,
       descuento,
+      estado
     });
     res.status(response.status).json(response);
   } catch (error) {
